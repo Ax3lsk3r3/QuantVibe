@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "qlib-signals": {
+      "command": "python",
+      "args": ["-m", "bridge.mcp_server"],
+      "cwd": ".",
+      "env": {
+        "QVB_SIGNALS_PATH": "artifacts/signals.json"
+      }
+    }
+  }
+}

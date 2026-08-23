@@ -1,0 +1,44 @@
+{
+  "project": "qlib-vibe-bridge",
+  "region": "us",
+  "universe": ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA", "JPM", "V", "XOM"],
+  "data": {
+    "raw_dir": "data/raw",
+    "qlib_dir": "data/qlib_data",
+    "start": "2021-01-01",
+    "end": "auto"
+  },
+  "training": {
+    "model": "lgbm",
+    "label": "Ref($close, -2) / Ref($close, -1) - 1",
+    "segments": {
+      "train": ["2021-01-04", "2024-06-30"],
+      "valid": ["2024-07-01", "2024-12-31"],
+      "test": ["2025-01-02", "2026-08-21"]
+    },
+    "handler_kwargs": {
+      "instruments": "all"
+    },
+    "lgbm_kwargs": {
+      "loss": "mse",
+      "colsample_bytree": 0.8879,
+      "learning_rate": 0.0421,
+      "subsample": 0.8789,
+      "lambda_l1": 205.6999,
+      "lambda_l2": 580.9768,
+      "max_depth": 8,
+      "num_leaves": 210,
+      "num_threads": 8
+    },
+    "momentum_window": 20
+  },
+  "signals": {
+    "top_k": 5,
+    "horizon_days": 1
+  },
+  "execution": {
+    "total_notional": 10000.0,
+    "currency": "USD",
+    "action": "BUY"
+  }
+}

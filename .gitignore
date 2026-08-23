@@ -1,0 +1,6 @@
+venvs/
+data/
+artifacts/
+__pycache__/
+*.pyc
+.pytest_cache/
