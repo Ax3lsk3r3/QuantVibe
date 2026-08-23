@@ -64,7 +64,7 @@ def main() -> int:
     if unknown:
         parser.error(f"unknown steps: {unknown}")
 
-    print(f"qlib-vibe-bridge pipeline | root={PROJECT_ROOT}")
+    print(f"QuantVibe pipeline | root={PROJECT_ROOT}")
     for step in steps:
         rc = run_step(step, args.config, args.force_demo, args.python)
         if rc != 0:

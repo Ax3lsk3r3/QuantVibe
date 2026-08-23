@@ -1,5 +1,5 @@
 {
-  "project": "qlib-vibe-bridge",
+  "project": "QuantVibe",
   "region": "us",
   "universe": ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA", "JPM", "V", "XOM"],
   "data": {

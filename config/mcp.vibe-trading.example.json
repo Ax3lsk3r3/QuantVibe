@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "qlib-signals": {
+    "quantvibe-signals": {
       "command": "python",
       "args": ["-m", "bridge.mcp_server"],
       "cwd": ".",

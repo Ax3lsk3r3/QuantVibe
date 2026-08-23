@@ -1,4 +1,4 @@
-# qlib-vibe-bridge environment setup (Windows PowerShell)
+# QuantVibe environment setup (Windows PowerShell)
 # Creates two isolated venvs and installs dependencies.
 #
 #   venvs\qlib  -> pyqlib + yfinance      (research side; needs Python 3.11/3.12)

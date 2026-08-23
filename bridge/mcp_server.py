@@ -23,7 +23,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SIGNALS_PATH = Path(os.environ.get("QVB_SIGNALS_PATH", PROJECT_ROOT / "artifacts" / "signals.json"))
 
 mcp = FastMCP(
-    "qlib-signals",
+    "quantvibe-signals",
     instructions=(
         "Read-only access to stock-selection signals produced by a Qlib ML model. "
         "Call get_latest_signals before any trading decision; scores are cross-sectional "
