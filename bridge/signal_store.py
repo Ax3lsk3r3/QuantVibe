@@ -147,7 +147,7 @@ def write_signals(path: os.PathLike | str, payload: Dict[str, Any]) -> Path:
 def load_signals(path: os.PathLike | str, verify_checksum: bool = True) -> Dict[str, Any]:
     out = Path(path)
     if not out.is_file():
-        raise FileNotFoundError(f"signals file not found: {out}")
+        raise FileNotFoundError(f"archivo de señales no encontrado: {out}")
     with open(out, "r", encoding="utf-8") as fh:
         payload = json.load(fh)
     stored = payload.get("checksum")
@@ -157,7 +157,7 @@ def load_signals(path: os.PathLike | str, verify_checksum: bool = True) -> Dict[
         expected = checksum_of(payload)
         if not hmac.compare_digest(stored, expected):
             raise SignalValidationError(
-                "checksum mismatch: the signals file was modified after being written"
+                "checksum no coincide: el archivo de señales fue modificado después de escribirse"
             )
     else:
         payload.pop("checksum", None)
@@ -169,7 +169,7 @@ def summary(payload: Dict[str, Any]) -> str:
     lines = [
         f"model={payload['source_model']} as_of={payload['as_of']} "
         f"data={payload['metadata'].get('data_source', 'unknown')}",
-        f"top_{len(payload['signals'])} of universe({len(payload['universe'])}):",
+        f"top_{len(payload['signals'])} del universo({len(payload['universe'])}):",
     ]
     for s in sorted(payload["signals"], key=lambda x: x["rank"]):
         lines.append(f"  #{s['rank']:<2} {s['instrument']:<6} score={s['score']:+.6f}")

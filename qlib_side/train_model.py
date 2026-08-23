@@ -28,7 +28,7 @@ def _demo_momentum(cfg) -> "object":
         score = float(closes.iloc[-1] / closes.iloc[-1 - window] - 1.0)
         rows.append({"datetime": str(df["date"].iloc[-1]), "instrument": symbol, "score": score})
     if not rows:
-        fail("no raw data found for demo mode; run qlib_side.prepare_data first")
+        fail("no se encontraron datos crudos para el modo demo; ejecuta qlib_side.prepare_data primero")
     return normalize_predictions(pd.DataFrame(rows))
 
 
@@ -85,13 +85,13 @@ def train(config_path: str | None = None, force_demo: bool | None = None):
         try:
             import qlib  # noqa: F401
 
-            print("  Qlib detected -> training LGBModel (this may take a few minutes)")
+            print("  Qlib detectado -> entrenando LGBModel (puede tardar unos minutos)")
             pred = _train_qlib(cfg)
         except ImportError:
-            print("  pyqlib not installed -> falling back to DemoMomentum")
+            print("  pyqlib no instalado -> usando DemoMomentum")
             demo = True
         except Exception as exc:
-            print(f"  Qlib training failed ({exc}) -> falling back to DemoMomentum")
+            print(f"  entrenamiento con Qlib falló ({exc}) -> usando DemoMomentum")
             demo = True
     if pred is None:
         source_model = "DemoMomentum"
@@ -122,12 +122,12 @@ def train(config_path: str | None = None, force_demo: bool | None = None):
             fh,
             indent=2,
         )
-    print(f"  predictions written: {out_csv} rows={len(pred)} model={source_model}")
+    print(f"  predicciones escritas: {out_csv} filas={len(pred)} modelo={source_model}")
     return out_csv
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train the signal model (Qlib or demo fallback)")
+    parser = argparse.ArgumentParser(description="Entrena el modelo de señales (Qlib o fallback demo)")
     parser.add_argument("--config", default=None)
     parser.add_argument("--force-demo", action="store_true")
     args = parser.parse_args()
@@ -136,4 +136,4 @@ if __name__ == "__main__":
     except SystemExit:
         raise
     except Exception as exc:
-        fail(f"train_model failed: {exc}")
+        fail(f"train_model falló: {exc}")

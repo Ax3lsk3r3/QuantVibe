@@ -1,106 +1,91 @@
 # QuantVibe
 
-[English](README.md) | [EspaÃ±ol](README_es.md)
+**Usa [Qlib](https://github.com/microsoft/qlib) como cerebro cuant y [Vibe-Trading](https://github.com/HKUDS/Vibe-Trading) como manos.**
 
-**Use [Qlib](https://github.com/microsoft/qlib) as the quant brain and [Vibe-Trading](https://github.com/HKUDS/Vibe-Trading) as the hands.**
+`QuantVibe` es un pequeño proyecto de integración que conecta dos herramientas existentes sin hacer fork de ninguna:
 
-`QuantVibe` is a small integration project that connects two existing tools without forking either of them:
+- **Qlib** (Microsoft) entrena un modelo ML con datos de mercado y produce scores de acciones.
+- **Vibe-Trading** (HKUDS) es un agente de trading basado en LLM que lee esos scores vía un servidor MCP read-only y actúa sobre ellos (paper trading primero).
 
-- **Qlib** (Microsoft) trains an ML model on market data and produces cross-sectional stock scores.
-- **Vibe-Trading** (HKUDS) is an LLM trading agent that can read those scores through a read-only MCP server and act on them (paper trading first).
-
-The bridge itself is ~600 lines of dependency-light Python:
+El puente son ~600 líneas de Python sin dependencias pesadas:
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Qlib side (own venv) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”      â”Œâ”€â”€â”€â”€â”€â”€â”€â”€ Vibe-Trading side (own venv) â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                                              â”‚      â”‚                                              â”‚
-â”‚  prepare_data    OHLCV -> Qlib binary format â”‚      â”‚  LLM agent (MCP client)                      â”‚
-â”‚       â†“                                      â”‚ MCP  â”‚       â†“                                      â”‚
-â”‚  train_model     LGBModel (or demo fallback) â”‚â”€â”€â”€â”€â”€â†’â”‚  get_latest_signals()                        â”‚
-â”‚       â†“                                      â”‚ stdioâ”‚       â†“                                      â”‚
-â”‚  export_signals  top-k + SHA-256 checksum    â”‚      â”‚  execute_signals   order plan (paper)        â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜      â”‚       â†“                                      â”‚
-                                                      â”‚  shadow account â†’ broker                     â”‚
-                                                      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌──────────── Lado Qlib (venv propio) ─────────┐      ┌───── Lado Vibe-Trading (venv propio) ────────┐
+│                                              │      │                                              │
+│  prepare_data    OHLCV -> formato Qlib       │      │  Agente LLM (cliente MCP)                    │
+│       ↓                                      │ MCP  │       ↓                                      │
+│  train_model     LGBModel (o demo fallback)  │─────→│  get_latest_signals()                        │
+│       ↓                                      │ stdio│       ↓                                      │
+│  export_signals  top-k + checksum SHA-256    │      │  execute_signals   plan de órdenes (paper)   │
+└──────────────────────────────────────────────┘      │       ↓                                      │
+                                                      │  cuenta sombra → broker                      │
+                                                      └──────────────────────────────────────────────┘
 ```
 
-The two worlds **never import each other**. They communicate through one signed file
-(`artifacts/signals.json`, tamper-evident via checksum) and a stdio MCP server. Each side
-lives in its own virtualenv, so the very different dependency trees never collide.
+Los dos mundos **nunca se importan entre sí**: se comunican por un archivo firmado (`artifacts/signals.json`, a prueba de manipulación vía checksum) y un servidor MCP stdio. Cada lado vive en su propio venv, así los árboles de dependencias nunca chocan.
 
-## Features
+## Características
 
-- **One-command demo** that runs end-to-end with no external services: synthetic GBM market
-  data + momentum scoring fallback when pyqlib/yfinance are not installed.
-- **Real mode**: yfinance download â†’ `qlib.scripts.dump_bin` conversion â†’ Alpha158 features â†’
-  LGBModel training â†’ predictions.
-- **Signed signals contract**: schema validation, contiguous ranking, finite-score checks and
-  a SHA-256 checksum over the canonical JSON â€” any post-hoc edit is rejected by the consumer.
-- **MCP server** (`bridge/mcp_server.py`) exposing three read-only tools:
-  `get_latest_signals`, `list_universe`, `signal_health` (staleness gate).
-- **Execution guardrails**: `execute_signals.py` only writes an *order plan* by default.
-  Real submission requires BOTH `--submit` AND the env flag `VIBE_ALLOW_ORDERS=1`.
-- **Provenance tracking**: whether each symbol came from yfinance or from the synthetic
-  generator travels inside `manifest.json` â†’ `signals.json`.
+- **Demo con un comando** que corre end-to-end sin servicios externos: datos sintéticos GBM + fallback de momentum cuando pyqlib/yfinance no están instalados.
+- **Modo real**: descarga yfinance → conversión `qlib.scripts.dump_bin` → features Alpha158 → entrenamiento LGBModel → predicciones.
+- **Contrato de señales firmado**: validación de esquema, ranking contiguo, scores finitos y checksum SHA-256 sobre el JSON canónico — cualquier edición posterior es rechazada.
+- **Servidor MCP** (`bridge/mcp_server.py`) con tres tools read-only: `get_latest_signals`, `list_universe`, `signal_health` (control de frescura).
+- **Guardarraíles de ejecución**: `execute_signals.py` solo escribe un *plan de órdenes* por defecto. Enviar órdenes reales exige `--submit` Y la variable `VIBE_ALLOW_ORDERS=1`.
+- **Trazabilidad de procedencia**: si cada símbolo vino de yfinance o del generador sintético viaja en `manifest.json` → `signals.json`.
 
-## Project layout
+## Estructura
 
 ```
-config/pipeline.json          universe, date ranges, train/valid/test segments, top_k, notional
-config/mcp.vibe-trading.example.json  how to register this MCP server in a Vibe-Trading agent
-bridge/signal_store.py        signal schema + validation + checksums (pure Python)
-bridge/mcp_server.py          FastMCP stdio server (works with mcp SDK 1.x or fastmcp)
-qlib_side/prepare_data.py     yfinance (or synthetic) -> CSV -> Qlib binary format
-qlib_side/train_model.py      Qlib LGBModel; automatic DemoMomentum fallback
-qlib_side/export_signals.py   predictions.csv -> verified signals.json
-vibe_side/execute_signals.py  signals -> equal-weight order plan; guarded submit hook
-scripts/run_pipeline.py       end-to-end orchestrator (picks the right venv per step)
-scripts/setup.ps1             creates venvs\qlib and venvs\vibe, installs deps
-tests/                        unittest suite for the bridge (checksum, top-k, validation)
+config/pipeline.json          universo, fechas, segmentos train/valid/test, top_k, notional
+config/mcp.vibe-trading.example.json  registro del servidor MCP en el agente Vibe-Trading
+bridge/signal_store.py        esquema + validación + checksums (Python puro)
+bridge/mcp_server.py          servidor FastMCP stdio (compatible mcp SDK 1.x o fastmcp)
+qlib_side/prepare_data.py     yfinance (o sintético) -> CSV -> formato binario de Qlib
+qlib_side/train_model.py      LGBModel de Qlib; fallback automático DemoMomentum
+qlib_side/export_signals.py   predictions.csv -> signals.json verificado
+vibe_side/execute_signals.py  señales -> plan equal-weight; submit con doble guardia
+scripts/run_pipeline.py       orquestador end-to-end (elige el venv correcto por paso)
+scripts/setup.ps1             crea venvs\qlib y venvs\vibe e instala dependencias
+tests/                        suite unittest del puente (checksum, top-k, validación)
 ```
 
-## Quick start
+## Inicio rápido
 
-Requirements: Python â‰¥ 3.10 with `pandas` for demo mode. Nothing else.
+Requisitos: Python ≥ 3.10 con `pandas` para modo demo. Nada más.
 
 ```powershell
 git clone https://github.com/Ax3lsk3r3/QuantVibe.git
 cd QuantVibe
 
-# run the test suite
 python -m unittest discover -s tests
 
-# full pipeline in demo mode (no installs needed beyond pandas/numpy)
+# pipeline completo en modo demo (solo hace falta pandas/numpy)
 python scripts/run_pipeline.py --force-demo
 ```
 
-Output you get:
+Salidas:
 
-- `artifacts/signals.json` â€” signed top-k signals consumed by the agent/MCP tools
-- `artifacts/orders_plan.json` â€” equal-weight paper order plan (`dry_run: true`)
-- `data/raw/*.csv` â€” per-symbol OHLCV + `manifest.json` provenance
+- `artifacts/signals.json` — señales top-k firmadas que consume el agente/MCP
+- `artifacts/orders_plan.json` — plan de órdenes paper equal-weight (`dry_run: true`)
+- `data/raw/*.csv` — OHLCV por símbolo + procedencia en `manifest.json`
 
-## Full setup (real data + real model)
+## Setup completo (datos reales + modelo real)
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts/setup.ps1
 python scripts/run_pipeline.py
 ```
 
-`setup.ps1` builds two isolated environments:
-
-| venv | contents | Python |
-|------|----------|--------|
-| `venvs\qlib` | `pyqlib`, `yfinance` | **3.10â€“3.12 required** (pyqlib does not build on 3.13+) |
+| venv | contenido | Python |
+|------|-----------|--------|
+| `venvs\qlib` | `pyqlib`, `yfinance` | **3.10–3.12 obligatorio** (pyqlib no compila en 3.13+) |
 | `venvs\vibe` | `vibe-trading-ai` | 3.11+ |
 
-Without a compatible interpreter for Qlib, everything still runs via the demo fallback â€”
-the pipeline prints which mode it used.
+Sin intérprete compatible para Qlib todo sigue funcionando con el fallback demo — el pipeline indica qué modo usó.
 
-## Wiring the Vibe-Trading agent
+## Conectar el agente de Vibe-Trading
 
-Register the MCP server (example in `config/mcp.vibe-trading.example.json`; check exact key
-names against your Vibe-Trading version):
+Registra el servidor MCP (ejemplo en `config/mcp.vibe-trading.example.json`; verifica los nombres exactos contra tu versión de Vibe-Trading):
 
 ```jsonc
 {
@@ -108,37 +93,36 @@ names against your Vibe-Trading version):
     "quantvibe-signals": {
       "command": "python",
       "args": ["-m", "bridge.mcp_server"],
-      "cwd": "<path-to-this-repo>"
+      "cwd": "<ruta-a-este-repo>"
     }
   }
 }
 ```
 
-Recommended agent loop:
+Flujo recomendado del agente:
 
-1. `signal_health` â€” are the signals fresh (< N hours)?
-2. `get_latest_signals` â€” read ranks/scores and reason about them (news, risk, sizing).
-3. Execute or hand off only the reviewed plan.
+1. `signal_health` — ¿las señales son frescas (< N horas)?
+2. `get_latest_signals` — leer ranks/scores y razonar sobre ellos (noticias, riesgo, tamaño).
+3. Ejecutar o entregar solo el plan revisado.
 
-## Going live (when ready)
+## Pasar a real (cuando estés listo)
 
-By design nothing ever reaches a broker implicitly:
+Por diseño nada llega a un broker implícitamente:
 
 ```powershell
 $env:VIBE_ALLOW_ORDERS = "1"
-python -m vibe_side.execute_signals --submit --order-cmd-template "<your broker CLI> {symbol} {qty}"
+python -m vibe_side.execute_signals --submit --order-cmd-template "<CLI de tu broker> {symbol} {qty}"
 ```
 
-Missing either barrier â†’ exit code 2, no orders. Start with Vibe-Trading's shadow/paper
-account and review several sessions before even thinking about real money.
+Falta cualquiera de las dos barreras → exit code 2, cero órdenes. Empieza con la cuenta sombra/paper de Vibe-Trading y revisa varias sesiones antes de pensar en dinero real.
 
-## Signal file format
+## Formato del archivo de señales
 
 ```jsonc
 {
   "schema_version": 1,
   "generated_at": "2026-08-23T19:33:05+00:00",
-  "source_model": "LGBModel",           // or DemoMomentum
+  "source_model": "LGBModel",           // o DemoMomentum
   "as_of": "2026-08-21",
   "horizon_days": 1,
   "universe": ["AAPL", "..."],
@@ -146,24 +130,20 @@ account and review several sessions before even thinking about real money.
     { "instrument": "AAPL", "score": 0.109, "rank": 1 }
   ],
   "metadata": { "data_source": "yfinance", "top_k": 5, "test_window": ["...", "..."] },
-  "checksum": "sha256 over the canonical JSON above"  // verified by every consumer
+  "checksum": "sha256 sobre el JSON canónico"  // verificado por cada consumidor
 }
 ```
 
-## Troubleshooting
+## Solución de problemas
 
-- **`pyqlib` install fails** â†’ you are on Python 3.13/3.14. Create the qlib venv with
-  `py -3.12` (the setup script tries 3.12/3.11/3.10 automatically).
-- **`No MCP server runtime found`** â†’ in the environment that runs the MCP server:
-  `pip install "mcp>=1.2,<2"` or `pip install fastmcp`.
-- **yfinance rate-limits** â†’ the affected symbols fall back to synthetic data and it is
-  declared in `manifest.json`; delete `data/raw` and retry later for clean data.
+- **La instalación de `pyqlib` falla** → estás en Python 3.13/3.14. Crea el venv con `py -3.12` (el setup prueba 3.12/3.11/3.10 automáticamente).
+- **`No MCP server runtime found`** → en el entorno que ejecuta el servidor MCP: `pip install "mcp>=1.2,<2"` o `pip install fastmcp`.
+- **Rate-limits de yfinance** → los símbolos afectados caen a datos sintéticos y queda declarado en `manifest.json`; borra `data/raw` y reintenta luego para datos limpios.
 
-## Disclaimer
+## Aviso
 
-Educational software. Not financial advice. Model scores are not predictions you should
-trust with money; backtests overfit; LLM agents make mistakes. Use paper trading.
+Software educativo. No es asesoría financiera. Los scores no son predicciones para confiarle dinero; los backtests sobreajustan; los agentes LLM se equivocan. Usa paper trading.
 
-## License
+## Licencia
 
-MIT â€” see [LICENSE](LICENSE).
+MIT — ver [LICENSE](LICENSE).

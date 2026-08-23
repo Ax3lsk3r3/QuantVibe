@@ -109,7 +109,7 @@ def prepare(config_path: str | None = None, force_synthetic: bool = False) -> Pa
             "first": str(frame["date"].iloc[0]),
             "last": str(frame["date"].iloc[-1]),
         }
-        print(f"  {symbol:<6} {source:<9} rows={len(frame):>5} {frame['date'].iloc[0]}..{frame['date'].iloc[-1]}")
+        print(f"  {symbol:<6} {source:<9} filas={len(frame):>5} {frame['date'].iloc[0]}..{frame['date'].iloc[-1]}")
 
     manifest_path = raw_dir / "manifest.json"
     with open(manifest_path, "w", encoding="utf-8") as fh:
@@ -134,26 +134,26 @@ def prepare(config_path: str | None = None, force_synthetic: bool = False) -> Pa
         except TypeError:
             pass
         except Exception as exc:
-            print(f"  qlib dump failed: {exc}")
+            print(f"  fallo el dump de qlib: {exc}")
     if dump_ok:
-        print(f"  qlib format written to {qlib_dir}")
+        print(f"  formato qlib escrito en {qlib_dir}")
     else:
         print(
-            "  qlib not available or dump failed; CSVs kept at "
-            f"{raw_dir} (demo/paper flow still works)"
+            "  qlib no disponible o el dump falló; CSVs conservados en "
+            f"{raw_dir} (el flujo demo/paper sigue funcionando)"
         )
     return manifest_path
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Download market data and convert to Qlib format")
+    parser = argparse.ArgumentParser(description="Descarga datos de mercado y los convierte al formato de Qlib")
     parser.add_argument("--config", default=None)
     parser.add_argument("--force-synthetic", action="store_true")
     args = parser.parse_args()
     try:
         prepare(args.config, args.force_synthetic)
     except Exception as exc:
-        fail(f"prepare_data failed: {exc}")
+        fail(f"prepare_data falló: {exc}")
 
 
 if __name__ == "__main__":

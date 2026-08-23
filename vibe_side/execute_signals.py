@@ -57,12 +57,12 @@ def build_plan(cfg_path: str, signals_path: Path) -> dict:
             "signals_checksum": payload.get("checksum"),
         }
         if price is None or price <= 0:
-            entry.update({"status": "SKIPPED", "reason": "no_price_data"})
+            entry.update({"status": "SKIPPED", "reason": "sin_datos_de_precio"})
             orders.append(entry)
             continue
         qty = int(per_name // price)
         if qty < 1:
-            entry.update({"status": "SKIPPED", "reason": "insufficient_notional", "est_price": price})
+            entry.update({"status": "SKIPPED", "reason": "notional_insuficiente", "est_price": price})
             orders.append(entry)
             continue
         entry.update(
@@ -98,10 +98,10 @@ def build_plan(cfg_path: str, signals_path: Path) -> dict:
 def submit(plan_path: Path, order_cmd_template: str) -> int:
     if os.environ.get("VIBE_ALLOW_ORDERS", "").strip() != "1":
         print(
-            "[GUARD] Real submission is disabled.\n"
-            "         Set VIBE_ALLOW_ORDERS=1 AND pass --order-cmd-template to enable it.\n"
-            "         Recommended: keep paper trading (shadow account) until the plan\n"
-            "         has been reviewed across several sessions.",
+            "[GUARDIA] El envío real está deshabilitado.\n"
+            "         Configura VIBE_ALLOW_ORDERS=1 Y pasa --order-cmd-template para activarlo.\n"
+            "         Recomendado: mantén paper trading (cuenta sombra) hasta revisar el plan\n"
+            "         a lo largo de varias sesiones.",
             file=sys.stderr,
         )
         return 2
@@ -117,7 +117,7 @@ def submit(plan_path: Path, order_cmd_template: str) -> int:
             )
             for tok in shlex.split(order_cmd_template, posix=False)
         ]
-        print(f"[ORDER] {' '.join(argv)}")
+        print(f"[ORDEN] {' '.join(argv)}")
         result = subprocess.run(argv)
         if result.returncode != 0:
             rc = result.returncode
@@ -126,7 +126,7 @@ def submit(plan_path: Path, order_cmd_template: str) -> int:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Turn verified Qlib signals into an order plan for the Vibe-Trading agent (paper by default)"
+        description="Convierte señales verificadas de Qlib en un plan de órdenes para el agente Vibe-Trading (paper por defecto)"
     )
     parser.add_argument("--config", default=None)
     parser.add_argument("--signals", default=str(DEFAULT_SIGNALS))
@@ -134,12 +134,12 @@ def main() -> None:
     parser.add_argument(
         "--submit",
         action="store_true",
-        help="execute orders via --order-cmd-template (requires VIBE_ALLOW_ORDERS=1)",
+        help="ejecuta las órdenes vía --order-cmd-template (requiere VIBE_ALLOW_ORDERS=1)",
     )
     parser.add_argument(
         "--order-cmd-template",
         default=None,
-        help="broker CLI template, e.g. 'vibe-trading trade buy {symbol} {qty}'",
+        help="plantilla CLI del broker, ej. 'vibe-trading trade buy {symbol} {qty}'",
     )
     args = parser.parse_args()
 
@@ -150,10 +150,10 @@ def main() -> None:
     try:
         plan = build_plan(args.config, signals_path)
     except FileNotFoundError as exc:
-        print(f"[ERROR] {exc}\nRun scripts/run_pipeline.py first.", file=sys.stderr)
+        print(f"[ERROR] {exc}\nEjecuta scripts/run_pipeline.py primero.", file=sys.stderr)
         raise SystemExit(1)
     except Exception as exc:
-        print(f"[ERROR] could not build plan: {exc}", file=sys.stderr)
+        print(f"[ERROR] no se pudo construir el plan: {exc}", file=sys.stderr)
         raise SystemExit(1)
 
     out_path = Path(args.out)
@@ -163,19 +163,19 @@ def main() -> None:
     with open(out_path, "w", encoding="utf-8") as fh:
         json.dump(plan, fh, indent=2)
 
-    print(f"Order plan ({plan['totals']['planned_orders']} planned / "
-          f"{plan['totals']['skipped_orders']} skipped):")
+    print(f"Plan de órdenes ({plan['totals']['planned_orders']} planeadas / "
+          f"{plan['totals']['skipped_orders']} omitidas):")
     for o in plan["orders"]:
         if o["status"] == "PLANNED":
             print(f"  {o['action']:<4} {o['instrument']:<6} qty={o['qty']:>4} "
                   f"@ ~{o['est_price']:.2f} (rank #{o['rank']})")
         else:
             print(f"  SKIP  {o['instrument']:<6} {o['reason']}")
-    print(f"\nPlan written: {out_path} (dry_run={plan['dry_run']})")
+    print(f"\nPlan escrito: {out_path} (dry_run={plan['dry_run']})")
 
     if args.submit:
         if not args.order_cmd_template:
-            print("[ERROR] --submit requires --order-cmd-template", file=sys.stderr)
+            print("[ERROR] --submit requiere --order-cmd-template", file=sys.stderr)
             raise SystemExit(2)
         raise SystemExit(submit(out_path, args.order_cmd_template))
 

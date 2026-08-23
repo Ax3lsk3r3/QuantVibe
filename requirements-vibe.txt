@@ -1,2 +1,2 @@
-# Agent/execution side
+# Lado agente/ejecución
 vibe-trading-ai

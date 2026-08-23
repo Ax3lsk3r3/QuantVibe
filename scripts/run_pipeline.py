@@ -51,12 +51,12 @@ def run_step(step: str, config: str | None, force_demo: bool, python_override: s
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="End-to-end pipeline: data -> model -> signals -> order plan"
+        description="Pipeline end-to-end: datos -> modelo -> señales -> plan de órdenes"
     )
     parser.add_argument("--config", default=None)
-    parser.add_argument("--steps", default=",".join(STEPS), help="comma-separated subset of: " + ",".join(STEPS))
-    parser.add_argument("--force-demo", action="store_true", help="skip Qlib training and use the momentum demo model")
-    parser.add_argument("--python", default=None, help="interpreter override for every step")
+    parser.add_argument("--steps", default=",".join(STEPS), help="subconjunto separado por comas de: " + ",".join(STEPS))
+    parser.add_argument("--force-demo", action="store_true", help="omite el entrenamiento con Qlib y usa el modelo demo de momentum")
+    parser.add_argument("--python", default=None, help="intérprete alternativo para todos los pasos")
     args = parser.parse_args()
 
     steps = [s.strip() for s in args.steps.split(",") if s.strip()]
@@ -68,13 +68,13 @@ def main() -> int:
     for step in steps:
         rc = run_step(step, args.config, args.force_demo, args.python)
         if rc != 0:
-            print(f"\n[ABORT] step '{step}' exited with code {rc}")
+            print(f"\n[ABORTE] el paso '{step}' terminó con código {rc}")
             return rc
     print(
-        "\nPipeline finished.\n"
-        f"  signals:     {PROJECT_ROOT / 'artifacts' / 'signals.json'}\n"
-        f"  order plan:  {PROJECT_ROOT / 'artifacts' / 'orders_plan.json'}\n"
-        "Next: point the Vibe-Trading agent at the MCP server (config/mcp.vibe-trading.example.json)"
+        "\nPipeline terminado.\n"
+        f"  señales:     {PROJECT_ROOT / 'artifacts' / 'signals.json'}\n"
+        f"  plan de órdenes: {PROJECT_ROOT / 'artifacts' / 'orders_plan.json'}\n"
+        "Siguiente paso: apunta el agente Vibe-Trading al servidor MCP (config/mcp.vibe-trading.example.json)"
     )
     return 0
 

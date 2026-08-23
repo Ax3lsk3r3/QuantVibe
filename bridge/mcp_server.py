@@ -12,9 +12,9 @@ except ImportError:
         from fastmcp import FastMCP
     except ImportError as exc:
         raise ImportError(
-            "No MCP server runtime found. Install one of:\n"
-            '  pip install "mcp>=1.2,<2"   (official SDK, FastMCP bundled)\n'
-            "  pip install fastmcp         (standalone FastMCP)"
+            "No se encontró un runtime de servidor MCP. Instala uno de:\n"
+            '  pip install "mcp>=1.2,<2"   (SDK oficial, incluye FastMCP)\n'
+            "  pip install fastmcp         (FastMCP independiente)"
         ) from exc
 
 from bridge.signal_store import load_signals
@@ -25,9 +25,9 @@ SIGNALS_PATH = Path(os.environ.get("QVB_SIGNALS_PATH", PROJECT_ROOT / "artifacts
 mcp = FastMCP(
     "quantvibe-signals",
     instructions=(
-        "Read-only access to stock-selection signals produced by a Qlib ML model. "
-        "Call get_latest_signals before any trading decision; scores are cross-sectional "
-        "(higher is better) and refresh after each pipeline run."
+        "Acceso read-only a señales de selección de acciones producidas por un modelo ML de Qlib. "
+        "Llama get_latest_signals antes de cualquier decisión de trading; los scores son "
+        "transversales (mayor es mejor) y se refrescan con cada ejecución del pipeline."
     ),
 )
 
@@ -37,7 +37,7 @@ def _load() -> Dict[str, Any]:
 
 
 def get_latest_signals(top_n: int = 0) -> Dict[str, Any]:
-    """Latest model signals: as_of date, source model and ranked instruments (top_n=0 for all)."""
+    """Señales más recientes del modelo: fecha as_of, modelo origen e instrumentos rankeados (top_n=0 para todos)."""
     payload = _load()
     signals: List[Dict[str, Any]] = sorted(payload["signals"], key=lambda s: s["rank"])
     if top_n > 0:
@@ -57,7 +57,7 @@ def get_latest_signals(top_n: int = 0) -> Dict[str, Any]:
 
 
 def list_universe() -> Dict[str, Any]:
-    """Instruments tracked by the research pipeline."""
+    """Instrumentos seguidos por el pipeline de investigación."""
     payload = _load()
     return {
         "universe": payload["universe"],
@@ -67,7 +67,7 @@ def list_universe() -> Dict[str, Any]:
 
 
 def signal_health(max_age_hours: float = 24.0) -> Dict[str, Any]:
-    """Freshness check for the signals file: exists, checksum-valid and age in hours."""
+    """Chequeo de frescura del archivo de señales: existe, checksum válido y edad en horas."""
     result: Dict[str, Any] = {"path": str(SIGNALS_PATH)}
     if not SIGNALS_PATH.is_file():
         result.update({"ok": False, "reason": "missing_file"})
