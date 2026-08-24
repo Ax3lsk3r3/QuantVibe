@@ -1,0 +1,10 @@
+[tool.ruff]
+line-length = 110
+extend-exclude = ["vendor", "venvs", "data", "artifacts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]
+
+[tool.coverage.run]
+branch = true

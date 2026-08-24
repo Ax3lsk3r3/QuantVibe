@@ -1,6 +1,11 @@
 # QuantVibe
 
-![CI](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml/badge.svg)](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml)
+[![Cobertura](https://codecov.io/gh/Ax3lsk3r3/QuantVibe/branch/main/graph/badge.svg)](https://codecov.io/gh/Ax3lsk3r3/QuantVibe)
+[![Estilo: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue?logo=python&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fax3lsk3r3%2Fquantvibe-2496ED?logo=docker&logoColor=white)
+[![Licencia: MIT](https://img.shields.io/badge/Licencia-MIT-yellow.svg)](LICENSE)
 
 **Usa [Qlib](https://github.com/microsoft/qlib) como cerebro cuant y [Vibe-Trading](https://github.com/HKUDS/Vibe-Trading) como manos.**
 
@@ -124,9 +129,23 @@ docker compose run --rm pipeline          # pipeline completo con datos/modelo r
 docker compose up -d signals-mcp          # MCP vía SSE en http://localhost:8000/sse
 ```
 
+También hay una imagen preconstruida en GitHub Container Registry, publicada
+automáticamente con cada cambio en `main`:
+
+```bash
+docker pull ghcr.io/ax3lsk3r3/quantvibe:latest
+docker run --rm -v ./data:/app/data -v ./artifacts:/app/artifacts ghcr.io/ax3lsk3r3/quantvibe:latest python scripts/run_pipeline.py --force-demo
+```
+
 `./data` y `./artifacts` están montados como volúmenes: las señales, planes y la base
 del track record quedan en tu disco, no dentro del contenedor. Para apuntar cualquier
 cliente MCP remoto al servidor: URL `http://localhost:8000/sse`.
+
+## Comunidad
+
+- [Contribuir](CONTRIBUTING.md) — cómo reportar bugs y proponer cambios
+- [Reportar una vulnerabilidad](SECURITY.md)
+- [Issues](https://github.com/Ax3lsk3r3/QuantVibe/issues) — plantillas para bug e idea
 
 ## Conectar el agente de Vibe-Trading
 
