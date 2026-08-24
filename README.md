@@ -1,7 +1,7 @@
 # QuantVibe
 
 [![CI](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml/badge.svg)](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml)
-[![Cobertura](https://codecov.io/gh/Ax3lsk3r3/QuantVibe/branch/main/graph/badge.svg)](https://codecov.io/gh/Ax3lsk3r3/QuantVibe)
+[![Cobertura](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Ax3lsk3r3/QuantVibe/badges/coverage-badge.json)](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml)
 [![Estilo: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue?logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fax3lsk3r3%2Fquantvibe-2496ED?logo=docker&logoColor=white)

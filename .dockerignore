@@ -6,4 +6,3 @@ artifacts
 __pycache__
 *.pyc
 .pytest_cache
-README_es.md

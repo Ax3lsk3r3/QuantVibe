@@ -20,6 +20,8 @@ jobs:
   test:
     name: Tests (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -37,9 +39,23 @@ jobs:
         run: |
           coverage run --include="*/bridge/signal_store.py,*/bridge/track_record.py,*/qlib_side/evaluate.py" -m unittest discover -s tests -v
           coverage report -m
-          coverage xml
-      - name: Subir cobertura a Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: coverage.xml
-          fail_ci_if_error: false
+          coverage json -o coverage.json
+      - name: Publicar badge de cobertura
+        if: matrix.os == 'ubuntu-latest' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pct=$(python -c "import json; t=json.load(open('coverage.json'))['totals']; print(round(float(t.get('percent_covered_display', t.get('percent_covered', 0)))))")
+          if [ "$pct" -ge 90 ]; then color=brightgreen; elif [ "$pct" -ge 75 ]; then color=green; elif [ "$pct" -ge 60 ]; then color=yellow; else color=orange; fi
+          printf '{"schemaVersion":1,"label":"cobertura","message":"%s%%","color":"%s"}' "$pct" "$color" > coverage-badge.json
+          rm -rf bd
+          if git ls-remote --exit-code --heads origin badges >/dev/null 2>&1; then
+            git clone --depth 1 --branch badges "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" bd
+            cd bd && git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          else
+            mkdir bd && cd bd && git init -b badges -q && git config user.name "github-actions[bot]" && git config user.email "41898282+github-actions[bot]@users.noreply.github.com" && git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          fi
+          cp ../coverage-badge.json .
+          git add coverage-badge.json
+          git commit -qm "badge de cobertura: ${pct}%" || echo "sin cambios"
+          git push -u origin badges
