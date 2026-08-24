@@ -36,6 +36,14 @@
     "top_k": 5,
     "horizon_days": 1
   },
+  "evaluation": {
+    "fwd_horizon": 1,
+    "gate": {
+      "min_days": 60,
+      "min_mean_ic": 0.0,
+      "min_icir": 0.0
+    }
+  },
   "execution": {
     "total_notional": 10000.0,
     "currency": "USD",

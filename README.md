@@ -1,5 +1,7 @@
 # QuantVibe
 
+![CI](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml/badge.svg)
+
 **Usa [Qlib](https://github.com/microsoft/qlib) como cerebro cuant y [Vibe-Trading](https://github.com/HKUDS/Vibe-Trading) como manos.**
 
 `QuantVibe` es un pequeño proyecto de integración que conecta dos herramientas existentes sin hacer fork de ninguna:
@@ -26,9 +28,11 @@ Los dos mundos **nunca se importan entre sí**: se comunican por un archivo firm
 
 ## Características
 
-- **Demo con un comando** que corre end-to-end sin servicios externos: datos sintéticos GBM + fallback de momentum cuando pyqlib/yfinance no están instalados.
+- **Demo con un comando** que corre end-to-end sin servicios externos: datos sintéticos con tendencias autorregresivas + fallback de momentum cuando pyqlib/yfinance no están instalados.
 - **Modo real**: descarga yfinance → conversión `qlib.scripts.dump_bin` → features Alpha158 → entrenamiento LGBModel → predicciones.
 - **Contrato de señales firmado**: validación de esquema, ranking contiguo, scores finitos y checksum SHA-256 sobre el JSON canónico — cualquier edición posterior es rechazada.
+- **Gate de evaluación**: antes de publicar señales se mide IC/ICIR/hit-rate del modelo sobre retornos futuros; si reprueba, `signals.json` no se escribe (salvo `--force`).
+- **Track record en SQLite**: cada señal publicada se registra y se liquida con precios reales cuando existen; `stats` muestra hit-rate y exceso vs universo.
 - **Servidor MCP** (`bridge/mcp_server.py`) con tres tools read-only: `get_latest_signals`, `list_universe`, `signal_health` (control de frescura).
 - **Guardarraíles de ejecución**: `execute_signals.py` solo escribe un *plan de órdenes* por defecto. Enviar órdenes reales exige `--submit` Y la variable `VIBE_ALLOW_ORDERS=1`.
 - **Trazabilidad de procedencia**: si cada símbolo vino de yfinance o del generador sintético viaja en `manifest.json` → `signals.json`.
@@ -40,9 +44,11 @@ config/pipeline.json          universo, fechas, segmentos train/valid/test, top_
 config/mcp.vibe-trading.example.json  registro del servidor MCP en el agente Vibe-Trading
 bridge/signal_store.py        esquema + validación + checksums (Python puro)
 bridge/mcp_server.py          servidor FastMCP stdio (compatible mcp SDK 1.x o fastmcp)
+bridge/track_record.py        registro histórico de señales en SQLite (log/settle/stats)
 qlib_side/prepare_data.py     yfinance (o sintético) -> CSV -> formato binario de Qlib
 qlib_side/train_model.py      LGBModel de Qlib; fallback automático DemoMomentum
-qlib_side/export_signals.py   predictions.csv -> signals.json verificado
+qlib_side/evaluate.py         IC/ICIR/hit-rate + gate de publicación
+qlib_side/export_signals.py   predictions.csv -> evaluación -> signals.json verificado
 vibe_side/execute_signals.py  señales -> plan equal-weight; submit con doble guardia
 scripts/run_pipeline.py       orquestador end-to-end (elige el venv correcto por paso)
 scripts/setup.ps1             crea venvs\qlib y venvs\vibe e instala dependencias
@@ -65,9 +71,28 @@ python scripts/run_pipeline.py --force-demo
 
 Salidas:
 
+- `artifacts/evaluation.json` — métricas del modelo (IC, ICIR, hit-rate) y veredicto del gate
 - `artifacts/signals.json` — señales top-k firmadas que consume el agente/MCP
 - `artifacts/orders_plan.json` — plan de órdenes paper equal-weight (`dry_run: true`)
+- `artifacts/track_record.db` — histórico de señales para medir el hit-rate real
 - `data/raw/*.csv` — OHLCV por símbolo + procedencia en `manifest.json`
+
+Pasos del pipeline: `prepare → settle → train → export → execute`.
+El paso `settle` liquida las señales de días anteriores con los precios ya disponibles.
+
+## Gate de evaluación y track record
+
+Antes de publicar, `export` evalúa el modelo: correlación de Spearman (IC) entre scores y
+retornos futuros por fecha, ICIR (IC/volatilidad del IC) y hit-rate del top-k. Los umbrales
+están en `config/pipeline.json → evaluation.gate`. Si reprueba, no se publican señales
+(`--force` para saltarlo conscientemente).
+
+Con el tiempo, consulta el rendimiento real:
+
+```powershell
+python -m bridge.track_record stats     # hit-rate, retorno medio, exceso vs universo
+python -m bridge.track_record settle    # liquida pendientes con precios nuevos
+```
 
 ## Setup completo (datos reales + modelo real)
 

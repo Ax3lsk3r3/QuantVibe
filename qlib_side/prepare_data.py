@@ -14,12 +14,16 @@ from qlib_side.common import fail, load_config
 RAW_COLUMNS = ["date", "symbol", "open", "high", "low", "close", "volume"]
 
 
-def _synthetic_frame(symbol: str, start: str, end: str, rng) -> pd.DataFrame:
+def _synthetic_frame(symbol: str, start: str, end: str, rng, seed: int) -> pd.DataFrame:
     idx = pd.bdate_range(start=start, end=end)
     n = len(idx)
-    drift = 0.0004
-    vol = 0.02
-    rets = rng.normal(drift, vol, size=n)
+    drift = 0.0002 + (seed % 100) / 100.0 * 0.0008
+    innov = rng.normal(0.0, 0.012, size=n)
+    rets = []
+    dev = 0.0
+    for e in innov:
+        dev = 0.55 * dev + e
+        rets.append(drift + dev)
     closes = [50.0]
     for r in rets:
         closes.append(closes[-1] * (1.0 + r))
@@ -99,7 +103,7 @@ def prepare(config_path: str | None = None, force_synthetic: bool = False) -> Pa
         if frame is None:
             import numpy as np
 
-            frame = _synthetic_frame(symbol, start, end, np.random.default_rng(seed))
+            frame = _synthetic_frame(symbol, start, end, np.random.default_rng(seed), seed)
             source = "synthetic"
         out_csv = raw_dir / f"{symbol}.csv"
         frame.to_csv(out_csv, index=False)

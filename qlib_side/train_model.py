@@ -15,21 +15,23 @@ def _demo_momentum(cfg) -> "object":
 
     window = int(cfg["training"].get("momentum_window", 20))
     raw_dir = Path(cfg["data"]["raw_dir"])
-    rows = []
+    frames = []
     for symbol in cfg["universe"]:
         csv_path = raw_dir / f"{symbol}.csv"
         if not csv_path.is_file():
             continue
-        df = pd.read_csv(csv_path)
-        df = df.sort_values("date")
+        df = pd.read_csv(csv_path).sort_values("date")
         if len(df) <= window:
             continue
-        closes = df["close"].astype(float).reset_index(drop=True)
-        score = float(closes.iloc[-1] / closes.iloc[-1 - window] - 1.0)
-        rows.append({"datetime": str(df["date"].iloc[-1]), "instrument": symbol, "score": score})
-    if not rows:
+        close = df["close"].astype(float).reset_index(drop=True)
+        score = close / close.shift(window) - 1.0
+        frame = pd.DataFrame(
+            {"datetime": df["date"], "instrument": symbol, "score": score}
+        ).dropna()
+        frames.append(frame)
+    if not frames:
         fail("no se encontraron datos crudos para el modo demo; ejecuta qlib_side.prepare_data primero")
-    return normalize_predictions(pd.DataFrame(rows))
+    return normalize_predictions(pd.concat(frames, ignore_index=True))
 
 
 def _train_qlib(cfg) -> "object":

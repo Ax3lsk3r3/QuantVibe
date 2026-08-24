@@ -11,15 +11,18 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from qlib_side.common import venv_python  # noqa: E402
 
-STEPS = ["prepare", "train", "export", "execute"]
+STEPS = ["prepare", "settle", "train", "export", "execute"]
 MODULES = {
     "prepare": "qlib_side.prepare_data",
+    "settle": "bridge.track_record",
     "train": "qlib_side.train_model",
     "export": "qlib_side.export_signals",
     "execute": "vibe_side.execute_signals",
 }
+EXTRA_ARGS = {"settle": ["settle"]}
 VENV_FOR_STEP = {
     "prepare": "qlib",
+    "settle": "base",
     "train": "qlib",
     "export": "qlib",
     "execute": "vibe",
@@ -37,7 +40,7 @@ def pick_python(step: str, override: str | None) -> Path:
 
 def run_step(step: str, config: str | None, force_demo: bool, python_override: str | None) -> int:
     py = pick_python(step, python_override)
-    cmd = [str(py), "-m", MODULES[step]]
+    cmd = [str(py), "-m", MODULES[step], *EXTRA_ARGS.get(step, [])]
     if config:
         cmd += ["--config", config]
     env = dict(os.environ)
