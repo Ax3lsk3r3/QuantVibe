@@ -21,14 +21,15 @@
     },
     "lgbm_kwargs": {
       "loss": "mse",
-      "colsample_bytree": 0.8879,
-      "learning_rate": 0.0421,
-      "subsample": 0.8789,
-      "lambda_l1": 205.6999,
-      "lambda_l2": 580.9768,
-      "max_depth": 8,
-      "num_leaves": 210,
-      "num_threads": 8
+      "colsample_bytree": 0.9,
+      "learning_rate": 0.05,
+      "subsample": 0.9,
+      "lambda_l1": 0.0,
+      "lambda_l2": 1.0,
+      "max_depth": 6,
+      "num_leaves": 32,
+      "min_data_in_leaf": 20,
+      "num_threads": 4
     },
     "momentum_window": 20
   },

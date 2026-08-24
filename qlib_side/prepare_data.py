@@ -121,29 +121,50 @@ def prepare(config_path: str | None = None, force_synthetic: bool = False) -> Pa
 
     qlib_dir = Path(cfg["data"]["qlib_dir"])
     dump_ok = False
-    try:
-        from qlib.scripts.dump_bin import DumpDataAll
-    except ImportError:
-        DumpDataAll = None
-    if DumpDataAll is not None:
+    vendor = Path(__file__).resolve().parents[1] / "vendor" / "dump_bin.py"
+    if not vendor.is_file():
+        print("  vendor/dump_bin.py no encontrado; omitiendo conversión a formato qlib")
+    else:
         try:
-            dumper = DumpDataAll(
-                csv_path=str(raw_dir),
-                qlib_dir=str(qlib_dir),
-                date_field_name="date",
-                symbol_field_name="symbol",
-            )
-            dumper.dump()
-            dump_ok = (qlib_dir / "instruments" / "all.txt").is_file()
-        except TypeError:
-            pass
+            import shutil
+            import subprocess
+            import sys as _sys
+
+            tmp_csv = raw_dir.parent / ".raw_qlib_dump"
+            if tmp_csv.exists():
+                shutil.rmtree(tmp_csv)
+            shutil.copytree(raw_dir, tmp_csv, ignore=shutil.ignore_patterns("manifest.json"))
+            cmd = [
+                _sys.executable,
+                str(vendor),
+                "dump_all",
+                "--data_path",
+                str(tmp_csv),
+                "--qlib_dir",
+                str(qlib_dir),
+                "--date_field_name",
+                "date",
+                "--symbol_field_name",
+                "symbol",
+                "--exclude_fields",
+                "date,symbol",
+                "--max_workers",
+                "4",
+            ]
+            proc = subprocess.run(cmd, capture_output=True, text=True)
+            shutil.rmtree(tmp_csv, ignore_errors=True)
+            if proc.returncode != 0:
+                tail = (proc.stderr or proc.stdout or "").strip().splitlines()[-5:]
+                print("  fallo el dump de qlib:\n    " + "\n    ".join(tail))
+            else:
+                dump_ok = (qlib_dir / "instruments" / "all.txt").is_file()
         except Exception as exc:
             print(f"  fallo el dump de qlib: {exc}")
     if dump_ok:
         print(f"  formato qlib escrito en {qlib_dir}")
     else:
         print(
-            "  qlib no disponible o el dump falló; CSVs conservados en "
+            "  dump a formato qlib no completado; CSVs conservados en "
             f"{raw_dir} (el flujo demo/paper sigue funcionando)"
         )
     return manifest_path

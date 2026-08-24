@@ -1,3 +1,3 @@
-"""QuantVibe: signals produced by Qlib, consumed by a Vibe-Trading agent."""
+"""QuantVibe: señales producidas por Qlib, consumidas por un agente Vibe-Trading."""
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"

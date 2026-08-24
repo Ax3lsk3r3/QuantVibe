@@ -52,6 +52,11 @@ qlib_side/export_signals.py   predictions.csv -> evaluación -> signals.json ver
 vibe_side/execute_signals.py  señales -> plan equal-weight; submit con doble guardia
 scripts/run_pipeline.py       orquestador end-to-end (elige el venv correcto por paso)
 scripts/setup.ps1             crea venvs\qlib y venvs\vibe e instala dependencias
+Dockerfile                    imagen Python 3.11 con pyqlib; corre los tests en el build
+docker-compose.yml            servicios pipeline + signals-mcp (MCP vía SSE :8000)
+vendor/dump_bin.py            script oficial de microsoft/qlib (MIT) para convertir CSVs;
+                              el wheel de PyPI no lo incluye — ver vendor/README.md
+CHANGELOG.md                  historial de versiones
 tests/                        suite unittest del puente (checksum, top-k, validación)
 ```
 
@@ -107,6 +112,21 @@ python scripts/run_pipeline.py
 | `venvs\vibe` | `vibe-trading-ai` | 3.11+ |
 
 Sin intérprete compatible para Qlib todo sigue funcionando con el fallback demo — el pipeline indica qué modo usó.
+
+## Docker (alternativa a los venvs)
+
+Resuelve de raíz el problema de versiones de Python: la imagen usa 3.11, donde `pyqlib`
+compila sin problemas, y los tests corren como parte del build.
+
+```powershell
+docker compose build                      # construye la imagen (ejecuta tests)
+docker compose run --rm pipeline          # pipeline completo con datos/modelo reales
+docker compose up -d signals-mcp          # MCP vía SSE en http://localhost:8000/sse
+```
+
+`./data` y `./artifacts` están montados como volúmenes: las señales, planes y la base
+del track record quedan en tu disco, no dentro del contenedor. Para apuntar cualquier
+cliente MCP remoto al servidor: URL `http://localhost:8000/sse`.
 
 ## Conectar el agente de Vibe-Trading
 

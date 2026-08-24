@@ -1,0 +1,25 @@
+services:
+  pipeline:
+    build: .
+    image: quantvibe:latest
+    container_name: quantvibe-pipeline
+    volumes:
+      - ./data:/app/data
+      - ./artifacts:/app/artifacts
+    command: ["python", "scripts/run_pipeline.py"]
+
+  signals-mcp:
+    build: .
+    image: quantvibe:latest
+    container_name: quantvibe-signals
+    depends_on:
+      - pipeline
+    ports:
+      - "8000:8000"
+    environment:
+      QVB_MCP_TRANSPORT: sse
+      QVB_MCP_HOST: 0.0.0.0
+      QVB_SIGNALS_PATH: /app/artifacts/signals.json
+    volumes:
+      - ./artifacts:/app/artifacts:ro
+    command: ["python", "-m", "bridge.mcp_server"]

@@ -29,6 +29,8 @@ mcp = FastMCP(
         "Llama get_latest_signals antes de cualquier decisión de trading; los scores son "
         "transversales (mayor es mejor) y se refrescan con cada ejecución del pipeline."
     ),
+    host=os.environ.get("QVB_MCP_HOST", "127.0.0.1"),
+    port=int(os.environ.get("QVB_MCP_PORT", "8000")),
 )
 
 
@@ -98,4 +100,8 @@ mcp.tool()(signal_health)
 
 
 if __name__ == "__main__":
-    mcp.run()
+    transport = os.environ.get("QVB_MCP_TRANSPORT", "stdio").strip().lower()
+    if transport in ("sse", "streamable-http", "http"):
+        mcp.run(transport="sse" if transport == "sse" else "streamable-http")
+    else:
+        mcp.run()

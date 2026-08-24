@@ -54,6 +54,8 @@ def _train_qlib(cfg) -> "object":
             "fit_start_time": segments["train"][0],
             "fit_end_time": segments["train"][1],
             "label": [cfg["training"]["label"]],
+            "infer_processors": [],
+            "learn_processors": ["DropnaLabel"],
         },
     }
     dataset_config = {
