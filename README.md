@@ -206,7 +206,17 @@ Falta cualquiera de las dos barreras → exit code 2, cero órdenes. Empieza con
 
 ## Aviso
 
-Software educativo. No es asesoría financiera. Los scores no son predicciones para confiarle dinero; los backtests sobreajustan; los agentes LLM se equivocan. Usa paper trading.
+Aviso Legal y Descargo de Responsabilidad 
+
+Este software tiene fines estrictamente educativos, experimentales y de investigación técnica. Ninguno de los módulos, códigos, señales, métricas o análisis generados por este sistema constituye, ni debe interpretarse como, asesoría financiera, tributaria, legal o recomendación de inversión.
+
+Riesgo del Modelado Predictivo: Los scores y clasificaciones producidos por modelos cuantitativos y algoritmos de Machine Learning son estimaciones estadísticas basadas en datos históricos. No garantizan rendimientos futuros ni representan certeza operativa en mercados reales.
+
+Sobreajuste (Overfitting): Los resultados obtenidos en entornos de backtesting presentan sesgos inherentes al ajuste histórico de parámetros y no reflejan con exactitud las condiciones de liquidez, comisiones, deslizamiento (slippage) ni la volatilidad de un mercado en vivo.
+
+Comportamiento de Modelos de Lenguaje (LLMs): Las decisiones y evaluaciones generadas por agentes basados en LLM pueden incurrir en alucinaciones, sesgos contextuales o razonamientos erróneos frente a dinámicas complejas del mercado.
+
+Uso Exclusivo en Simulación: Se aconseja operar únicamente en cuentas sombra, entornos de prueba (paper trading) o simuladores de riesgo cero. Cualquier despliegue con capital real es responsabilidad única y exclusiva del usuario final.
 
 ## Licencia
 
