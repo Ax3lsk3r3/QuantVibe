@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { motion } from 'framer-motion'
+import confetti from 'canvas-confetti'
 import {
   Play,
   Terminal as TermIcon,
   Copy,
   Trash2,
-  CheckCircle,
   Loader2,
   Sliders,
+  Sparkles,
+  Search,
+  Check,
+  Zap,
 } from 'lucide-react'
 import { runPipeline } from '../api'
 import type { SystemStatus } from '../types'
@@ -16,29 +21,34 @@ interface PipelineTabProps {
   onPipelineFinished: () => void
 }
 
-const ALL_STEPS = ['prepare', 'settle', 'train', 'export', 'execute']
+const ALL_STEPS = [
+  { id: 'prepare', label: '1. Ingesta (prepare)', desc: 'Descarga y preprocesamiento de datos' },
+  { id: 'settle', label: '2. Liquidación (settle)', desc: 'Auditoría en SQLite de retornos pasados' },
+  { id: 'train', label: '3. Entrenamiento (train)', desc: 'Modelo LightGBM sobre Alpha158' },
+  { id: 'export', label: '4. Evaluación (export)', desc: 'Control de Gate IC/ICIR y firma SHA-256' },
+  { id: 'execute', label: '5. Plan (execute)', desc: 'Construcción del plan de órdenes equal-weight' },
+]
 
 export const PipelineTab: React.FC<PipelineTabProps> = ({
   status,
   onPipelineFinished,
 }) => {
   const [mode, setMode] = useState<'demo' | 'real'>('demo')
-  const [selectedSteps, setSelectedSteps] = useState<string[]>(ALL_STEPS)
+  const [selectedSteps, setSelectedSteps] = useState<string[]>(ALL_STEPS.map((s) => s.id))
   const [logs, setLogs] = useState<string[]>([])
   const [isRunning, setIsRunning] = useState(false)
   const [autoScroll, setAutoScroll] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [searchLog, setSearchLog] = useState('')
   const terminalEndRef = useRef<HTMLDivElement>(null)
   const eventSourceRef = useRef<EventSource | null>(null)
 
-  // Sync isRunning with backend status
   useEffect(() => {
     if (status?.pipeline.is_running !== undefined) {
       setIsRunning(status.pipeline.is_running)
     }
   }, [status])
 
-  // Setup EventSource for real-time log streaming
   const connectSSE = () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close()
@@ -57,10 +67,16 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
         if (data.done) {
           setIsRunning(false)
           onPipelineFinished()
+          confetti({
+            particleCount: 80,
+            spread: 60,
+            origin: { y: 0.7 },
+            colors: ['#00F2FE', '#4FACFE', '#8B5CF6', '#10B981'],
+          })
           es.close()
         }
       } catch (err) {
-        console.error('Error parsing SSE event:', err)
+        console.error('Error parsing SSE:', err)
       }
     }
 
@@ -70,7 +86,6 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
   }
 
   useEffect(() => {
-    // Initial fetch of logs if running or logs exist
     const fetchInitialLogs = async () => {
       try {
         const API_BASE = import.meta.env.VITE_API_BASE || '/api'
@@ -98,22 +113,21 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
     }
   }, [])
 
-  // Auto-scroll terminal
   useEffect(() => {
     if (autoScroll && terminalEndRef.current) {
       terminalEndRef.current.scrollIntoView({ behavior: 'smooth' })
     }
   }, [logs, autoScroll])
 
-  const handleToggleStep = (step: string) => {
+  const handleToggleStep = (stepId: string) => {
     setSelectedSteps((prev) =>
-      prev.includes(step) ? prev.filter((s) => s !== step) : [...prev, step]
+      prev.includes(stepId) ? prev.filter((s) => s !== stepId) : [...prev, stepId]
     )
   }
 
   const handleRunPipeline = async () => {
     if (selectedSteps.length === 0) {
-      alert('Selecciona al menos un paso para ejecutar.')
+      alert('Por favor selecciona al menos una fase del pipeline.')
       return
     }
 
@@ -121,7 +135,7 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
     setLogs((prev) => [
       ...prev,
       `\n-----------------------------------------------------------`,
-      `[CLIENTE] Solicitando ejecución del pipeline (${mode.toUpperCase()})...`,
+      `[CLIENTE] Invocando pipeline en modo: ${mode.toUpperCase()}...`,
     ])
 
     try {
@@ -143,198 +157,240 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
     setLogs([])
   }
 
-  const formatLogLine = (line: string) => {
-    if (line.includes('[ÉXITO]') || line.includes('PASSED') || line.includes('código 0')) {
-      return <span className="text-emerald-400 font-semibold">{line}</span>
-    }
-    if (line.includes('[ABORTE]') || line.includes('FAIL') || line.includes('ERROR')) {
-      return <span className="text-rose-400 font-semibold">{line}</span>
-    }
-    if (line.includes('=== [') || line.includes('>>>')) {
-      return <span className="text-cyan-400 font-bold">{line}</span>
-    }
-    if (line.includes('[GUARDIA]')) {
-      return <span className="text-amber-300">{line}</span>
-    }
-    return <span className="text-slate-300">{line}</span>
-  }
+  const filteredLogs = searchLog
+    ? logs.filter((line) => line.toLowerCase().includes(searchLog.toLowerCase()))
+    : logs
 
   return (
-    <div className="space-y-6">
-      {/* Configuration & Controls Card */}
-      <div className="bg-dark-800/80 border border-dark-600 rounded-xl p-5 shadow-xl">
-        <div className="flex items-center space-x-2 border-b border-dark-600 pb-3 mb-4">
-          <Sliders className="w-5 h-5 text-cyan-400" />
-          <h3 className="font-mono font-semibold text-sm text-white">
-            Panel de Control del Orquestador (run_pipeline.py)
-          </h3>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Mode Selector */}
-          <div>
-            <label className="block text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Modo de Ejecución
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setMode('demo')}
-                className={`p-3 rounded-lg border text-left font-mono transition ${
-                  mode === 'demo'
-                    ? 'bg-cyan-950/60 border-cyan-500/60 text-cyan-300 shadow-md shadow-cyan-950'
-                    : 'bg-dark-900 border-dark-700 text-slate-400 hover:bg-dark-700'
-                }`}
-              >
-                <div className="font-bold text-xs">Modo Demo</div>
-                <div className="text-[11px] text-slate-400 mt-1">
-                  Momentum fallback + sintéticos (Sin Qlib pesado)
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setMode('real')}
-                className={`p-3 rounded-lg border text-left font-mono transition ${
-                  mode === 'real'
-                    ? 'bg-purple-950/60 border-purple-500/60 text-purple-300 shadow-md shadow-purple-950'
-                    : 'bg-dark-900 border-dark-700 text-slate-400 hover:bg-dark-700'
-                }`}
-              >
-                <div className="font-bold text-xs">Modo Qlib Real</div>
-                <div className="text-[11px] text-slate-400 mt-1">
-                  Alpha158 + LightGBM (Requiere venv qlib)
-                </div>
-              </button>
+    <div className="space-y-8 font-sans">
+      {/* Configuration Header Card */}
+      <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-white/[0.08] shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.08] pb-5 mb-6">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+              <Sliders className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white tracking-tight">
+                Centro de Mando del Pipeline (Orquestador)
+              </h3>
+              <p className="text-xs text-slate-400">
+                Control de ciclo cerrado: Ingesta → Modelado Machine Learning → Evaluación y Firma Criptográfica.
+              </p>
             </div>
           </div>
 
-          {/* Steps Checklist */}
-          <div className="md:col-span-2">
-            <label className="block text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider mb-2">
-              Fases del Pipeline a Ejecutar
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-              {ALL_STEPS.map((step) => {
-                const isSelected = selectedSteps.includes(step)
-                return (
-                  <button
-                    key={step}
-                    type="button"
-                    onClick={() => handleToggleStep(step)}
-                    className={`px-3 py-2 rounded-lg border font-mono text-xs text-center transition ${
-                      isSelected
-                        ? 'bg-dark-700 border-cyan-500/50 text-white font-bold'
-                        : 'bg-dark-900 border-dark-700 text-slate-500 hover:bg-dark-800'
-                    }`}
-                  >
-                    <span className="capitalize">{step}</span>
-                  </button>
-                )
-              })}
-            </div>
-            <div className="text-[11px] text-slate-400 mt-2 font-mono">
-              Secuencia: prepare (datos) → settle (liquidación SQLite) → train (ML) → export (gate + firma) → execute (plan)
-            </div>
+          {/* Mode Badges */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setMode('demo')}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                mode === 'demo'
+                  ? 'bg-gradient-to-r from-cyan-500/25 to-blue-500/25 text-cyan-300 border border-cyan-500/50 shadow-lg shadow-cyan-500/10'
+                  : 'bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.06]'
+              }`}
+            >
+              <div className="flex items-center space-x-1.5">
+                <Zap className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Modo Demo (Instantáneo)</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setMode('real')}
+              className={`px-4 py-2 rounded-xl text-xs font-semibold transition-all ${
+                mode === 'real'
+                  ? 'bg-gradient-to-r from-violet-500/25 to-purple-500/25 text-violet-300 border border-violet-500/50 shadow-lg shadow-violet-500/10'
+                  : 'bg-white/[0.03] text-slate-400 hover:text-white border border-white/[0.06]'
+              }`}
+            >
+              <div className="flex items-center space-x-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-violet-400" />
+                <span>Modo Qlib Real (Alpha158)</span>
+              </div>
+            </button>
           </div>
         </div>
 
-        {/* Action Button */}
-        <div className="mt-5 pt-4 border-t border-dark-600 flex items-center justify-between">
-          <div className="text-xs font-mono text-slate-400 hidden sm:block">
+        {/* Phase Selector Grid */}
+        <div className="space-y-3">
+          <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider block">
+            Fases del Pipeline Activas
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            {ALL_STEPS.map((step) => {
+              const isSelected = selectedSteps.includes(step.id)
+
+              return (
+                <motion.button
+                  key={step.id}
+                  whileTap={{ scale: 0.97 }}
+                  type="button"
+                  onClick={() => handleToggleStep(step.id)}
+                  className={`p-3.5 rounded-xl border text-left transition-all relative overflow-hidden ${
+                    isSelected
+                      ? 'bg-white/[0.06] border-cyan-500/50 text-white shadow-md'
+                      : 'bg-white/[0.01] border-white/[0.05] text-slate-500 hover:bg-white/[0.03]'
+                  }`}
+                >
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs font-bold tracking-tight">{step.label}</span>
+                    <div
+                      className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
+                        isSelected
+                          ? 'bg-cyan-500 text-[#090D16] font-black'
+                          : 'bg-white/[0.05] text-slate-600'
+                      }`}
+                    >
+                      {isSelected ? <Check className="w-3 h-3 stroke-[3]" /> : null}
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-slate-400 leading-tight">{step.desc}</p>
+                </motion.button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Launch Button Strip */}
+        <div className="mt-8 pt-5 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="text-xs text-slate-400 flex items-center gap-2">
             {isRunning ? (
-              <span className="text-cyan-400 flex items-center gap-1.5">
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                Ejecutando proceso en segundo plano...
+              <span className="text-cyan-300 font-semibold flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                Ejecutando en subproceso asíncrono con captura continua...
               </span>
             ) : (
-              <span>Listo para lanzar. Presiona el botón para iniciar.</span>
+              <span>Parámetros listos. El log fluirá en tiempo real abajo.</span>
             )}
           </div>
 
-          <button
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             onClick={handleRunPipeline}
             disabled={isRunning}
-            className={`flex items-center space-x-2 py-2.5 px-6 rounded-lg font-mono font-bold text-xs sm:text-sm text-white transition shadow-lg ${
+            className={`flex items-center space-x-2.5 px-8 py-3 rounded-xl font-bold text-sm text-white tracking-wide transition shadow-xl ${
               isRunning
-                ? 'bg-dark-700 border border-dark-600 text-slate-500 cursor-not-allowed'
-                : 'bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-cyan-900/40'
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-white/[0.05]'
+                : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-violet-600 hover:from-cyan-400 hover:to-violet-500 shadow-cyan-500/25'
             }`}
           >
             {isRunning ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Ejecutando...</span>
+                <span>Ejecutando Pipeline...</span>
               </>
             ) : (
               <>
                 <Play className="w-4 h-4 fill-current" />
-                <span>Ejecutar Pipeline Completo</span>
+                <span>Lanzar Pipeline Completo</span>
               </>
             )}
-          </button>
+          </motion.button>
         </div>
       </div>
 
-      {/* Real-time Terminal Window */}
-      <div className="bg-dark-900 border border-dark-700 rounded-xl overflow-hidden shadow-2xl">
-        {/* Terminal Header */}
-        <div className="bg-dark-800 px-4 py-2.5 border-b border-dark-700 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <TermIcon className="w-4 h-4 text-cyan-400" />
-            <span className="font-mono text-xs text-slate-200 font-semibold">
-              Live Console Output (Server-Sent Events)
-            </span>
-            {isRunning && (
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-            )}
+      {/* Glassmorphic Streaming Console */}
+      <div className="glass-panel rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl">
+        {/* Terminal Header Bar */}
+        <div className="p-4 bg-white/[0.02] border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center space-x-3">
+            <div className="flex space-x-1.5">
+              <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block" />
+              <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block" />
+              <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block" />
+            </div>
+
+            <div className="h-4 w-[1px] bg-white/[0.1]" />
+
+            <div className="flex items-center space-x-2 text-xs font-mono text-slate-300">
+              <TermIcon className="w-4 h-4 text-cyan-400" />
+              <span>pipeline.stream • {logs.length} líneas registradas</span>
+              {isRunning && (
+                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+              )}
+            </div>
           </div>
 
+          {/* Search & Actions */}
           <div className="flex items-center space-x-2">
-            <label className="flex items-center space-x-1.5 text-xs text-slate-400 cursor-pointer mr-2">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-2 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Filtrar consola..."
+                value={searchLog}
+                onChange={(e) => setSearchLog(e.target.value)}
+                className="bg-white/[0.04] border border-white/[0.08] rounded-lg pl-8 pr-3 py-1 text-xs font-mono text-white focus:outline-none focus:border-cyan-500 w-36 sm:w-44"
+              />
+            </div>
+
+            <label className="flex items-center space-x-1.5 text-xs text-slate-400 cursor-pointer ml-1">
               <input
                 type="checkbox"
                 checked={autoScroll}
                 onChange={(e) => setAutoScroll(e.target.checked)}
-                className="rounded bg-dark-900 border-dark-600 text-cyan-500 focus:ring-0 w-3.5 h-3.5"
+                className="rounded bg-white/[0.05] border-white/[0.1] text-cyan-500 focus:ring-0 w-3.5 h-3.5"
               />
-              <span className="font-mono text-[11px]">Auto-scroll</span>
+              <span className="text-[11px] font-mono">Auto-scroll</span>
             </label>
 
             <button
               onClick={handleCopyLogs}
-              className="p-1.5 rounded bg-dark-700 text-slate-300 hover:text-white hover:bg-dark-600 transition"
+              className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 transition"
               title="Copiar registros"
             >
-              {copied ? (
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-              ) : (
-                <Copy className="w-3.5 h-3.5" />
-              )}
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
             </button>
 
             <button
               onClick={handleClearLogs}
-              className="p-1.5 rounded bg-dark-700 text-slate-300 hover:text-rose-300 hover:bg-dark-600 transition"
-              title="Limpiar consola"
+              className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 hover:text-rose-400 transition"
+              title="Limpiar pantalla"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Terminal Screen */}
-        <div className="p-4 font-mono text-xs text-slate-300 min-h-[350px] max-h-[500px] overflow-y-auto space-y-1 bg-[#070A0F]">
-          {logs.length === 0 ? (
-            <div className="text-slate-600 py-12 text-center select-none font-mono">
-              Consola a la espera. Inicia una ejecución para ver el flujo en vivo.
+        {/* Terminal Text Body */}
+        <div className="p-5 font-mono text-xs text-slate-300 min-h-[360px] max-h-[520px] overflow-y-auto space-y-1.5 bg-[#05070B]/80 select-text">
+          {filteredLogs.length === 0 ? (
+            <div className="text-slate-600 py-16 text-center select-none font-sans text-sm">
+              <TermIcon className="w-8 h-8 text-slate-700 mx-auto mb-2 opacity-50" />
+              Esperando ejecución del pipeline. Presiona "Lanzar Pipeline" arriba para ver la telemetría en vivo.
             </div>
           ) : (
-            logs.map((line, idx) => (
-              <div key={idx} className="leading-relaxed whitespace-pre-wrap break-all">
-                {formatLogLine(line)}
-              </div>
-            ))
+            filteredLogs.map((line, idx) => {
+              const isSuccess = line.includes('[ÉXITO]') || line.includes('código 0') || line.includes('PASSED')
+              const isError = line.includes('[ABORTE]') || line.includes('FAIL') || line.includes('ERROR')
+              const isHeader = line.includes('=== [') || line.includes('>>>')
+              const isGuard = line.includes('[GUARDIA]')
+
+              return (
+                <div key={idx} className="flex items-start space-x-3 leading-relaxed">
+                  <span className="text-slate-600 text-[10px] w-7 text-right select-none font-mono">
+                    {idx + 1}
+                  </span>
+                  <div
+                    className={`flex-1 whitespace-pre-wrap break-all ${
+                      isSuccess
+                        ? 'text-emerald-400 font-semibold'
+                        : isError
+                        ? 'text-rose-400 font-semibold'
+                        : isHeader
+                        ? 'text-cyan-300 font-bold'
+                        : isGuard
+                        ? 'text-amber-300'
+                        : 'text-slate-300'
+                    }`}
+                  >
+                    {line}
+                  </div>
+                </div>
+              )
+            })
           )}
           <div ref={terminalEndRef} />
         </div>

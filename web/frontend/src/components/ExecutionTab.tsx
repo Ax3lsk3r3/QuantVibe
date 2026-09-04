@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import confetti from 'canvas-confetti'
 import {
   ShieldAlert,
   ShieldCheck,
   Send,
-  Layers,
+  AlertTriangle,
+  Lock,
+  CheckCircle2,
 } from 'lucide-react'
 import type { OrdersPlan } from '../types'
 import { executeOrders } from '../api'
@@ -18,17 +22,21 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
   const [orderCmdTemplate, setOrderCmdTemplate] = useState('echo "SUBMITTED {symbol} qty={qty} est={est_price}"')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitOutput, setSubmitOutput] = useState<string | null>(null)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
-  const handleExecuteOrders = async () => {
-    if (allowLive && !window.confirm('⚠️ ATENCIÓN: El envío real está activado. ¿Confirmas el envío de estas órdenes al broker?')) {
-      return
-    }
-
+  const handleExecute = async () => {
+    setShowConfirmModal(false)
     setIsSubmitting(true)
     setSubmitOutput(null)
     try {
       const res = await executeOrders(allowLive, orderCmdTemplate)
-      setSubmitOutput(res.stdout || (res.return_code === 0 ? 'Ejecución completada.' : res.stderr))
+      setSubmitOutput(res.stdout || (res.return_code === 0 ? 'Ejecución de plan completada con éxito.' : res.stderr))
+      confetti({
+        particleCount: 70,
+        spread: 50,
+        origin: { y: 0.6 },
+        colors: ['#10B981', '#00F2FE', '#8B5CF6'],
+      })
       onRefresh()
     } catch (err: any) {
       setSubmitOutput(`Error: ${err.message}`)
@@ -38,188 +46,260 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
   }
 
   const orderList = orders?.orders || []
+  const totalTarget = orders?.total_notional_target || 10000
+  const estimatedTotal = orders?.totals.estimated_exposure || 0
 
   return (
-    <div className="space-y-6">
-      {/* Execution Guardrails Banner */}
-      <div className="bg-dark-800/80 border border-dark-600 rounded-xl p-5 shadow-xl">
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-dark-600 pb-4">
-          <div className="flex items-center space-x-3">
+    <div className="space-y-8 font-sans">
+      {/* Cockpit Header & Safety Guardrail */}
+      <div className="glass-panel rounded-3xl p-6 sm:p-8 border border-white/[0.08] shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-white/[0.08] pb-6">
+          <div className="flex items-start space-x-4">
             <div
-              className={`p-2.5 rounded-xl border ${
+              className={`p-3 rounded-2xl border transition-all ${
                 allowLive
-                  ? 'bg-rose-950/40 border-rose-500/50 text-rose-400'
-                  : 'bg-cyan-950/40 border-cyan-500/50 text-cyan-400'
+                  ? 'bg-rose-500/15 border-rose-500/40 text-rose-400 shadow-lg shadow-rose-500/20'
+                  : 'bg-cyan-500/15 border-cyan-500/40 text-cyan-400 shadow-lg shadow-cyan-500/20'
               }`}
             >
-              {allowLive ? <ShieldAlert className="w-6 h-6" /> : <ShieldCheck className="w-6 h-6" />}
+              {allowLive ? <ShieldAlert className="w-7 h-7" /> : <ShieldCheck className="w-7 h-7" />}
             </div>
-            <div>
-              <h3 className="font-mono font-bold text-sm text-white flex items-center gap-2">
-                Mesa de Ejecución & Guardarraíles de Vibe-Trading
+
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <h3 className="text-xl font-bold text-white tracking-tight">
+                  Mesa de Ejecución del Agente Vibe-Trading
+                </h3>
                 <span
-                  className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold uppercase ${
+                  className={`px-3 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${
                     allowLive
-                      ? 'bg-rose-950 text-rose-300 border border-rose-800'
-                      : 'bg-cyan-950 text-cyan-300 border border-cyan-800'
+                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                   }`}
                 >
-                  {allowLive ? 'ENVÍO REAL ACTIVO' : 'MODO PAPEL (SIMULACIÓN)'}
+                  {allowLive ? 'Envío Real' : 'Modo Seguro (Papel)'}
                 </span>
-              </h3>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Por seguridad, QuantVibe nunca envía órdenes a brokers sin confirmación explícita (variable de entorno VIBE_ALLOW_ORDERS=1 y flag --submit).
+              </div>
+              <p className="text-xs text-slate-400 max-w-2xl leading-relaxed">
+                El agente LLM de Vibe-Trading lee las señales firmadas vía MCP stdio y dimensiona un plan de órdenes equilibrado.
+                Por arquitectura de seguridad, la ejecución a mercado está bloqueada salvo que se active manualmente la doble confirmación.
               </p>
             </div>
           </div>
 
-          {/* Toggle Switch */}
-          <div className="flex items-center space-x-3 bg-dark-900 p-2 rounded-lg border border-dark-700 self-end md:self-auto">
-            <span className="text-xs font-mono text-slate-400">Modo Papel</span>
+          {/* Apple-style Sliding Safety Toggle Switch */}
+          <div className="flex items-center space-x-3 p-2 rounded-2xl bg-white/[0.04] border border-white/[0.08] self-start lg:self-auto">
+            <span className="text-xs font-medium text-slate-400">Modo Papel</span>
             <button
               type="button"
               onClick={() => setAllowLive(!allowLive)}
-              className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              className={`relative inline-flex h-7 w-13 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                 allowLive ? 'bg-rose-600' : 'bg-slate-700'
               }`}
             >
-              <span
-                aria-hidden="true"
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                  allowLive ? 'translate-x-5' : 'translate-x-0'
+              <motion.span
+                layout
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                className={`inline-block h-6 w-6 rounded-full bg-white shadow-md transform ${
+                  allowLive ? 'translate-x-6' : 'translate-x-0'
                 }`}
               />
             </button>
-            <span className={`text-xs font-mono font-bold ${allowLive ? 'text-rose-400' : 'text-slate-400'}`}>
+            <span className={`text-xs font-bold ${allowLive ? 'text-rose-400' : 'text-slate-400'}`}>
               Envío Real
             </span>
           </div>
         </div>
 
-        {/* Live execution parameters if allowed */}
+        {/* Live Submission Warning Box */}
         {allowLive && (
-          <div className="mt-4 p-4 rounded-lg bg-rose-950/20 border border-rose-800/40 space-y-3">
-            <div className="flex items-center space-x-2 text-rose-300 text-xs font-mono font-semibold">
-              <ShieldAlert className="w-4 h-4" />
-              <span>Doble Confirmación de Seguridad Activada</span>
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="mt-6 p-5 rounded-2xl bg-rose-950/30 border border-rose-500/40 space-y-3"
+          >
+            <div className="flex items-center space-x-2 text-rose-300 text-sm font-semibold">
+              <AlertTriangle className="w-5 h-5 text-rose-400" />
+              <span>Advertencia de Envío Real a Mercado (Doble Candado Activo)</span>
             </div>
+            <p className="text-xs text-slate-300">
+              Las órdenes se enviarán al comando especificado abajo utilizando la variable de entorno{' '}
+              <code className="px-1.5 py-0.5 rounded bg-black/40 text-cyan-300 font-mono">VIBE_ALLOW_ORDERS=1</code>.
+            </p>
             <div>
               <label className="block text-xs font-mono text-slate-300 mb-1">
-                Plantilla de Comando de Orden (Ej. CLI del broker o script):
+                Plantilla de Comando de Ejecución (Broker CLI o Wrapper API):
               </label>
               <input
                 type="text"
                 value={orderCmdTemplate}
                 onChange={(e) => setOrderCmdTemplate(e.target.value)}
                 placeholder='order-cli buy --ticker {symbol} --amount {qty}'
-                className="w-full bg-dark-900 border border-dark-700 rounded px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-rose-500"
+                className="w-full bg-black/40 border border-white/[0.1] rounded-xl px-4 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-rose-500"
               />
-              <p className="text-[11px] text-slate-400 mt-1">
-                Variables disponibles: <code className="text-cyan-300">{'{symbol}'}</code>, <code className="text-cyan-300">{'{qty}'}</code>, <code className="text-cyan-300">{'{est_price}'}</code>
-              </p>
             </div>
-          </div>
+          </motion.div>
         )}
 
-        {/* Action Button */}
-        <div className="mt-4 pt-3 flex items-center justify-between">
-          <div className="text-xs font-mono text-slate-400">
-            Firma de señales vinculada:{' '}
-            <span className="text-cyan-300 truncate inline-block max-w-[200px] align-bottom">
-              {orders?.signals_checksum || 'N/A'}
+        {/* Exposure Progress Metrics */}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="p-4 rounded-2xl glass-card border border-white/[0.06]">
+            <span className="text-xs text-slate-400 uppercase tracking-wider block">Capital Objetivo</span>
+            <div className="text-2xl font-bold text-white tracking-tight mt-1 tnum">
+              ${totalTarget.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+            </div>
+            <span className="text-[11px] text-slate-400">Ponderación igualitaria (Equal-Weight)</span>
+          </div>
+
+          <div className="p-4 rounded-2xl glass-card border border-white/[0.06]">
+            <span className="text-xs text-slate-400 uppercase tracking-wider block">Exposición Calculada</span>
+            <div className="text-2xl font-bold text-cyan-300 tracking-tight mt-1 tnum">
+              ${estimatedTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+            </div>
+            <span className="text-[11px] text-cyan-400/80">
+              Utilización: {((estimatedTotal / totalTarget) * 100).toFixed(1)}% del capital
             </span>
           </div>
-          <button
-            onClick={handleExecuteOrders}
+
+          <div className="p-4 rounded-2xl glass-card border border-white/[0.06]">
+            <span className="text-xs text-slate-400 uppercase tracking-wider block">Posiciones Staged</span>
+            <div className="text-2xl font-bold text-emerald-400 tracking-tight mt-1 tnum">
+              {orderList.length} Activos
+            </div>
+            <span className="text-[11px] text-slate-400">Estado: Listas para transmisión</span>
+          </div>
+        </div>
+
+        {/* Execute Action Button */}
+        <div className="mt-6 pt-5 border-t border-white/[0.08] flex items-center justify-between">
+          <div className="text-xs font-mono text-slate-400 flex items-center gap-2">
+            <Lock className="w-3.5 h-3.5 text-cyan-400" />
+            <span>Firma SHA-256 vinculada al lote</span>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => {
+              if (allowLive) {
+                setShowConfirmModal(true)
+              } else {
+                handleExecute()
+              }
+            }}
             disabled={isSubmitting || orderList.length === 0}
-            className={`flex items-center space-x-2 py-2 px-5 rounded-lg font-mono font-bold text-xs sm:text-sm text-white transition shadow-lg ${
+            className={`flex items-center space-x-2 px-7 py-3 rounded-xl font-bold text-xs sm:text-sm text-white tracking-wide transition shadow-xl ${
               allowLive
-                ? 'bg-rose-600 hover:bg-rose-500 shadow-rose-900/40'
-                : 'bg-cyan-600 hover:bg-cyan-500 shadow-cyan-900/40'
+                ? 'bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 shadow-rose-900/30'
+                : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-violet-600 hover:from-cyan-400 hover:to-violet-500 shadow-cyan-500/25'
             }`}
           >
             <Send className="w-4 h-4" />
-            <span>{allowLive ? 'Confirmar & Enviar Órdenes Reales' : 'Ejecutar Plan en Modo Papel'}</span>
-          </button>
+            <span>{allowLive ? 'Transmitir Órdenes a Mercado' : 'Simular Plan en Cuenta Sombra'}</span>
+          </motion.button>
         </div>
 
-        {/* Execution Output Box */}
+        {/* Execution Output Feedback */}
         {submitOutput && (
-          <div className="mt-4 p-3 rounded bg-dark-900 border border-dark-700 font-mono text-xs text-slate-300 whitespace-pre-wrap">
-            <div className="font-bold text-cyan-400 mb-1">Respuesta del Ejecutor:</div>
-            {submitOutput}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-6 p-4 rounded-2xl bg-black/40 border border-white/[0.08] font-mono text-xs text-slate-300"
+          >
+            <div className="font-bold text-cyan-300 mb-1 flex items-center gap-1.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              Resultado de la Transmisión:
+            </div>
+            <pre className="whitespace-pre-wrap leading-relaxed text-slate-300">{submitOutput}</pre>
+          </motion.div>
         )}
       </div>
 
-      {/* Orders Plan Table */}
-      <div className="bg-dark-800/80 border border-dark-600 rounded-xl overflow-hidden shadow-xl">
-        <div className="p-4 border-b border-dark-600 flex items-center justify-between bg-dark-800">
-          <div className="flex items-center space-x-2">
-            <Layers className="w-4 h-4 text-cyan-400" />
-            <h3 className="font-mono font-semibold text-sm text-white">
-              Órdenes Staged para Ejecución ({orderList.length} posiciones)
-            </h3>
-          </div>
-          <div className="flex items-center space-x-4 text-xs font-mono text-slate-400">
-            <div>
-              Total Estimado:{' '}
-              <span className="text-emerald-400 font-bold">
-                ${orders?.totals.estimated_exposure.toFixed(2) || '0.00'} {orders?.currency || 'USD'}
-              </span>
-            </div>
-          </div>
-        </div>
+      {/* Orders Grid */}
+      <div className="space-y-4">
+        <h4 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+          <span>Órdenes Staged para Ejecución</span>
+          <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-300">
+            {orderList.length} Órdenes
+          </span>
+        </h4>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse font-mono">
-            <thead>
-              <tr className="border-b border-dark-700 bg-dark-900/60 text-xs text-slate-400 uppercase tracking-wider">
-                <th className="py-3 px-4">Acción</th>
-                <th className="py-3 px-4">Instrumento</th>
-                <th className="py-3 px-4">Rank</th>
-                <th className="py-3 px-4">Score ML</th>
-                <th className="py-3 px-4">Precio Est.</th>
-                <th className="py-3 px-4">Cantidad (Shares)</th>
-                <th className="py-3 px-4">Notional Est.</th>
-                <th className="py-3 px-4 text-right">Estado</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-dark-700 text-sm">
-              {orderList.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="py-8 text-center text-slate-500">
-                    No hay plan de órdenes cargado.
-                  </td>
-                </tr>
-              ) : (
-                orderList.map((ord) => (
-                  <tr key={ord.instrument} className="hover:bg-dark-700/50 transition-colors">
-                    <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded text-xs font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
-                        {ord.action}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 font-bold text-white text-base">
-                      {ord.instrument}
-                    </td>
-                    <td className="py-3 px-4 text-slate-400">#{ord.rank}</td>
-                    <td className="py-3 px-4 text-slate-300">{ord.signal_score.toFixed(6)}</td>
-                    <td className="py-3 px-4 text-slate-200">${ord.est_price.toFixed(4)}</td>
-                    <td className="py-3 px-4 font-bold text-cyan-300">×{ord.qty}</td>
-                    <td className="py-3 px-4 font-bold text-white">${ord.est_notional.toFixed(2)}</td>
-                    <td className="py-3 px-4 text-right">
-                      <span className="px-2 py-0.5 rounded text-xs bg-dark-900 text-slate-300 border border-dark-600">
-                        {ord.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {orderList.map((ord, idx) => (
+            <motion.div
+              key={ord.instrument}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.05 }}
+              className="glass-card-interactive rounded-2xl p-5 border border-white/[0.08] flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold font-mono bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                    {ord.action}
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">Rank #{ord.rank}</span>
+                </div>
+
+                <div className="text-2xl font-extrabold text-white tracking-tight">{ord.instrument}</div>
+                <div className="text-xs text-slate-400 font-mono mt-1">
+                  Precio Estimado: <span className="text-slate-200">${ord.est_price.toFixed(2)}</span>
+                </div>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-white/[0.06] space-y-2">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-400">Cantidad:</span>
+                  <span className="font-bold text-cyan-300 font-mono text-sm">×{ord.qty} shares</span>
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-slate-400">Notional:</span>
+                  <span className="font-bold text-white font-mono">${ord.est_notional.toFixed(2)}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <AnimatePresence>
+        {showConfirmModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="glass-panel rounded-3xl p-6 max-w-md w-full border border-rose-500/40 shadow-2xl space-y-4"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-rose-400">
+                <ShieldAlert className="w-6 h-6" />
+              </div>
+
+              <h3 className="text-lg font-bold text-white">¿Confirmas la Transmisión Real a Mercado?</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Estás a punto de emitir {orderList.length} órdenes reales con una exposición de $
+                {estimatedTotal.toFixed(2)} USD. Verifica que tu entorno de broker y parámetros sean correctos.
+              </p>
+
+              <div className="flex space-x-3 pt-2">
+                <button
+                  onClick={() => setShowConfirmModal(false)}
+                  className="flex-1 py-2.5 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] text-xs font-semibold text-slate-300 transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleExecute}
+                  className="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white shadow-lg shadow-rose-900/30 transition"
+                >
+                  Confirmar & Enviar
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
