@@ -90,6 +90,42 @@ Salidas:
 Pasos del pipeline: `prepare → settle → train → export → execute`.
 El paso `settle` liquida las señales de días anteriores con los precios ya disponibles.
 
+## Interfaz Web y Terminal (Codespaces & Local)
+
+QuantVibe incluye una **interfaz web moderna estilo terminal fintech** montada con FastAPI y React/Tailwind/TypeScript, diseñada para operar tanto en local como en **GitHub Codespaces** y servidores remotos en un único puerto unificado (por defecto `8000`).
+
+### Iniciar la Interfaz Web
+
+```powershell
+# 1. Instalar dependencias web ligeras
+pip install -r requirements-web.txt
+
+# 2. Iniciar el servidor web (escucha en 0.0.0.0:8000 para Codespaces)
+python scripts/start_web.py
+```
+
+* **Local / Codespaces URL:** `http://localhost:8000`
+* **Swagger API Docs:** `http://localhost:8000/docs`
+
+### Características de la Interfaz
+
+1. **Dashboard & Gate de Calidad:** Semáforo del veredicto del modelo (IC, ICIR, hit-rate), verificación criptográfica SHA-256 en tiempo real y tabla interactiva de señales Top-$k$.
+2. **Lanzador de Pipeline Interactivo:** Selector de modo (Demo vs Qlib Real), selección granular de fases y consola con streaming en tiempo real vía Server-Sent Events (SSE).
+3. **Mesa de Órdenes & Guardarraíles:** Visualizador del plan de órdenes (`orders_plan.json`), cálculo de exposición y switch de seguridad para alternar entre Paper Trading y envío real (`VIBE_ALLOW_ORDERS=1`).
+4. **Track Record & Auditoría:** Rendimiento histórico asentado en SQLite (`artifacts/track_record.db`), hit-rate real y exceso frente al universo.
+5. **Arquitectura & MCP Inspector:** Estado de los servidores FastMCP y grafos de conocimiento indexados.
+
+### Desarrollo del Frontend
+
+El frontend vive en `web/frontend/` y compila estáticamente a `web/static/` (servido automáticamente por FastAPI):
+
+```powershell
+cd web/frontend
+pnpm install
+pnpm build     # compila a web/static/
+pnpm dev       # servidor dev Vite en puerto 5173 con proxy hacia FastAPI :8000
+```
+
 ## Gate de evaluación y track record
 
 Antes de publicar, `export` evalúa el modelo: correlación de Spearman (IC) entre scores y
