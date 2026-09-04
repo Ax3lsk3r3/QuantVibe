@@ -1,11 +1,11 @@
 {
     "schema_version": 2,
-    "commit": "53ec827f4310a0041bc5bbe5a5d4b6531fbae50c",
-    "indexed_at": "2026-09-04T21:07:18Z",
+    "commit": "dfa588248e068c10b73e50244c4548d4f2cac7ec",
+    "indexed_at": "2026-09-04T21:07:43Z",
     "project": "C-Users-ax3lsk3r3-Desktop-QuantVibe",
     "nodes": 1040,
     "edges": 4288,
     "original_size": 7405568,
-    "compressed_size": 1388711,
+    "compressed_size": 1390355,
     "compression_level": 3
 }
