@@ -4,128 +4,167 @@
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Ax3lsk3r3/QuantVibe/badges/coverage-badge.json)](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml)
 [![Code Style: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue?logo=python&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688?logo=fastapi&logoColor=white)
-![React](https://img.shields.io/badge/React-19.2+-61DAFB?logo=react&logoColor=black)
-![TailwindCSS](https://img.shields.io/badge/TailwindCSS-OKLCH%20Color-38B2AC?logo=tailwindcss&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fax3lsk3r3%2Fquantvibe-2496ED?logo=docker&logoColor=white)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-🌐 **Language / Idioma:** [English](README.md) • [Español](README.es.md)  
-🚀 **Cloud Deployment Guide:** [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)  
-🔴 **Live Server Demo:** [http://47.85.111.6](http://47.85.111.6)
+Language: **English** | [Español](README.es.md)
 
----
+**Uses [Qlib](https://github.com/microsoft/qlib) as the quantitative brain and [Vibe-Trading](https://github.com/HKUDS/Vibe-Trading) as the execution hands.**
 
-> **Where Quantitative Rigor Meets Autonomous Execution.**  
-> Institutional-grade quantitative finance platform combining **Microsoft Qlib** (Alpha158 Factor Mining & LightGBM) with autonomous **Vibe-Trading LLM Agents**, bound by zero-import cryptographic barriers and mathematical gate validation.
+`QuantVibe` is an integration project connecting two independent quantitative finance tools without forking either:
 
----
+- **Qlib** (Microsoft) trains machine learning models on market data and produces stock rank scores.
+- **Vibe-Trading** (HKUDS) is an LLM-powered trading agent that consumes those scores via a read-only MCP server and acts on them (paper trading by default).
 
-## 🏛️ Architectural Overview
+The bridge is ~600 lines of clean Python with zero heavy dependencies:
 
 ```
-┌───────────────── Qlib Brain (Statistical Alpha) ────────────────┐
-│                                                                 │
-│  Data Lake ──> Alpha158 Mining ──> LightGBM Walk-Forward Model  │
-│                                           ↓                     │
-│                             Spearman IC & ICIR Gate (≥ 0.05)    │
-│                                           ↓                     │
-│                        Cryptographic SHA-256 State Vault        │
-└───────────────────────────────────────────┬─────────────────────┘
-                                            │
-                             ZERO-IMPORT AIR GAP BARRIER
-                        (Signed Canonical JSON + Stdio FastMCP)
-                                            │
-                                            ▼
-┌──────────────── Vibe Agent Hands (Execution & Risk) ────────────┐
-│                                                                 │
-│  MCP Client ──> Portfolio Constructor ──> Risk Invariant Guard  │
-│                                           (Max 20% single asset)│
-│                                           (Sector Neutrality)   │
-│                                           ↓                     │
-│                          Double-Guarded Execution Desk          │
-│                          (--submit + VIBE_ALLOW_ORDERS=1)       │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────── Qlib Side (Dedicated venv) ──────┐      ┌───── Vibe-Trading Side (Dedicated venv) ────┐
+│                                              │      │                                              │
+│  prepare_data    OHLCV -> Qlib binary format │      │  LLM Agent (MCP Client)                      │
+│       ↓                                      │ MCP  │       ↓                                      │
+│  train_model     LGBModel (or demo fallback) │─────→│  get_latest_signals()                        │
+│       ↓                                      │ stdio│       ↓                                      │
+│  export_signals  top-k + SHA-256 checksum    │      │  execute_signals   orders plan (paper)       │
+└──────────────────────────────────────────────┘      │       ↓                                      │
+                                                      │  shadow account -> broker                    │
+                                                      └──────────────────────────────────────────────┘
 ```
 
-The two systems **never import each other**:
-- They communicate exclusively across an immutable signed contract (`artifacts/signals.json`) validated with canonical SHA-256 hashes and a FastMCP stdio interface.
-- Python runtime boundaries remain isolated in dedicated environments to prevent dependency conflicts.
+The two systems **never import each other**: they communicate exclusively across an immutable signed contract (`artifacts/signals.json`, tamper-proofed with SHA-256 checksums) and a FastMCP stdio server. Each side runs in its own virtual environment to prevent dependency conflicts.
 
----
+## Features
 
-## ✨ Key Capabilities
+- **One-command demo**: Runs end-to-end without external services using synthetic trend data and a momentum fallback when pyqlib/yfinance are not installed.
+- **Real mode**: Downloads OHLCV data via yfinance -> converts with `qlib.scripts.dump_bin` -> computes Alpha158 features -> trains LightGBM ranker -> outputs predictions.
+- **Signed signal contract**: Schema validation, contiguous rank validation, finite score guarantees, and canonical JSON SHA-256 checksum verification. Any tampering is rejected.
+- **Evaluation gate**: Evaluates Spearman correlation (Information Coefficient), ICIR, and top-k hit-rate against forward returns before signals are published. Degraded signals are rejected.
+- **SQLite track record**: Every published signal is logged to `artifacts/track_record.db` and settled against realized prices. `stats` command reports real hit-rate and excess return.
+- **FastMCP server** (`bridge/mcp_server.py`): Exposes three read-only tools: `get_latest_signals`, `list_universe`, and `signal_health` (freshness check).
+- **Guarded execution**: By default, `execute_signals.py` only outputs a dry-run order plan (`orders_plan.json`). Real broker order submission requires `--submit` and the explicit environment variable `VIBE_ALLOW_ORDERS=1`.
+- **Data provenance**: Tracks whether each symbol originated from yfinance or the synthetic generator via `manifest.json` -> `signals.json`.
 
-1. **Luxury SaaS Web Terminal (Single-Port Architecture)**:
-   - Built with **React 19**, **TypeScript**, **Tailwind CSS**, and **Framer Motion**.
-   - Custom **OKLCH** color system for maximum perceptual clarity and deep glassmorphic elevation.
-   - Fluid spring motion physics (`apple-design`), tactile press feedback (`better-ui`), and kinetic text animations (`animate-text`).
-   - Interactive **Portfolio Simulator & Alpha Factor Laboratory** with real-time recalculation of Sharpe, IC, alpha spread, and dynamic weight constraints.
-   - Interactive **Pipeline Topology Visualizer** with live streaming logs via Server-Sent Events (SSE).
-   - Single-port FastAPI engine (`0.0.0.0:8000` or port `80`) with native GitHub Codespaces port-forwarding support.
+## Structure
 
-2. **Microsoft Qlib Continuous Factor Mining**:
-   - Alpha158 continuous quantitative indicators (momentum, volatility, volume-price interaction, mean-reversion).
-   - Rolling walk-forward gradient-boosted decision trees (LightGBM ranker).
-   - Automated demo momentum fallback for zero-dependency test runs.
+```
+config/pipeline.json                 universe, dates, train/valid/test splits, top_k, notional
+config/mcp.vibe-trading.example.json MCP server registration config for Vibe-Trading agent
+bridge/signal_store.py               schema, validation, and SHA-256 checksums (pure Python)
+bridge/mcp_server.py                 FastMCP stdio server (compatible with MCP SDK 1.x / FastMCP)
+bridge/track_record.py               historical SQLite signal ledger (log / settle / stats)
+qlib_side/prepare_data.py            yfinance (or synthetic) -> CSV -> Qlib binary format
+qlib_side/train_model.py             Qlib LGBModel; automatic DemoMomentum fallback
+qlib_side/evaluate.py                IC / ICIR / hit-rate evaluation + publication gate
+qlib_side/export_signals.py          predictions.csv -> gate evaluation -> verified signals.json
+vibe_side/execute_signals.py         signals -> equal-weight plan; double-guarded execution
+web/api.py                           FastAPI REST API, SSE streaming, and static SPA mounting
+web/server.py                        production web runner
+web/static/                          compiled production frontend assets
+web/frontend/                        React 19 + TypeScript + Tailwind + Framer Motion
+docs/DEPLOYMENT_GUIDE.md             cloud VPS and server deployment guide
+scripts/start_web.py                 one-command web launcher (single port: 8000 or 80)
+scripts/run_pipeline.py              end-to-end orchestrator across isolated venvs
+scripts/setup.ps1                    sets up venvs\qlib and venvs\vibe and installs dependencies
+Dockerfile                           Python 3.11 container with pyqlib; runs tests on build
+```
 
-3. **Mathematical Gatekeeper (Quality Firewall)**:
-   - Before publishing any trading signal, the model undergoes validation: Spearman Information Coefficient ($IC \ge 0.05$), $ICIR \ge 0.50$, and hit-rate testing.
-   - Degraded signals are rejected automatically before reaching the execution layer.
+Generated artifacts:
+- `artifacts/signals.json` — signed top-k signals consumed by the MCP agent
+- `artifacts/orders_plan.json` — equal-weight paper trading order plan (`dry_run: true`)
+- `artifacts/track_record.db` — SQLite historical ledger measuring real hit-rate
+- `data/raw/*.csv` — OHLCV per symbol with provenance in `manifest.json`
 
-4. **Cryptographic SHA-256 Vault & Zero Data Leakage**:
-   - Every signal payload is sealed with a canonical SHA-256 checksum.
-   - Audited historical ledger stored in SQLite (`artifacts/track_record.db`).
+Pipeline steps: `prepare -> settle -> train -> export -> execute`.
+The `settle` step settles historical signals from previous dates using newly available prices.
 
-5. **Double-Guarded Risk Execution**:
-   - By default, the execution module only outputs a dry-run order plan (`orders_plan.json`).
-   - Real broker order dispatch requires both the `--submit` command-line flag and explicit environment variable `VIBE_ALLOW_ORDERS=1`.
+## Web Interface and Terminal (Local, Codespaces & Cloud VPS)
 
----
+QuantVibe includes a modern fintech terminal web interface built with FastAPI, React 19, TypeScript, and Tailwind CSS. It is designed to run locally, on **GitHub Codespaces**, or on a cloud VPS using a single unified port (default `8000`, or port `80`).
 
-## ⚡ Quickstart (One-Command Setup)
-
-### Option 1: Web Interface & API (Local or Codespaces)
+### Launching the Web Interface
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/Ax3lsk3r3/QuantVibe.git
-cd QuantVibe
-
-# 2. Install lightweight web dependencies
+# 1. Install lightweight web dependencies
 pip install -r requirements-web.txt
 
-# 3. Launch Web Terminal (Listens on 0.0.0.0:8000)
+# 2. Launch web server (listens on 0.0.0.0:8000)
 python scripts/start_web.py
 ```
 
-* **Web Application:** `http://localhost:8000`
-* **Interactive API Docs (Swagger):** `http://localhost:8000/docs`
-* **GitHub Codespaces:** Opens automatically on port `8000` without CORS configuration.
+- **Local / Codespaces URL:** `http://localhost:8000`
+- **Interactive Swagger Docs:** `http://localhost:8000/docs`
 
----
+### Interface Features
 
-### Option 2: Full End-to-End Pipeline (Demo Mode)
+1. **Dashboard & Quality Gate:** Real-time visual traffic light of model verdict (Spearman IC, ICIR, hit-rate), SHA-256 cryptographic verification status, and interactive Top-$k$ signal table.
+2. **Interactive Pipeline Launcher:** Mode selector (Demo vs Full Qlib), granular phase triggers, and real-time streaming console output via Server-Sent Events (SSE).
+3. **Execution Desk & Guardrails:** Visualizer for `orders_plan.json`, portfolio exposure breakdown, and a hardware-style safety switch toggling Paper Trading vs real order dispatch (`VIBE_ALLOW_ORDERS=1`).
+4. **Track Record & Audit:** Historical performance settled in SQLite (`artifacts/track_record.db`), hit-rate metrics, and excess return vs universe benchmark.
+5. **Architecture & MCP Inspector:** Status monitor for FastMCP stdio server and indexed knowledge graphs.
 
-Runs without external dependencies (only standard `pandas` and `numpy` required):
+### Frontend Development
+
+The frontend source lives in `web/frontend/` and compiles to static files in `web/static/`:
 
 ```bash
-python scripts/run_pipeline.py --force-demo
+cd web/frontend
+pnpm install
+pnpm build     # builds production assets to web/static/
+pnpm dev       # Vite dev server on port 5173 with proxy to FastAPI :8000
 ```
 
-**Generated Artifacts:**
-* `artifacts/evaluation.json` — Gate validation verdict and statistical IC/ICIR metrics.
-* `artifacts/signals.json` — Verified Top-$k$ stock signals with cryptographic SHA-256 seal.
-* `artifacts/orders_plan.json` — Equal-weight paper trading order execution plan.
-* `artifacts/track_record.db` — SQLite historical ledger for performance auditing.
+## Evaluation Gate and Track Record
 
----
+Before signals are published, `export` evaluates the model: Spearman rank correlation (IC) between model scores and realized forward returns per date, ICIR (IC / volatility of IC), and top-k hit-rate. Thresholds are defined in `config/pipeline.json -> evaluation.gate`. If the model fails validation, signals are blocked (`--force` bypasses if needed).
 
-### Option 3: Cloud VPS Deployment (24/7 Production)
-
-Follow our complete deployment manual: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md).
+To inspect realized performance over time:
 
 ```bash
-# On Ubuntu 22.04 / 24.04 server:
+python -m bridge.track_record stats     # hit-rate, mean return, excess vs universe
+python -m bridge.track_record settle    # settles pending records with new market prices
+```
+
+## Full Setup (Real Data + Real Model)
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/setup.ps1
+python scripts/run_pipeline.py
+```
+
+| venv | Packages | Python Version |
+|------|----------|----------------|
+| `venvs\qlib` | `pyqlib`, `yfinance` | **3.10–3.12 required** (pyqlib does not build on 3.13+) |
+| `venvs\vibe` | `vibe-trading-ai` | 3.11+ |
+
+Without a compatible interpreter for Qlib, the pipeline falls back to demo mode automatically — output indicates which mode ran.
+
+## Docker (Alternative to venvs)
+
+Solves Python version differences: the Docker image runs Python 3.11 with `pyqlib` preinstalled, running the test suite during build.
+
+```bash
+docker compose build                      # builds image and runs tests
+docker compose run --rm pipeline          # full pipeline with real data/model
+docker compose up -d signals-mcp          # MCP server over SSE on http://localhost:8000/sse
+```
+
+A prebuilt image is also published to GitHub Container Registry with every commit to `main`:
+
+```bash
+docker pull ghcr.io/ax3lsk3r3/quantvibe:latest
+docker run --rm -v ./data:/app/data -v ./artifacts:/app/artifacts ghcr.io/ax3lsk3r3/quantvibe:latest python scripts/run_pipeline.py --force-demo
+```
+
+Mount `./data` and `./artifacts` as volumes so signals, plans, and the track record database persist on your local filesystem.
+
+## Cloud Deployment (24/7 Production)
+
+For deploying QuantVibe on a cloud server (e.g. Alibaba Cloud ECS, AWS EC2, or DigitalOcean):
+
+See our step-by-step operations guide: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md).
+
+```bash
+# On an Ubuntu 22.04 / 24.04 server:
 sudo apt update && sudo apt install -y python3-pip python3-venv git
 git clone https://github.com/Ax3lsk3r3/QuantVibe.git
 cd QuantVibe
@@ -134,83 +173,83 @@ pip install -r requirements-web.txt
 nohup python scripts/start_web.py --port 80 > web.log 2>&1 &
 ```
 
----
+## Connecting the Vibe-Trading Agent
 
-## 📁 Repository Structure
+Register the MCP server (example in `config/mcp.vibe-trading.example.json`; verify tool names against your Vibe-Trading installation):
 
-```
-├── config/
-│   ├── pipeline.json                 # Universe, train/valid/test splits, gate criteria
-│   └── mcp.vibe-trading.example.json # FastMCP configuration for Vibe Agent
-├── bridge/
-│   ├── signal_store.py               # Schema validation & canonical SHA-256 checksums
-│   ├── mcp_server.py                 # FastMCP stdio server (read-only tools)
-│   └── track_record.py               # SQLite execution ledger & historical hit-rate
-├── qlib_side/
-│   ├── prepare_data.py               # OHLCV data converter -> Qlib binary format
-│   ├── train_model.py                # LightGBM Alpha158 model & fallback ranker
-│   ├── evaluate.py                   # IC, ICIR & Gate verification logic
-│   └── export_signals.py             # Validated signal publisher
-├── vibe_side/
-│   └── execute_signals.py            # Order plan constructor with double guardrails
-├── web/
-│   ├── api.py                        # FastAPI endpoints, SSE stream & static SPA mount
-│   ├── server.py                     # Production server runner
-│   ├── static/                       # Compiled production frontend bundle
-│   └── frontend/                     # React 19 + TypeScript + Tailwind + Framer Motion
-│       ├── src/components/
-│       │   ├── Header.tsx            # Frosted glass navigation with spring pill
-│       │   ├── LandingPage.tsx       # Luxury SaaS Showcase landing page
-│       │   ├── OverviewTab.tsx       # Holographic stock cards & dynamic sparklines
-│       │   ├── PipelineTab.tsx       # Live control cockpit & SSE streaming console
-│       │   ├── ExecutionTab.tsx      # Risk-guarded execution desk with iOS toggle
-│       │   ├── TrackRecordTab.tsx    # SQLite equity curve & performance explorer
-│       │   ├── ArchitectureTab.tsx   # 3-Pillar breakdown & knowledge graph status
-│       │   └── landing/              # Kinetic titles, simulators & comparison matrix
-├── docs/
-│   └── DEPLOYMENT_GUIDE.md           # Cloud VPS, ECS, and domain setup manual
-├── scripts/
-│   ├── start_web.py                  # Single-command web terminal launcher
-│   └── run_pipeline.py               # Orchestrator across isolated environments
-├── tests/
-│   ├── test_bridge.py                # Checksum, schema, and gate integrity tests
-│   └── test_web.py                   # 24 FastAPI and static mount unit tests
-└── requirements-web.txt              # FastAPI, Uvicorn, Pydantic dependencies
+```jsonc
+{
+  "mcpServers": {
+    "quantvibe-signals": {
+      "command": "python",
+      "args": ["-m", "bridge.mcp_server"],
+      "cwd": "<path-to-this-repo>"
+    }
+  }
+}
 ```
 
----
+Recommended agent workflow:
 
-## 🔒 Security & Safe Execution Invariants
+1. `signal_health` — verify signals are fresh (< N hours old).
+2. `get_latest_signals` — inspect rankings and scores; reason about news, risk, and position sizing.
+3. Output or execute only the reviewed orders plan.
 
-| Invariant | Protection Mechanism | Enforcement |
-| :--- | :--- | :--- |
-| **Model Quality** | IC $\ge 0.05$, ICIR $\ge 0.50$ Gate | Signals are blocked if alpha has decayed |
-| **Payload Integrity** | Canonical SHA-256 Hash | Consumers reject modified or unverified JSON |
-| **Architectural Separation** | Zero-Import Policy | `qlib_side` and `vibe_side` never share memory |
-| **Position Concentration** | Max 20.0% Weight Cap | Portfolio constructor prevents over-allocation |
-| **Broker Safety** | Double-Guarded CLI Flag | Execution requires `--submit` AND `VIBE_ALLOW_ORDERS=1` |
+## Live Trading (When Ready)
 
----
-
-## 🧪 Testing Suite
-
-QuantVibe includes automated unit tests covering cryptographic checksums, ranking consistency, gate thresholds, and FastAPI endpoints:
+By design, no order ever reaches a broker implicitly:
 
 ```bash
-# Run all unit tests
-python -m unittest discover -s tests -v
+# Windows PowerShell
+$env:VIBE_ALLOW_ORDERS = "1"
+python -m vibe_side.execute_signals --submit --order-cmd-template "<broker CLI> {symbol} {qty}"
+
+# Linux / macOS
+export VIBE_ALLOW_ORDERS=1
+python -m vibe_side.execute_signals --submit --order-cmd-template "<broker CLI> {symbol} {qty}"
 ```
 
-All 29 tests run in under 0.5 seconds with 100% clean passes.
+If either the `--submit` flag or the environment variable is missing, execution exits with code 2 and zero orders are placed. Start with Vibe-Trading paper trading accounts before deploying capital.
 
----
+## Signals Payload Format
 
-## ⚖️ Legal Disclaimer
+```jsonc
+{
+  "schema_version": 1,
+  "generated_at": "2026-08-23T19:33:05+00:00",
+  "source_model": "LGBModel",           // or DemoMomentum
+  "as_of": "2026-08-21",
+  "horizon_days": 1,
+  "universe": ["AAPL", "..."],
+  "signals": [
+    { "instrument": "AAPL", "score": 0.109, "rank": 1 }
+  ],
+  "metadata": { "data_source": "yfinance", "top_k": 5, "test_window": ["...", "..."] },
+  "checksum": "sha256 canonical JSON hash"  // verified by consumers before loading
+}
+```
 
-*This software is created strictly for technical research, educational purposes, and algorithmic simulation. None of the modules, predictions, metrics, or signals constitute financial, tax, or investment advice. Historical backtesting is subject to overfitting and survivorship biases. Always validate strategies in paper trading accounts before deploying capital.*
+## Troubleshooting
 
----
+- **`pyqlib` installation fails**: You are using Python 3.13 or 3.14. Create the venv using Python 3.10-3.12 (`py -3.12`).
+- **`No MCP server runtime found`**: In the environment executing the MCP server: `pip install "mcp>=1.2,<2"` or `pip install fastmcp`.
+- **yfinance rate limits**: Affected symbols fall back to synthetic data marked in `manifest.json`. Delete `data/raw` and retry later.
 
-## 📄 License
+## Community
 
-Distributed under the [MIT License](LICENSE). Copyright © 2026 Ax3lsk3r3.
+- [Contributing](CONTRIBUTING.md) — bug reports and pull requests
+- [Security](SECURITY.md) — vulnerability disclosure policy
+- [Issues](https://github.com/Ax3lsk3r3/QuantVibe/issues) — issue templates
+
+## Legal Notice and Disclaimer
+
+This software is provided strictly for educational, experimental, and technical research purposes. None of the modules, code, signals, metrics, or analysis generated by this system constitute financial, investment, legal, or tax advice.
+
+- **Predictive Modeling Risk**: Scores and rankings produced by machine learning models are statistical estimates based on historical data. They do not guarantee future returns or operational certainty.
+- **Overfitting**: Backtesting results carry inherent historical fit biases and do not accurately reflect real-world market liquidity, spreads, execution slippage, commissions, or live volatility.
+- **Language Model (LLM) Behavior**: Decisions generated by LLM-based agents can exhibit hallucinations, contextual bias, or faulty reasoning regarding market dynamics.
+- **Simulation Only**: Users are advised to operate solely within paper trading accounts and zero-risk simulators. Any live capital deployment is the sole and exclusive responsibility of the user.
+
+## License
+
+Distributed under the [MIT License](LICENSE).
