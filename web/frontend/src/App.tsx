@@ -6,6 +6,7 @@ import { PipelineTab } from './components/PipelineTab'
 import { ExecutionTab } from './components/ExecutionTab'
 import { TrackRecordTab } from './components/TrackRecordTab'
 import { ArchitectureTab } from './components/ArchitectureTab'
+import { LandingPage } from './components/LandingPage'
 import {
   fetchStatus,
   fetchSignals,
@@ -22,7 +23,7 @@ import type {
 } from './types'
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>('overview')
+  const [activeTab, setActiveTab] = useState<string>('landing')
   const [loading, setLoading] = useState<boolean>(true)
 
   const [status, setStatus] = useState<SystemStatus | null>(null)
@@ -84,6 +85,10 @@ export const App: React.FC = () => {
             exit={{ opacity: 0, y: -12 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           >
+            {activeTab === 'landing' && (
+              <LandingPage onNavigateToTab={setActiveTab} />
+            )}
+
             {activeTab === 'overview' && (
               <OverviewTab
                 signals={signals}

@@ -38,6 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
   const gatePassed = evaluation?.passed ?? false
 
   const tabs = [
+    { id: 'landing', label: 'SaaS Showcase', icon: Sparkles },
     { id: 'overview', label: 'Alpha Studio', icon: Activity },
     { id: 'pipeline', label: 'Pipeline Control', icon: Terminal },
     { id: 'execution', label: 'Mesa de Órdenes', icon: Layers },
@@ -53,7 +54,10 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18 py-3">
           {/* Brand Mark */}
-          <div className="flex items-center space-x-3.5">
+          <div
+            onClick={() => setActiveTab('landing')}
+            className="flex items-center space-x-3.5 cursor-pointer group"
+          >
             <motion.div
               whileHover={{ scale: 1.05, rotate: 3 }}
               whileTap={{ scale: 0.95 }}
