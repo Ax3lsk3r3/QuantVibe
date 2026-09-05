@@ -11,6 +11,7 @@ import {
 export const BloombergTerminal: React.FC = () => {
   const [activeUniverse, setActiveUniverse] = useState<string>('sp10')
   const [customTickers, setCustomTickers] = useState<string>('PLTR, SMCI, ARM, COIN, MSTR')
+  const [showBloombergTV, setShowBloombergTV] = useState<boolean>(false)
 
   const marketQuotesContainerRef = useRef<HTMLDivElement>(null)
   const newsContainerRef = useRef<HTMLDivElement>(null)
@@ -214,6 +215,17 @@ export const BloombergTerminal: React.FC = () => {
               <Terminal className="w-3.5 h-3.5" />
               <span>QVB &lt;GO&gt;</span>
             </div>
+            <button
+              onClick={() => setShowBloombergTV(!showBloombergTV)}
+              className={`px-3 py-1 rounded-lg border font-mono text-xs font-semibold flex items-center space-x-1.5 transition-all ${
+                showBloombergTV
+                  ? 'bg-rose-500/20 border-rose-500/50 text-rose-300 shadow-sm'
+                  : 'bg-black/60 border-amber-500/40 text-amber-300 hover:bg-amber-500/10'
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${showBloombergTV ? 'bg-rose-400 animate-ping' : 'bg-amber-400'}`} />
+              <span>TV &lt;GO&gt; {showBloombergTV ? 'CERRAR TV' : 'BLOOMBERG TV EN VIVO'}</span>
+            </button>
             <div className="px-3 py-1 rounded-lg bg-black/60 border border-white/10 text-white font-medium">
               <span>TOP5 &lt;GO&gt;</span>
             </div>
@@ -245,6 +257,30 @@ export const BloombergTerminal: React.FC = () => {
             </div>
           ))}
         </div>
+
+        {/* Official 24/7 Bloomberg TV Live Broadcast Player */}
+        {showBloombergTV && (
+          <div className="mt-6 pt-6 border-t border-white/[0.08]">
+            <div className="rounded-2xl bg-black border border-white/[0.14] overflow-hidden shadow-2xl">
+              <div className="px-4 py-2 bg-[#0E0E14] border-b border-white/[0.08] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+                <div className="flex items-center space-x-2 text-rose-400">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                  <span className="font-bold">SEÑAL EN DIRECTO: BLOOMBERG TELEVISION (OFICIAL 24/7)</span>
+                </div>
+                <span className="text-[#86868B] text-[11px]">Transmisión Oficial de Mercados Mundiales & Wall Street</span>
+              </div>
+              <div className="relative w-full aspect-video sm:h-[480px]">
+                <iframe
+                  src="https://www.youtube-nocookie.com/embed/live_stream?channel=UCUMZ7gohGI9HcU9VNsr2FJQ&autoplay=1"
+                  title="Bloomberg Television Live Broadcast"
+                  className="w-full h-full border-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 2. Configuración de Universos Dinámicos ("¿Solo se puede esos activos?") */}
