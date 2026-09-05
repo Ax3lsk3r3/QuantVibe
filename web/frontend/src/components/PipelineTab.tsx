@@ -13,7 +13,7 @@ import {
   Check,
   Zap,
 } from 'lucide-react'
-import { runPipeline } from '../api'
+import { runPipeline, getApiBase } from '../api'
 import type { SystemStatus } from '../types'
 
 interface PipelineTabProps {
@@ -54,8 +54,7 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
       eventSourceRef.current.close()
     }
 
-    const API_BASE = import.meta.env.VITE_API_BASE || '/api'
-    const es = new EventSource(`${API_BASE}/pipeline/logs/stream`)
+    const es = new EventSource(`${getApiBase()}/pipeline/logs/stream`)
     eventSourceRef.current = es
 
     es.onmessage = (event) => {
@@ -88,8 +87,7 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
   useEffect(() => {
     const fetchInitialLogs = async () => {
       try {
-        const API_BASE = import.meta.env.VITE_API_BASE || '/api'
-        const res = await fetch(`${API_BASE}/pipeline/logs`)
+        const res = await fetch(`${getApiBase()}/pipeline/logs`)
         if (res.ok) {
           const data = await res.json()
           if (data.logs && data.logs.length > 0) {
