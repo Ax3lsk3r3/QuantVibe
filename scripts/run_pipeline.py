@@ -45,6 +45,8 @@ def run_step(step: str, config: str | None, force_demo: bool, python_override: s
         cmd += ["--config", config]
     env = dict(os.environ)
     env["PYTHONPATH"] = str(PROJECT_ROOT)
+    if step == "prepare" and force_demo:
+        cmd.append("--force-synthetic")
     if step == "train" and force_demo:
         env["QVB_FORCE_DEMO"] = "1"
     if step == "export" and force_demo:

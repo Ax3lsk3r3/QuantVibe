@@ -53,7 +53,8 @@ jobs:
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" << 'EOF'
             echo "🚀 Starting continuous deployment on Alibaba Cloud ECS..."
             cd /root/QuantVibe
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main
             source venv/bin/activate
             pip install -r requirements-web.txt --quiet
             python scripts/run_pipeline.py --force-demo || true
