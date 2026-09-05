@@ -22,12 +22,32 @@ jobs:
             exit 0
           fi
           mkdir -p ~/.ssh
-          # Strip Windows carriage returns (\r) and ensure Unix LF format
-          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/deploy_key
-          echo "" >> ~/.ssh/deploy_key
+
+          python3 - << 'PYEOF'
+          import os, base64, sys
+
+          raw = os.environ.get("SSH_PRIVATE_KEY", "").strip()
+          if not raw:
+              sys.exit("Empty key")
+
+          # If it was base64 encoded
+          if not raw.startswith("-----"):
+              try:
+                  raw = base64.b64decode(raw).decode("utf-8")
+              except Exception:
+                  pass
+
+          # Normalize newlines to pure Unix LF and ensure trailing newline
+          lines = [line.strip() for line in raw.replace("\r\n", "\n").replace("\r", "\n").split("\n") if line.strip()]
+          clean_key = "\n".join(lines) + "\n"
+
+          with open(os.path.expanduser("~/.ssh/deploy_key"), "w", newline="\n") as f:
+              f.write(clean_key)
+          PYEOF
+
           chmod 600 ~/.ssh/deploy_key
 
-          # Verify key can be parsed by ssh-keygen
+          # Verify key format
           ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null || (echo "Key format error" && exit 1)
 
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" << 'EOF'
