@@ -71,8 +71,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             </div>
 
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-[#F5F5F7] tracking-[-0.035em] leading-[1.08]">
-              Señales Cuantitativas con{' '}
-              <span className="font-serif italic font-normal text-white drop-shadow-[0_2px_12px_rgba(255,255,255,0.2)]">Ventaja Estadística.</span>
+              Señales Cuantitativas con <span className="text-white">Ventaja Estadística</span>
             </h2>
 
             <p className="text-sm text-[#86868B] leading-relaxed">

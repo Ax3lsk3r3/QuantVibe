@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   RefreshCw,
   Sparkles,
+  Monitor,
 } from 'lucide-react'
 import type { SystemStatus, EvaluationData, SignalsResponse } from '../types'
 
@@ -38,6 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
   const tabs = [
     { id: 'landing', label: 'SaaS Showcase', icon: Sparkles },
     { id: 'overview', label: 'Alpha Studio', icon: Activity },
+    { id: 'bloomberg', label: 'Bloomberg Terminal', icon: Monitor },
     { id: 'pipeline', label: 'Pipeline Control', icon: Terminal },
     { id: 'execution', label: 'Mesa de Órdenes', icon: Layers },
     { id: 'trackrecord', label: 'Track Record', icon: TrendingUp },
@@ -46,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-white/[0.08] bg-[#000000]/70 backdrop-blur-2xl transition-all">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18 py-3">
           {/* Brand Mark */}
           <div

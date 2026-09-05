@@ -65,9 +65,8 @@ export const TrackRecordShowcase: React.FC = () => {
               <Award className="w-3.5 h-3.5 text-white" />
               <span>DESEMPEÑO HISTÓRICO AUDITADO</span>
             </div>
-            <h3 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-[-0.035em] leading-[1.1]">
-              Curva de Equity vs{' '}
-              <span className="font-serif italic font-normal text-[#D2D2D7]">Benchmark S&P 500.</span>
+            <h3 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-[-0.035em] leading-[1.1]">
+              Curva de Equity vs <span className="text-[#86868B]">Benchmark S&P 500</span>
             </h3>
             <p className="text-xs sm:text-sm text-[#86868B] mt-1">
               Backtest continuo rolling walk-forward (Alpha158 + LightGBM con costos de transacción 5bps).

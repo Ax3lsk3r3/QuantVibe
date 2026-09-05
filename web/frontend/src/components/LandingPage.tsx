@@ -4,7 +4,6 @@ import {
   ArrowRight,
   ShieldCheck,
   Cpu,
-  Terminal,
   Layers,
   Lock,
   ChevronRight,
@@ -77,7 +76,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToTab }) => 
         </div>
 
         {/* Monumental Typographic Headline (Luxury Editorial + Geometric Sans) */}
-        <div className="max-w-5xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <KineticTitle
             text="Donde el Rigor Cuantitativo Institucional Conoce la Autonomía Agéntica"
             highlightWord="Cuantitativo"
@@ -91,7 +90,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToTab }) => 
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-2xl mx-auto mt-7 text-base sm:text-lg text-[#86868B] font-sans leading-relaxed px-4 tracking-[-0.015em] font-normal"
+          className="max-w-3xl mx-auto mt-7 text-base sm:text-lg text-[#86868B] font-sans leading-relaxed px-4 tracking-[-0.015em] font-normal"
         >
           QuantVibe orquesta el pipeline completo de finanzas computacionales: minado de 158 factores con{' '}
           <strong className="text-[#F5F5F7] font-medium">Microsoft Qlib</strong>, validación con firewall matemático ineludible{' '}
@@ -119,11 +118,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToTab }) => 
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => onNavigateToTab('pipeline')}
+            onClick={() => onNavigateToTab('bloomberg')}
             className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#121216]/90 hover:bg-[#1C1C22] border border-white/[0.14] text-[#F5F5F7] font-medium text-sm tracking-tight shadow-lg flex items-center justify-center space-x-2.5 transition-colors backdrop-blur-xl"
           >
-            <Terminal className="w-4 h-4 text-white" />
-            <span>Lanzar Pipeline en Vivo</span>
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span>Terminal Bloomberg en Vivo</span>
           </motion.button>
         </motion.div>
 
@@ -134,7 +133,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToTab }) => 
           initial={{ opacity: 0, y: 45, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.0, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-6xl mt-16 px-4"
+          className="w-full max-w-7xl mt-16 px-2 sm:px-4"
         >
           <div className="relative rounded-3xl bg-[#08080C]/90 border border-white/[0.12] p-1.5 sm:p-2 shadow-[0_30px_90px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-3xl overflow-hidden">
             {/* Specular Glare Strip */}
@@ -322,9 +321,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToTab }) => 
           <span className="text-xs font-mono uppercase tracking-widest text-[#86868B] font-medium block mb-3">
             INGENIERÍA SISTEMÁTICA
           </span>
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[-0.035em] leading-[1.05]">
+          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-[-0.035em] leading-[1.05]">
             Invariantes de Diseño.<br />
-            <span className="font-serif italic font-normal text-[#D2D2D7]">Cero Alucinaciones Financieras.</span>
+            <span className="text-[#86868B]">Cero Alucinaciones Financieras.</span>
           </h2>
         </div>
 

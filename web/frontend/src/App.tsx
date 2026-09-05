@@ -8,6 +8,8 @@ import { TrackRecordTab } from './components/TrackRecordTab'
 import { ArchitectureTab } from './components/ArchitectureTab'
 import { LandingPage } from './components/LandingPage'
 import { TradingViewTickerTape } from './components/TradingViewTickerTape'
+import { BloombergTerminal } from './components/BloombergTerminal'
+import { FloatingCollapsibleNav } from './components/FloatingCollapsibleNav'
 import {
   fetchStatus,
   fetchSignals,
@@ -80,7 +82,7 @@ export const App: React.FC = () => {
       <TradingViewTickerTape />
 
       {/* Main Workspace Container with Animated Tab Transition */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <main className="flex-1 max-w-[1720px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -102,6 +104,8 @@ export const App: React.FC = () => {
               />
             )}
 
+            {activeTab === 'bloomberg' && <BloombergTerminal />}
+
             {activeTab === 'pipeline' && (
               <PipelineTab status={status} onPipelineFinished={loadData} />
             )}
@@ -119,9 +123,12 @@ export const App: React.FC = () => {
         </AnimatePresence>
       </main>
 
+      {/* Floating Collapsible Navigation Dock (Follows scroll & collapses into button) */}
+      <FloatingCollapsibleNav activeTab={activeTab} setActiveTab={setActiveTab} />
+
       {/* Translucent Apple Glass Footer */}
       <footer className="border-t border-white/[0.08] bg-[#000000]/80 backdrop-blur-2xl py-8 px-4 sm:px-6 lg:px-8 text-xs text-[#86868B] relative z-10">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-[1720px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
             <span className="w-2 h-2 rounded-full bg-emerald-400" />
             <span className="text-[#F5F5F7] font-medium tracking-tight">QuantVibe Live Production Terminal</span>

@@ -63,7 +63,7 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
             variants={child}
             className={`inline-block mr-[0.24em] last:mr-0 ${
               isItalic
-                ? 'font-serif italic font-normal text-white drop-shadow-[0_2px_12px_rgba(255,255,255,0.25)] tracking-[-0.01em]'
+                ? 'text-[#86868B] font-extrabold tracking-[-0.03em]'
                 : isHighlight
                 ? 'bg-gradient-to-b from-white via-[#E1E1E6] to-[#71717A] bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(255,255,255,0.18)] font-extrabold'
                 : 'text-white'
