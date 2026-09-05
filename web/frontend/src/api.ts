@@ -5,7 +5,7 @@ import type {
   SystemStatus,
   TrackRecordResponse,
 } from './types'
-let resolvedApiBase = import.meta.env.VITE_API_BASE || '/api'
+const resolvedApiBase = import.meta.env.VITE_API_BASE || '/api'
 
 export function getApiBase(): string {
   return resolvedApiBase
@@ -13,38 +13,7 @@ export function getApiBase(): string {
 
 async function apiFetch(endpoint: string, options?: RequestInit): Promise<Response> {
   const url = `${resolvedApiBase}${endpoint}`
-  try {
-    const res = await fetch(url, options)
-    if (res.ok) return res
-    // If endpoint responded with 404 or 502 and we're using default relative /api, attempt localhost:8001
-    if ((res.status === 404 || res.status === 502) && resolvedApiBase === '/api') {
-      const fallbackUrl = `http://127.0.0.1:8001/api${endpoint}`
-      try {
-        const fallbackRes = await fetch(fallbackUrl, options)
-        if (fallbackRes.ok) {
-          resolvedApiBase = 'http://127.0.0.1:8001/api'
-          return fallbackRes
-        }
-      } catch {
-        // Fallback network error, continue with original response
-      }
-    }
-    return res
-  } catch (err) {
-    if (resolvedApiBase === '/api') {
-      const fallbackUrl = `http://127.0.0.1:8001/api${endpoint}`
-      try {
-        const fallbackRes = await fetch(fallbackUrl, options)
-        if (fallbackRes.ok) {
-          resolvedApiBase = 'http://127.0.0.1:8001/api'
-          return fallbackRes
-        }
-      } catch {
-        // Fallback network error
-      }
-    }
-    throw err
-  }
+  return fetch(url, options)
 }
 
 export async function fetchStatus(): Promise<SystemStatus> {

@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-05T03:07:47+00:00",
+  "source_model": "DemoMomentum",
+  "universe": [
+    "AAPL",
+    "AMZN",
+    "GOOGL",
+    "JPM",
+    "META",
+    "MSFT",
+    "NVDA",
+    "TSLA",
+    "V",
+    "XOM"
+  ],
+  "as_of": "2026-09-04",
+  "horizon_days": 1,
+  "signals": [
+    {
+      "instrument": "TSLA",
+      "score": 0.1281508803155218,
+      "rank": 1
+    },
+    {
+      "instrument": "AAPL",
+      "score": 0.1005455912773567,
+      "rank": 2
+    },
+    {
+      "instrument": "META",
+      "score": 0.0835580320576823,
+      "rank": 3
+    },
+    {
+      "instrument": "JPM",
+      "score": 0.0541345341964536,
+      "rank": 4
+    },
+    {
+      "instrument": "NVDA",
+      "score": 0.0474513837938415,
+      "rank": 5
+    }
+  ],
+  "metadata": {
+    "top_k": 5,
+    "horizon_days": 1,
+    "data_source": "synthetic",
+    "n_candidates": 5,
+    "test_window": [
+      "2025-01-02",
+      "2026-08-21"
+    ]
+  },
+  "checksum": "6ced972be6394102b125c9e7218cb79541c54f26253b8203876dc35da40d61f6"
+}

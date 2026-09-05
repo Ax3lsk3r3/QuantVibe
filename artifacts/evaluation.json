@@ -1,0 +1,17 @@
+{
+  "n_days": 1459,
+  "mean_ic": 0.06809562381872182,
+  "icir": 0.2034666930979537,
+  "hit_rate_topk": 0.570938999314599,
+  "avg_topk_fwd_return": 0.0011845710616860765,
+  "avg_universe_fwd_return": 0.00031342473412874095,
+  "passed": true,
+  "failures": [],
+  "thresholds": {
+    "min_days": 60,
+    "min_mean_ic": 0.0,
+    "min_icir": 0.0
+  },
+  "fwd_horizon": 1,
+  "evaluated_at": "2026-09-05T03:07:47+00:00"
+}

@@ -1,4 +1,10 @@
-# Dependencias para la interfaz Web y API de QuantVibe
+# Dependencias para la interfaz Web, API y Pipeline de QuantVibe
 fastapi>=0.110.0
 uvicorn>=0.28.0
 pydantic>=2.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+scipy>=1.10.0
+yfinance>=0.2.40
+fire>=0.6
+

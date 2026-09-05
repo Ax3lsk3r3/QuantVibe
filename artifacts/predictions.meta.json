@@ -1,0 +1,10 @@
+{
+  "source_model": "DemoMomentum",
+  "data_source": "synthetic",
+  "rows": 14610,
+  "as_of": "2026-09-04",
+  "test_window": [
+    "2025-01-02",
+    "2026-08-21"
+  ]
+}

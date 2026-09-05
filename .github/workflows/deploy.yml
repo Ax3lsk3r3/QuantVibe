@@ -56,9 +56,11 @@ jobs:
             git pull origin main
             source venv/bin/activate
             pip install -r requirements-web.txt --quiet
+            python scripts/run_pipeline.py --force-demo || true
             pkill -f "python scripts/start_web.py" || true
             nohup python scripts/start_web.py --port 80 > web.log 2>&1 &
             sleep 3
             curl -f http://localhost/api/status || (echo "❌ Healthcheck failed" && exit 1)
+            iptables -t nat -A PREROUTING -p tcp --dport 8000 -j REDIRECT --to-port 80 2>/dev/null || true
             echo "✅ Deployment completed successfully! Live on https://quantvibeapp.com"
           EOF

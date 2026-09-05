@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-05T03:07:47+00:00",
+  "dry_run": true,
+  "currency": "USD",
+  "total_notional_target": 10000.0,
+  "source_model": "DemoMomentum",
+  "data_source": "synthetic",
+  "signals_checksum": "6ced972be6394102b125c9e7218cb79541c54f26253b8203876dc35da40d61f6",
+  "orders": [
+    {
+      "instrument": "TSLA",
+      "action": "BUY",
+      "rank": 1,
+      "signal_score": 0.1281508803155218,
+      "signal_as_of": "2026-09-04",
+      "signals_checksum": "6ced972be6394102b125c9e7218cb79541c54f26253b8203876dc35da40d61f6",
+      "status": "PLANNED",
+      "qty": 33,
+      "est_price": 60.469,
+      "est_notional": 1995.48
+    },
+    {
+      "instrument": "AAPL",
+      "action": "BUY",
+      "rank": 2,
+      "signal_score": 0.1005455912773567,
+      "signal_as_of": "2026-09-04",
+      "signals_checksum": "6ced972be6394102b125c9e7218cb79541c54f26253b8203876dc35da40d61f6",
+      "status": "PLANNED",
+      "qty": 7,
+      "est_price": 258.2975,
+      "est_notional": 1808.08
+    },
+    {
+      "instrument": "META",
+      "action": "BUY",
+      "rank": 3,
+      "signal_score": 0.0835580320576823,
+      "signal_as_of": "2026-09-04",
+      "signals_checksum": "6ced972be6394102b125c9e7218cb79541c54f26253b8203876dc35da40d61f6",
+      "status": "PLANNED",
+      "qty": 36,
+      "est_price": 54.3711,
+      "est_notional": 1957.36
+    },
+    {
+      "instrument": "JPM",
+      "action": "BUY",
+      "rank": 4,
+      "signal_score": 0.0541345341964536,
+      "signal_as_of": "2026-09-04",
+      "signals_checksum": "6ced972be6394102b125c9e7218cb79541c54f26253b8203876dc35da40d61f6",
+      "status": "PLANNED",
+      "qty": 53,
+      "est_price": 37.4534,
+      "est_notional": 1985.03
+    },
+    {
+      "instrument": "NVDA",
+      "action": "BUY",
+      "rank": 5,
+      "signal_score": 0.0474513837938415,
+      "signal_as_of": "2026-09-04",
+      "signals_checksum": "6ced972be6394102b125c9e7218cb79541c54f26253b8203876dc35da40d61f6",
+      "status": "PLANNED",
+      "qty": 36,
+      "est_price": 55.393,
+      "est_notional": 1994.15
+    }
+  ],
+  "totals": {
+    "planned_orders": 5,
+    "skipped_orders": 0,
+    "estimated_exposure": 9740.1
+  }
+}

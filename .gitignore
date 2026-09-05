@@ -1,6 +1,6 @@
 venvs/
 data/
-artifacts/
+artifacts/*.csv
 __pycache__/
 *.pyc
 .pytest_cache/
