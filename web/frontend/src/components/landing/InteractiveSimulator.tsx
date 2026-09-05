@@ -94,31 +94,30 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
   }, [activeModel, topK])
 
   return (
-    <div className="relative w-full rounded-3xl bg-[#090D16]/90 border border-white/[0.09] p-6 sm:p-8 lg:p-10 shadow-2xl backdrop-blur-2xl overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-cyan-500/10 blur-[100px] pointer-events-none" />
-      <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-violet-500/10 blur-[100px] pointer-events-none" />
+    <div className="relative w-full rounded-3xl bg-[#0C0C10] border border-white/[0.08] p-6 sm:p-8 lg:p-10 shadow-2xl backdrop-blur-2xl overflow-hidden">
+      {/* Apple Subtle Top Light Highlight */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
 
       {/* Header bar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-8 border-b border-white/[0.08]">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono font-medium text-cyan-400 mb-1.5">
-            <Sliders className="w-3.5 h-3.5" />
+          <div className="flex items-center space-x-2 text-xs font-mono font-medium text-[#A1A1A6] mb-1.5">
+            <Sliders className="w-3.5 h-3.5 text-white" />
             <span>LABORATORIO DE FACTORES INTERACTIVO</span>
           </div>
           <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
             Simula tu Portafolio Institucional en Vivo
           </h3>
-          <p className="text-sm text-slate-400 mt-1 max-w-xl">
+          <p className="text-sm text-[#86868B] mt-1 max-w-xl leading-relaxed">
             Ajusta los parámetros de alpha y tolerancia de riesgo para observar en tiempo real cómo
-            el <span className="text-slate-200">Cerebro Qlib</span> y las <span className="text-slate-200">Manos Vibe</span> recalculan
+            el <span className="text-[#F5F5F7]">Cerebro Qlib</span> y las <span className="text-[#F5F5F7]">Manos Vibe</span> recalculan
             la frontera eficiente y la validación del Gate IC.
           </p>
         </div>
 
-        <div className="flex items-center space-x-2 bg-white/[0.04] p-1.5 rounded-2xl border border-white/[0.08] self-start md:self-auto">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-2" />
-          <span className="text-xs font-mono text-slate-300 pr-2">Simulador Reactivo v2.4</span>
+        <div className="flex items-center space-x-2 bg-white/[0.04] p-1.5 rounded-full border border-white/[0.08] self-start md:self-auto">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 ml-2" />
+          <span className="text-xs font-mono text-[#D2D2D7] pr-2">Simulador Reactivo v2.4</span>
         </div>
       </div>
 
@@ -128,7 +127,7 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
         <div className="lg:col-span-5 space-y-6">
           {/* Model Selector */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-[#86868B] mb-3">
               1. Estrategia de Factor Mining
             </label>
             <div className="space-y-2.5">
@@ -140,17 +139,17 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
                     onClick={() => setSelectedModelId(model.id)}
                     className={`w-full text-left p-3.5 rounded-2xl border transition-all apple-press ${
                       isSelected
-                        ? 'bg-gradient-to-r from-cyan-500/15 via-blue-500/10 to-transparent border-cyan-500/50 shadow-md shadow-cyan-500/10'
-                        : 'bg-white/[0.02] hover:bg-white/[0.05] border-white/[0.06] text-slate-300'
+                        ? 'bg-white/[0.1] border-white/30 text-white shadow-sm'
+                        : 'bg-white/[0.03] hover:bg-white/[0.06] border-white/[0.06] text-[#A1A1A6]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <span className={`text-sm font-semibold ${isSelected ? 'text-white' : 'text-slate-200'}`}>
+                      <span className={`text-sm font-semibold ${isSelected ? 'text-white' : 'text-[#D2D2D7]'}`}>
                         {model.name}
                       </span>
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-cyan-400" />}
+                      {isSelected && <CheckCircle2 className="w-4 h-4 text-white" />}
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">{model.desc}</p>
+                    <p className="text-xs text-[#86868B] mt-1">{model.desc}</p>
                   </button>
                 )
               })}
@@ -158,10 +157,10 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
           </div>
 
           {/* Risk Budget Slider */}
-          <div className="bg-white/[0.02] border border-white/[0.06] p-4 rounded-2xl">
+          <div className="bg-[#121216] border border-white/[0.08] p-4 rounded-2xl">
             <div className="flex items-center justify-between text-xs mb-2">
-              <span className="text-slate-400 font-medium">2. Presupuesto de Volatilidad Anual</span>
-              <span className="font-mono text-cyan-400 font-bold">{riskBudget}% σ</span>
+              <span className="text-[#A1A1A6] font-medium">2. Presupuesto de Volatilidad Anual</span>
+              <span className="font-mono text-white font-bold">{riskBudget}% σ</span>
             </div>
             <input
               type="range"
@@ -169,9 +168,9 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
               max="24"
               value={riskBudget}
               onChange={(e) => setRiskBudget(Number(e.target.value))}
-              className="w-full accent-cyan-400 h-1.5 bg-slate-800 rounded-lg cursor-pointer"
+              className="w-full accent-white h-1.5 bg-[#2C2C2E] rounded-lg cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] font-mono text-slate-500 mt-1.5">
+            <div className="flex justify-between text-[10px] font-mono text-[#86868B] mt-1.5">
               <span>Conservador (6%)</span>
               <span>Balanceado (14%)</span>
               <span>Agresivo (24%)</span>
@@ -179,20 +178,20 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
           </div>
 
           {/* Top-K Selection */}
-          <div className="bg-white/[0.02] border border-white/[0.06] p-4 rounded-2xl">
+          <div className="bg-[#121216] border border-white/[0.08] p-4 rounded-2xl">
             <div className="flex items-center justify-between text-xs mb-2">
-              <span className="text-slate-400 font-medium">3. Concentración de Activos (Top-k)</span>
-              <span className="font-mono text-cyan-400 font-bold">{topK} Activos</span>
+              <span className="text-[#A1A1A6] font-medium">3. Concentración de Activos (Top-k)</span>
+              <span className="font-mono text-white font-bold">{topK} Activos</span>
             </div>
             <div className="grid grid-cols-4 gap-2">
               {[3, 4, 5, 6].map((k) => (
                 <button
                   key={k}
                   onClick={() => setTopK(k)}
-                  className={`py-2 rounded-xl text-xs font-mono font-semibold border transition apple-press ${
+                  className={`py-2 rounded-xl text-xs font-mono font-medium border transition-colors apple-press ${
                     topK === k
-                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40'
-                      : 'bg-white/[0.03] text-slate-400 border-white/[0.06] hover:text-white'
+                      ? 'bg-white/[0.16] text-white border-white/30 font-semibold'
+                      : 'bg-white/[0.03] text-[#86868B] border-white/[0.06] hover:text-white'
                   }`}
                 >
                   Top-{k}
@@ -202,11 +201,11 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
           </div>
 
           {/* Invariant Badge */}
-          <div className="flex items-start space-x-3 p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs">
+          <div className="flex items-start space-x-3 p-3.5 rounded-2xl bg-white/[0.04] border border-white/[0.08] text-[#F5F5F7] text-xs">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <div>
-              <span className="font-semibold block">Invariante Matemático Respetado:</span>
-              <span className="text-emerald-300/80 text-[11px]">
+              <span className="font-semibold block text-white">Invariante Matemático Respetado:</span>
+              <span className="text-[#86868B] text-[11px] leading-relaxed block mt-0.5">
                 Ninguna posición individual puede exceder el 20.0% del portafolio. Doble blindaje activo.
               </span>
             </div>
@@ -217,47 +216,47 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
         <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
           {/* Real-Time Metrics Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] relative overflow-hidden">
-              <span className="text-[11px] text-slate-400 font-medium block mb-1">Sharpe Ratio</span>
+            <div className="p-4 rounded-2xl bg-[#121216] border border-white/[0.08] relative overflow-hidden">
+              <span className="text-[11px] text-[#86868B] font-medium block mb-1">Sharpe Ratio</span>
               <div className="text-xl sm:text-2xl font-bold text-white font-mono flex items-center space-x-1">
                 <CounterNumber value={metrics.sharpe} decimals={2} />
               </div>
               <span className="text-[10px] text-emerald-400 font-mono mt-1 block">Grado Institucional</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] relative overflow-hidden">
-              <span className="text-[11px] text-slate-400 font-medium block mb-1">Information Coeff (IC)</span>
-              <div className="text-xl sm:text-2xl font-bold text-cyan-400 font-mono flex items-center space-x-1">
+            <div className="p-4 rounded-2xl bg-[#121216] border border-white/[0.08] relative overflow-hidden">
+              <span className="text-[11px] text-[#86868B] font-medium block mb-1">Information Coeff (IC)</span>
+              <div className="text-xl sm:text-2xl font-bold text-white font-mono flex items-center space-x-1">
                 <CounterNumber value={metrics.ic} decimals={3} />
               </div>
-              <span className="text-[10px] text-cyan-400/80 font-mono mt-1 block">Gate $\ge 0.05$ Aprobado</span>
+              <span className="text-[10px] text-[#A1A1A6] font-mono mt-1 block">Gate ≥ 0.05 Aprobado</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] relative overflow-hidden">
-              <span className="text-[11px] text-slate-400 font-medium block mb-1">Retorno Alfa Anual</span>
+            <div className="p-4 rounded-2xl bg-[#121216] border border-white/[0.08] relative overflow-hidden">
+              <span className="text-[11px] text-[#86868B] font-medium block mb-1">Retorno Alfa Anual</span>
               <div className="text-xl sm:text-2xl font-bold text-emerald-400 font-mono flex items-center space-x-1">
                 <CounterNumber value={metrics.alpha} prefix="+" suffix="%" decimals={1} />
               </div>
-              <span className="text-[10px] text-slate-400 font-mono mt-1 block">vs S&P 500 (+12.4%)</span>
+              <span className="text-[10px] text-[#86868B] font-mono mt-1 block">vs S&P 500 (+12.4%)</span>
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.08] relative overflow-hidden">
-              <span className="text-[11px] text-slate-400 font-medium block mb-1">Max Drawdown</span>
+            <div className="p-4 rounded-2xl bg-[#121216] border border-white/[0.08] relative overflow-hidden">
+              <span className="text-[11px] text-[#86868B] font-medium block mb-1">Max Drawdown</span>
               <div className="text-xl sm:text-2xl font-bold text-rose-400 font-mono flex items-center space-x-1">
                 <CounterNumber value={metrics.drawdown} suffix="%" decimals={1} />
               </div>
-              <span className="text-[10px] text-slate-400 font-mono mt-1 block">Simulación Monte Carlo</span>
+              <span className="text-[10px] text-[#86868B] font-mono mt-1 block">Simulación Monte Carlo</span>
             </div>
           </div>
 
           {/* Dynamic Weight Allocation Bars */}
-          <div className="p-5 rounded-2xl bg-white/[0.02] border border-white/[0.08]">
+          <div className="p-5 rounded-2xl bg-[#121216] border border-white/[0.08]">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center space-x-2">
-                <BarChart3 className="w-4 h-4 text-cyan-400" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#D2D2D7] flex items-center space-x-2">
+                <BarChart3 className="w-4 h-4 text-white" />
                 <span>Asignación Dinámica del Portafolio</span>
               </span>
-              <span className="text-xs font-mono text-slate-400">Total: 100% Ponderado</span>
+              <span className="text-xs font-mono text-[#86868B]">Total: 100% Ponderado</span>
             </div>
 
             <div className="space-y-3">
@@ -265,18 +264,18 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
                 <div key={item.ticker} className="space-y-1">
                   <div className="flex items-center justify-between text-xs font-mono">
                     <span className="font-bold text-white">{item.ticker}</span>
-                    <div className="flex items-center space-x-3 text-slate-400 text-[11px]">
-                      <span>Score Qlib: <strong className="text-cyan-300">{item.score}</strong></span>
-                      <span>Peso: <strong className="text-white">{item.weight}%</strong></span>
+                    <div className="flex items-center space-x-3 text-[#86868B] text-[11px]">
+                      <span>Score Qlib: <strong className="text-white">{item.score}</strong></span>
+                      <span>Peso: <strong className="text-[#D2D2D7]">{item.weight}%</strong></span>
                     </div>
                   </div>
                   {/* Visual Bar */}
-                  <div className="h-2 w-full bg-slate-800/80 rounded-full overflow-hidden p-[1px]">
+                  <div className="h-1.5 w-full bg-[#202025] rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${item.weight * 5}%` }}
-                      transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-                      className="h-full rounded-full bg-gradient-to-r from-cyan-500 to-blue-500"
+                      transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+                      className="h-full rounded-full bg-gradient-to-r from-white via-[#D2D2D7] to-[#8E8E93]"
                     />
                   </div>
                 </div>
@@ -286,8 +285,8 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
 
           {/* Action CTA */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-            <div className="flex items-center space-x-2 text-xs text-slate-400">
-              <Lock className="w-3.5 h-3.5 text-cyan-400" />
+            <div className="flex items-center space-x-2 text-xs text-[#86868B]">
+              <Lock className="w-3.5 h-3.5 text-white" />
               <span>Contrato JSON generado con firma SHA-256</span>
             </div>
 
@@ -295,7 +294,7 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.96 }}
               onClick={() => onNavigateToTab('pipeline')}
-              className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm shadow-lg shadow-cyan-500/25 flex items-center justify-center space-x-2 apple-press"
+              className="w-full sm:w-auto px-6 py-3 rounded-full bg-white text-black font-semibold text-sm hover:bg-[#E8E8ED] shadow-lg flex items-center justify-center space-x-2 apple-press"
             >
               <span>Ejecutar Pipeline con este Modelo</span>
               <ArrowRight className="w-4 h-4" />

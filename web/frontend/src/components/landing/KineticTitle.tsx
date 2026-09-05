@@ -49,7 +49,7 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
       variants={container}
       initial="hidden"
       animate="visible"
-      className={`editorial-display font-extrabold text-slate-100 tracking-[-0.035em] ${className}`}
+      className={`editorial-display font-bold text-[#F5F5F7] tracking-[-0.038em] ${className}`}
     >
       {words.map((word, index) => {
         const isHighlight = highlightWord && word.toLowerCase().includes(highlightWord.toLowerCase())
@@ -57,9 +57,9 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
           <motion.span
             key={index}
             variants={child}
-            className={`inline-block mr-[0.28em] last:mr-0 ${
+            className={`inline-block mr-[0.26em] last:mr-0 ${
               isHighlight
-                ? 'gradient-text-cyan drop-shadow-[0_0_24px_rgba(0,242,254,0.35)]'
+                ? 'bg-gradient-to-b from-white via-[#E1E1E6] to-[#8E8E93] bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(255,255,255,0.15)] font-extrabold'
                 : 'text-white'
             }`}
           >

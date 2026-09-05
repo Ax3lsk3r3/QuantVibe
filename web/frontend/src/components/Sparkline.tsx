@@ -6,6 +6,7 @@ interface SparklineProps {
   width?: number
   height?: number
   className?: string
+  strokeColor?: string
 }
 
 export const Sparkline: React.FC<SparklineProps> = ({
@@ -14,6 +15,7 @@ export const Sparkline: React.FC<SparklineProps> = ({
   width = 120,
   height = 36,
   className = '',
+  strokeColor,
 }) => {
   if (!data || data.length < 2) return null
 
@@ -27,6 +29,7 @@ export const Sparkline: React.FC<SparklineProps> = ({
     return { x, y }
   })
 
+  // Smooth cubic bezier or line path
   const pathD = points.reduce(
     (acc, curr, idx) => (idx === 0 ? `M ${curr.x} ${curr.y}` : `${acc} L ${curr.x} ${curr.y}`),
     ''
@@ -34,24 +37,30 @@ export const Sparkline: React.FC<SparklineProps> = ({
 
   const areaD = `${pathD} L ${width} ${height} L 0 ${height} Z`
 
-  const strokeColor = positive ? '#10B981' : '#F43F5E'
+  // Apple Stocks aesthetic: sleek platinum/white or subtle Apple functional green/red
+  const resolvedStroke = strokeColor || (positive ? '#30D158' : '#FF453A')
   const gradientId = `sparkline-grad-${Math.random().toString(36).substring(2, 9)}`
 
   return (
     <div className={`inline-block overflow-hidden ${className}`}>
-      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
+      <svg
+        width={width}
+        height={height}
+        viewBox={`0 0 ${width} ${height}`}
+        className="overflow-visible"
+      >
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={strokeColor} stopOpacity="0.25" />
-            <stop offset="100%" stopColor={strokeColor} stopOpacity="0.0" />
+            <stop offset="0%" stopColor={resolvedStroke} stopOpacity="0.18" />
+            <stop offset="100%" stopColor={resolvedStroke} stopOpacity="0.0" />
           </linearGradient>
         </defs>
         <path d={areaD} fill={`url(#${gradientId})`} />
         <path
           d={pathD}
           fill="none"
-          stroke={strokeColor}
-          strokeWidth="2"
+          stroke={resolvedStroke}
+          strokeWidth="1.75"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -59,3 +68,4 @@ export const Sparkline: React.FC<SparklineProps> = ({
     </div>
   )
 }
+
