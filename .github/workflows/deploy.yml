@@ -22,8 +22,14 @@ jobs:
             exit 0
           fi
           mkdir -p ~/.ssh
-          printf "%s\n" "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          # Strip Windows carriage returns (\r) and ensure Unix LF format
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          echo "" >> ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+
+          # Verify key can be parsed by ssh-keygen
+          ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null || (echo "Key format error" && exit 1)
+
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" << 'EOF'
             echo "🚀 Starting continuous deployment on Alibaba Cloud ECS..."
             cd /root/QuantVibe
