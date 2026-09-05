@@ -50,8 +50,9 @@ export const SecurityVaultProof: React.FC = () => {
               <span>BÓVEDA CRIPTOGRÁFICA INMUTABLE</span>
             </div>
 
-            <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight editorial-display">
-              Aislamiento Zero-Import y Firma SHA-256
+            <h3 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-[-0.035em] leading-[1.1]">
+              Aislamiento Zero-Import y{' '}
+              <span className="font-serif italic font-normal text-[#D2D2D7]">Firma SHA-256.</span>
             </h3>
 
             <p className="text-sm text-[#86868B] leading-relaxed">

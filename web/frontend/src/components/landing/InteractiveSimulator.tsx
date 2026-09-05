@@ -105,8 +105,9 @@ export const InteractiveSimulator: React.FC<InteractiveSimulatorProps> = ({ onNa
             <Sliders className="w-3.5 h-3.5 text-white" />
             <span>LABORATORIO DE FACTORES INTERACTIVO</span>
           </div>
-          <h3 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">
-            Simula tu Portafolio Institucional en Vivo
+          <h3 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white tracking-[-0.035em] leading-[1.1]">
+            Simula tu Portafolio Institucional en{' '}
+            <span className="font-serif italic font-normal text-[#D2D2D7]">Vivo.</span>
           </h3>
           <p className="text-sm text-[#86868B] mt-1 max-w-xl leading-relaxed">
             Ajusta los parámetros de alpha y tolerancia de riesgo para observar en tiempo real cómo

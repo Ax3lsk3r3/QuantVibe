@@ -62,6 +62,7 @@ export default {
           'system-ui',
           'sans-serif',
         ],
+        serif: ['"Instrument Serif"', 'Georgia', 'serif'],
         mono: ['JetBrains Mono', 'SF Mono', 'ui-monospace', 'monospace'],
       },
       animation: {

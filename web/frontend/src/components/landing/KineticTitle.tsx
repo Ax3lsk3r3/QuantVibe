@@ -4,12 +4,14 @@ import { motion } from 'framer-motion'
 interface KineticTitleProps {
   text: string
   highlightWord?: string
+  italicWord?: string
   className?: string
 }
 
 export const KineticTitle: React.FC<KineticTitleProps> = ({
   text,
   highlightWord,
+  italicWord,
   className = '',
 }) => {
   const words = text.split(' ')
@@ -19,8 +21,8 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.045, // 12-principles: under 50ms stagger
-        delayChildren: 0.05,
+        staggerChildren: 0.04,
+        delayChildren: 0.04,
       },
     },
   }
@@ -28,8 +30,8 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
   const child = {
     hidden: {
       opacity: 0,
-      y: 24,
-      filter: 'blur(6px)',
+      y: 28,
+      filter: 'blur(8px)',
     },
     visible: {
       opacity: 1,
@@ -37,9 +39,9 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
       filter: 'blur(0px)',
       transition: {
         type: 'spring' as const,
-        damping: 26,
-        stiffness: 320,
-        bounce: 0, // apple-design: critically damped default
+        damping: 28,
+        stiffness: 300,
+        bounce: 0,
       },
     },
   }
@@ -49,17 +51,21 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
       variants={container}
       initial="hidden"
       animate="visible"
-      className={`editorial-display font-bold text-[#F5F5F7] tracking-[-0.038em] ${className}`}
+      className={`font-sans font-bold text-[#FFFFFF] tracking-[-0.045em] ${className}`}
     >
       {words.map((word, index) => {
         const isHighlight = highlightWord && word.toLowerCase().includes(highlightWord.toLowerCase())
+        const isItalic = italicWord && word.toLowerCase().includes(italicWord.toLowerCase())
+
         return (
           <motion.span
             key={index}
             variants={child}
-            className={`inline-block mr-[0.26em] last:mr-0 ${
-              isHighlight
-                ? 'bg-gradient-to-b from-white via-[#E1E1E6] to-[#8E8E93] bg-clip-text text-transparent drop-shadow-[0_4px_16px_rgba(255,255,255,0.15)] font-extrabold'
+            className={`inline-block mr-[0.24em] last:mr-0 ${
+              isItalic
+                ? 'font-serif italic font-normal text-white drop-shadow-[0_2px_12px_rgba(255,255,255,0.25)] tracking-[-0.01em]'
+                : isHighlight
+                ? 'bg-gradient-to-b from-white via-[#E1E1E6] to-[#71717A] bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(255,255,255,0.18)] font-extrabold'
                 : 'text-white'
             }`}
           >

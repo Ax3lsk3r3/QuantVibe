@@ -48,23 +48,24 @@ export const ComparisonMatrix: React.FC = () => {
           <Scale className="w-3.5 h-3.5 text-white" />
           <span>PARADIGMA COMPARATIVO INSTITUCIONAL</span>
         </div>
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight editorial-display">
-          Por qué la IA Pura Falla en Wall Street, y por qué los Quants Tradicionales se Quedan Atrás
+        <h2 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[-0.035em] leading-[1.05]">
+          Por qué los Modelos Tradicionales se Quedan Atrás y la IA Sin Rigor{' '}
+          <span className="font-serif italic font-normal text-[#D2D2D7]">Fracasa.</span>
         </h2>
-        <p className="text-[#86868B] text-sm sm:text-base mt-4 leading-relaxed">
+        <p className="text-[#86868B] text-sm sm:text-base mt-4 leading-relaxed font-sans">
           Los fondos cuantitativos tradicionales sufren de modelos rígidos e incapaces de razonar.
           Los bots de IA generativa sufren de alucinaciones financieras fatales. QuantVibe crea una
-          síntesis con separación estricta: <strong className="text-white">matemáticas para predecir, agentes para ejecutar</strong>.
+          síntesis con separación estricta: <strong className="text-white font-medium">matemáticas para predecir, agentes autónomos para ejecutar</strong>.
         </p>
       </div>
 
       {/* Comparison Grid (Cards) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative mb-10">
         {/* Column 1: Traditional Quant */}
-        <div className="rounded-3xl bg-[#0D0D11] border border-white/[0.08] p-6 lg:p-8 flex flex-col justify-between">
+        <div className="rounded-3xl bg-[#09090D] border border-white/[0.08] p-6 lg:p-8 flex flex-col justify-between hover:border-white/15 transition-all">
           <div>
             <div className="flex items-center space-x-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-white/[0.06] text-white">
+              <div className="p-2.5 rounded-xl bg-white/[0.06] text-white border border-white/[0.08]">
                 <Cpu className="w-5 h-5" />
               </div>
               <div>
@@ -72,71 +73,71 @@ export const ComparisonMatrix: React.FC = () => {
                 <span className="text-xs text-[#86868B] font-mono">Modelos Estadísticos Clásicos</span>
               </div>
             </div>
-            <p className="text-xs text-[#86868B] mb-6 leading-relaxed">
+            <p className="text-xs text-[#86868B] mb-6 leading-relaxed font-sans">
               Dependientes de scripts manuales y supuestos de distribución normales que fallan en colapsos de liquidez.
             </p>
 
             <div className="space-y-4 text-xs">
               <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <X className="w-4 h-4 text-[#86868B] shrink-0 mt-0.5" />
                 <span>Reentrenamiento lento y costoso por equipo humano</span>
               </div>
               <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <X className="w-4 h-4 text-[#86868B] shrink-0 mt-0.5" />
                 <span>Sin capacidad de sintetizar catalizadores contextuales</span>
               </div>
               <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <Check className="w-4 h-4 text-[#86868B] shrink-0 mt-0.5" />
+                <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
                 <span>Rigor formal pero con decaimiento de alpha rápido</span>
               </div>
             </div>
           </div>
           <div className="mt-8 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-[#86868B]">
-            Diagnóstico: Alpha decreciente
+            DIAGNÓSTICO // ALPHA DECRECIENTE
           </div>
         </div>
 
         {/* Column 2: Pure GenAI Bots (Dangerous) */}
-        <div className="rounded-3xl bg-[#120B0D] border border-red-500/20 p-6 lg:p-8 flex flex-col justify-between relative overflow-hidden">
+        <div className="rounded-3xl bg-[#0B0A0C] border border-white/[0.1] p-6 lg:p-8 flex flex-col justify-between relative overflow-hidden">
           <div>
             <div className="flex items-center space-x-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-red-950/40 text-red-400 border border-red-500/20">
-                <ShieldAlert className="w-5 h-5" />
+              <div className="p-2.5 rounded-xl bg-white/[0.06] text-[#A1A1A6] border border-white/[0.1]">
+                <ShieldAlert className="w-5 h-5 text-white/80" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-red-200">Bots GenAI Puros</h3>
-                <span className="text-xs text-red-400/80 font-mono">LLMs Operando Directamente</span>
+                <h3 className="text-lg font-bold text-white">Bots GenAI Puros</h3>
+                <span className="text-xs text-[#86868B] font-mono">LLMs Operando Directamente</span>
               </div>
             </div>
-            <p className="text-xs text-[#86868B] mb-6 leading-relaxed">
+            <p className="text-xs text-[#86868B] mb-6 leading-relaxed font-sans">
               Agentes que leen noticias y compran tickers sin validación econométrica ni barreras matemáticas de riesgo.
             </p>
 
             <div className="space-y-4 text-xs">
               <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <X className="w-4 h-4 text-[#FF453A] shrink-0 mt-0.5" />
                 <span>Alucinación en precios objetivo y apalancamiento</span>
               </div>
               <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <X className="w-4 h-4 text-[#FF453A] shrink-0 mt-0.5" />
                 <span>Sin Information Coefficient (IC) demostrable</span>
               </div>
               <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                <X className="w-4 h-4 text-[#FF453A] shrink-0 mt-0.5" />
                 <span>Riesgo existencial de liquidación en flash crashes</span>
               </div>
             </div>
           </div>
-          <div className="mt-8 pt-4 border-t border-red-500/10 text-[11px] font-mono text-red-400">
-            Diagnóstico: Riesgo de quiebra inaceptable
+          <div className="mt-8 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-[#FF453A]">
+            DIAGNÓSTICO // RIESGO CRÍTICO DE ALUCINACIÓN
           </div>
         </div>
 
         {/* Column 3: QuantVibe (Winner) */}
-        <div className="rounded-3xl bg-[#14141A] border border-white/20 p-6 lg:p-8 flex flex-col justify-between relative shadow-2xl">
+        <div className="rounded-3xl bg-[#111116] border border-white/[0.18] p-6 lg:p-8 flex flex-col justify-between relative shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
           {/* Top badge */}
-          <div className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-white text-black text-[10px] font-bold uppercase tracking-wider shadow-md">
-            Arquitectura Recomendada
+          <div className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-white text-black text-[10px] font-mono font-bold uppercase tracking-wider shadow-md">
+            ESTÁNDAR QUANTVIBE
           </div>
 
           <div>
