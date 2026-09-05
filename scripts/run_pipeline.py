@@ -47,6 +47,8 @@ def run_step(step: str, config: str | None, force_demo: bool, python_override: s
     env["PYTHONPATH"] = str(PROJECT_ROOT)
     if step == "train" and force_demo:
         env["QVB_FORCE_DEMO"] = "1"
+    if step == "export" and force_demo:
+        cmd.append("--force")
     print(f"\n=== [{step}] {' '.join(cmd)} ===")
     result = subprocess.run(cmd, cwd=str(PROJECT_ROOT), env=env)
     return result.returncode

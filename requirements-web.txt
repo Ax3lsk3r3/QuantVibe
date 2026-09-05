@@ -7,4 +7,5 @@ numpy>=1.24.0
 scipy>=1.10.0
 yfinance>=0.2.40
 fire>=0.6
+tqdm>=4.66.0
 
