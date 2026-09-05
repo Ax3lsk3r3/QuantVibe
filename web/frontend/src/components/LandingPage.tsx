@@ -17,6 +17,7 @@ import { InteractiveSimulator } from './landing/InteractiveSimulator'
 import { ComparisonMatrix } from './landing/ComparisonMatrix'
 import { SecurityVaultProof } from './landing/SecurityVaultProof'
 import { TrackRecordShowcase } from './landing/TrackRecordShowcase'
+import { BloombergNewsSection } from './BloombergNewsSection'
 
 interface LandingPageProps {
   onNavigateToTab: (tab: string) => void
@@ -457,7 +458,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToTab }) => 
         <InteractiveSimulator onNavigateToTab={onNavigateToTab} />
       </section>
 
-      {/* 4. INSTITUTIONAL COMPARISON MATRIX */}
+      {/* 4. BLOOMBERG LÍNEA NEWS WIRE (STATIC + REAL-TIME RSS) */}
+      <section className="w-full">
+        <BloombergNewsSection />
+      </section>
+
+      {/* 5. INSTITUTIONAL COMPARISON MATRIX */}
       <section className="w-full">
         <ComparisonMatrix />
       </section>

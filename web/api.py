@@ -8,6 +8,8 @@ import sqlite3
 import subprocess
 import sys
 import threading
+import urllib.request
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -479,6 +481,63 @@ def execute_orders(req: OrderSubmitRequest) -> Dict[str, Any]:
     }
 
 
+# In-memory cache for Bloomberg Línea live feeds
+_news_cache: Dict[str, Dict[str, Any]] = {}
+NEWS_CACHE_TTL = 300  # 5 minutes
+
+
+@app.get("/api/news/bloomberg")
+def get_bloomberg_news(region: str = Query("colombia", regex="^(colombia|global|mexico)$")) -> Dict[str, Any]:
+    """Fetches official live articles from Bloomberg Línea (Colombia, LatAm, Global)."""
+    now = datetime.now(timezone.utc).timestamp()
+    cached = _news_cache.get(region)
+    if cached and (now - cached["timestamp"] < NEWS_CACHE_TTL):
+        return {"region": region, "source": "Bloomberg Línea", "cached": True, "articles": cached["articles"]}
+
+    url_map = {
+        "colombia": "https://www.bloomberglinea.com/arc/outboundfeeds/rss/latinoamerica/colombia.xml",
+        "global": "https://www.bloomberglinea.com/arc/outboundfeeds/rss.xml",
+        "mexico": "https://www.bloomberglinea.com/arc/outboundfeeds/rss/latinoamerica/mexico.xml",
+    }
+    target_url = url_map.get(region, url_map["colombia"])
+
+    articles: List[Dict[str, str]] = []
+    try:
+        req = urllib.request.Request(target_url, headers={"User-Agent": "QuantVibeTerminal/1.0 (Mozilla/5.0)"})
+        with urllib.request.urlopen(req, timeout=6) as resp:
+            content = resp.read()
+        root = ET.fromstring(content)
+        namespaces = {"media": "http://search.yahoo.com/mrss/", "dc": "http://purl.org/dc/elements/1.1/"}
+        for it in root.findall(".//item")[:15]:
+            title = it.find("title").text.strip() if it.find("title") is not None and it.find("title").text else ""
+            link = it.find("link").text.strip() if it.find("link") is not None and it.find("link").text else ""
+            desc = it.find("description").text.strip() if it.find("description") is not None and it.find("description").text else ""
+            pub_date = it.find("pubDate").text.strip() if it.find("pubDate") is not None and it.find("pubDate").text else ""
+            author_el = it.find("dc:creator", namespaces)
+            author = author_el.text.strip() if author_el is not None and author_el.text else "Bloomberg Línea"
+            media_el = it.find("media:content", namespaces)
+            image = media_el.get("url") if media_el is not None else ""
+            if title:
+                articles.append({
+                    "title": title,
+                    "link": link,
+                    "description": desc,
+                    "pub_date": pub_date,
+                    "author": author,
+                    "image": image,
+                    "region": region,
+                    "source": "Bloomberg Línea",
+                })
+        _news_cache[region] = {"timestamp": now, "articles": articles}
+    except Exception as e:
+        # Fallback to cached articles if available
+        if cached:
+            return {"region": region, "source": "Bloomberg Línea", "cached": True, "articles": cached["articles"], "error": str(e)}
+        return {"region": region, "source": "Bloomberg Línea", "cached": False, "articles": [], "error": str(e)}
+
+    return {"region": region, "source": "Bloomberg Línea", "cached": False, "articles": articles}
+
+
 # Static Frontend mount (Vite build output in web/static)
 STATIC_DIR = PROJECT_ROOT / "web" / "static"
 if STATIC_DIR.is_dir():
@@ -490,6 +549,14 @@ if STATIC_DIR.is_dir():
         if full_path.startswith("api/"):
             raise HTTPException(status_code=404, detail="Endpoint no encontrado")
         target_file = STATIC_DIR / full_path
-        if target_file.is_file():
+        if target_file.is_file() and full_path != "index.html" and not full_path.endswith(".html"):
             return FileResponse(str(target_file))
-        return FileResponse(str(STATIC_DIR / "index.html"))
+
+        # Always serve index.html with no-cache headers to prevent browser stale cache
+        headers = {
+            "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+        return FileResponse(str(STATIC_DIR / "index.html"), headers=headers)
+

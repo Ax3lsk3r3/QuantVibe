@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
   Globe,
-  Radio,
   Sliders,
   CheckCircle2,
   Terminal,
   Activity,
 } from 'lucide-react'
+import { BloombergNewsSection } from './BloombergNewsSection'
 
 export const BloombergTerminal: React.FC = () => {
   const [activeUniverse, setActiveUniverse] = useState<string>('sp10')
@@ -14,7 +14,6 @@ export const BloombergTerminal: React.FC = () => {
   const [showBloombergTV, setShowBloombergTV] = useState<boolean>(false)
 
   const marketQuotesContainerRef = useRef<HTMLDivElement>(null)
-  const newsContainerRef = useRef<HTMLDivElement>(null)
   const screenerContainerRef = useRef<HTMLDivElement>(null)
 
   // Universe configurations proving QuantVibe is not limited to 10 tickers
@@ -125,27 +124,7 @@ export const BloombergTerminal: React.FC = () => {
     marketQuotesContainerRef.current.appendChild(script)
   }, [])
 
-  // Embed TradingView Financial News Timeline Widget (100% Free)
-  useEffect(() => {
-    if (!newsContainerRef.current) return
-    newsContainerRef.current.innerHTML = ''
 
-    const script = document.createElement('script')
-    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-timeline.js'
-    script.type = 'text/javascript'
-    script.async = true
-    script.innerHTML = JSON.stringify({
-      feedMode: 'all_symbols',
-      isTransparent: true,
-      displayMode: 'regular',
-      width: '100%',
-      height: 600,
-      colorTheme: 'dark',
-      locale: 'es'
-    })
-
-    newsContainerRef.current.appendChild(script)
-  }, [])
 
   // Embed TradingView Stock Screener Widget (100% Free)
   useEffect(() => {
@@ -393,42 +372,25 @@ export const BloombergTerminal: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Terminal Live Widescreen Multi-Column Stage (Market Overview + News Timeline) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Live Market Quotes & Charts (7 cols) */}
-        <div className="lg:col-span-7 rounded-3xl bg-[#09090D] border border-white/[0.12] p-5 sm:p-6 shadow-2xl overflow-hidden">
-          <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4">
-            <div className="flex items-center space-x-2">
-              <Globe className="w-4 h-4 text-white" />
-              <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-                Resumen de Mercado Global en Tiempo Real
-              </span>
-            </div>
-            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-              STREAMING DIRECTO
+      {/* 3. Terminal Live Market Overview Stage */}
+      <div className="rounded-3xl bg-[#09090D] border border-white/[0.12] p-5 sm:p-6 shadow-2xl overflow-hidden">
+        <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4">
+          <div className="flex items-center space-x-2">
+            <Globe className="w-4 h-4 text-white" />
+            <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
+              Resumen de Mercado Global en Tiempo Real
             </span>
           </div>
-
-          <div ref={marketQuotesContainerRef} className="w-full min-h-[600px] overflow-hidden" />
+          <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+            STREAMING DIRECTO
+          </span>
         </div>
 
-        {/* Right Column: Financial Breaking News & Wire (5 cols) */}
-        <div className="lg:col-span-5 rounded-3xl bg-[#09090D] border border-white/[0.12] p-5 sm:p-6 shadow-2xl overflow-hidden">
-          <div className="flex items-center justify-between pb-4 border-b border-white/[0.08] mb-4">
-            <div className="flex items-center space-x-2">
-              <Radio className="w-4 h-4 text-amber-400" />
-              <span className="text-xs font-mono font-bold text-white uppercase tracking-wider">
-                Teletipo de Noticias Financieras en Vivo
-              </span>
-            </div>
-            <span className="text-[10px] font-mono text-[#86868B]">
-              Reuters • Bloomberg • CNBC Wire
-            </span>
-          </div>
-
-          <div ref={newsContainerRef} className="w-full min-h-[600px] overflow-hidden" />
-        </div>
+        <div ref={marketQuotesContainerRef} className="w-full min-h-[600px] overflow-hidden" />
       </div>
+
+      {/* 4. Official Bloomberg Línea News Wire (Static & Live RSS) */}
+      <BloombergNewsSection />
 
       {/* 4. Institutional Stock Screener Stage */}
       <div className="rounded-3xl bg-[#09090D] border border-white/[0.12] p-5 sm:p-6 shadow-2xl overflow-hidden">
