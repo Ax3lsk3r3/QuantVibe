@@ -7,6 +7,7 @@ import { ExecutionTab } from './components/ExecutionTab'
 import { TrackRecordTab } from './components/TrackRecordTab'
 import { ArchitectureTab } from './components/ArchitectureTab'
 import { LandingPage } from './components/LandingPage'
+import { TradingViewTickerTape } from './components/TradingViewTickerTape'
 import {
   fetchStatus,
   fetchSignals,
@@ -74,6 +75,9 @@ export const App: React.FC = () => {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
+
+      {/* TradingView Live Streaming Ticker Tape Carousel */}
+      <TradingViewTickerTape />
 
       {/* Main Workspace Container with Animated Tab Transition */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">

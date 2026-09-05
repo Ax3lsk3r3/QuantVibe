@@ -16,6 +16,7 @@ import {
 import type { EvaluationData, OrdersPlan, SignalsResponse } from '../types'
 import { Sparkline } from './Sparkline'
 import { PipelineFlowVisualizer } from './PipelineFlowVisualizer'
+import { TradingViewChart } from './TradingViewChart'
 
 interface OverviewTabProps {
   signals: SignalsResponse | null
@@ -342,6 +343,12 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </div>
         </div>
       )}
+
+      {/* TradingView Real-Time Candlestick Chart Terminal */}
+      <TradingViewChart
+        initialSymbol={sigList[0]?.instrument || 'TSLA'}
+        availableSymbols={sigList.length > 0 ? sigList.map((s) => s.instrument) : ['TSLA', 'NVDA', 'AAPL', 'META', 'XOM']}
+      />
 
       {/* Orders Plan Hero Gateway */}
       {orders && (
