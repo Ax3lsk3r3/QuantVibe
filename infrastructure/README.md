@@ -44,6 +44,7 @@ Este directorio contiene la documentación técnica exhaustiva de la infraestruc
 | [**`SERVER_ECS.md`**](SERVER_ECS.md) | Ficha técnica del servidor Alibaba Cloud ECS, firewall, entorno virtual Python, comandos de inicio/reinicio y monitoreo de logs. |
 | [**`DOMAIN_DNS_CLOUDFLARE.md`**](DOMAIN_DNS_CLOUDFLARE.md) | Registro del dominio `quantvibeapp.com`, servidores de nombres (nameservers), registros DNS y configuración del modo SSL Flexible. |
 | [**`COSTS_AND_EXPIRATIONS.md`**](COSTS_AND_EXPIRATIONS.md) | Desglose financiero, matemática del crédito de $90 USD, fechas de vencimiento, alertas y guía para apagar o destruir el servidor para evitar cobros. |
+| [**`CI_CD_DEPLOYMENT.md`**](CI_CD_DEPLOYMENT.md) | Despliegue continuo automatizado con GitHub Actions: cada `git push` actualiza la web en 15 segundos sin tocar el servidor. |
 | [**`MIGRATION_GUIDE.md`**](MIGRATION_GUIDE.md) | Procedimiento paso a paso para migrar el sistema a cualquier otro proveedor (AWS, DigitalOcean, Hetzner, etc.) sin caídas ni pérdida de SSL. |
 
 ---

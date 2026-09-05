@@ -1,0 +1,34 @@
+name: CD - Deploy to Cloud VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Alibaba Cloud ECS
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Server via SSH
+        if: env.SERVER_SSH_KEY != ''
+        env:
+          SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST || '47.85.111.6' }}
+          username: ${{ secrets.SERVER_USER || 'root' }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            echo "Starting continuous deployment on Alibaba Cloud ECS..."
+            cd /root/QuantVibe
+            git pull origin main
+            source venv/bin/activate
+            pip install -r requirements-web.txt --quiet
+            pkill -f "python scripts/start_web.py" || true
+            nohup python scripts/start_web.py --port 80 > web.log 2>&1 &
+            sleep 3
+            curl -f http://localhost/api/status || (echo "Healthcheck failed" && exit 1)
+            echo "Deployment completed successfully! Live on https://quantvibeapp.com"
