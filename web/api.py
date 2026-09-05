@@ -87,6 +87,8 @@ def get_status() -> Dict[str, Any]:
     db_file = ARTIFACTS_DIR / "track_record.db"
 
     return {
+        "version": "1.0.1",
+        "deployment": "automated-cicd",
         "project_root": str(PROJECT_ROOT),
         "pipeline": {
             "is_running": pipeline_state["is_running"],
