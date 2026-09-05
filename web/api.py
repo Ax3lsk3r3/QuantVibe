@@ -487,7 +487,7 @@ NEWS_CACHE_TTL = 300  # 5 minutes
 
 
 @app.get("/api/news/bloomberg")
-def get_bloomberg_news(region: str = Query("colombia", regex="^(colombia|global|mexico)$")) -> Dict[str, Any]:
+def get_bloomberg_news(region: str = Query("colombia", pattern="^(colombia|global|mexico)$")) -> Dict[str, Any]:
     """Fetches official live articles from Bloomberg Línea (Colombia, LatAm, Global)."""
     now = datetime.now(timezone.utc).timestamp()
     cached = _news_cache.get(region)
@@ -536,6 +536,71 @@ def get_bloomberg_news(region: str = Query("colombia", regex="^(colombia|global|
         return {"region": region, "source": "Bloomberg Línea", "cached": False, "articles": [], "error": str(e)}
 
     return {"region": region, "source": "Bloomberg Línea", "cached": False, "articles": articles}
+
+
+@app.get("/api/news/bloomberg/live")
+def get_bloomberg_live_broadcast() -> Dict[str, Any]:
+    """Provides verified official Bloomberg TV 24/7 live stream and official podcasts."""
+    now = datetime.now(timezone.utc).timestamp()
+    cached = _news_cache.get("_live_tv")
+    if cached and (now - cached["timestamp"] < 3600):
+        return cached["data"]
+
+    # Fallback to current verified active live stream
+    current_video_id = "QB5BNdBFujE"
+    channel_id = "UCrM7B73j_vHn2wQ-v5-M52Q"
+    try:
+        req = urllib.request.Request("https://www.youtube.com/@markets/live", headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=4) as resp:
+            html = resp.read().decode("utf-8", errors="ignore")
+            import re
+            m = re.search(r'"videoId":"([a-zA-Z0-9_-]{11})"', html)
+            if m:
+                current_video_id = m.group(1)
+    except Exception:
+        pass
+
+    data = {
+        "tv": {
+            "title": "Bloomberg Television (24/7 Global Live Broadcast)",
+            "video_id": current_video_id,
+            "embed_url": f"https://www.youtube-nocookie.com/embed/{current_video_id}?autoplay=0&mute=1&enablejsapi=1",
+            "channel_embed_url": f"https://www.youtube-nocookie.com/embed/live_stream?channel={channel_id}",
+            "official_channel_url": "https://www.youtube.com/@markets/live",
+            "bloomberg_live_url": "https://www.bloomberg.com/live"
+        },
+        "podcasts": [
+            {
+                "id": "colombia",
+                "title": "La Estrategia del Día Colombia",
+                "host": "María C. Suárez",
+                "spotify_show_id": "4LbFVsDKSmiivu5EcVQuw0",
+                "spotify_url": "https://open.spotify.com/show/4LbFVsDKSmiivu5EcVQuw0",
+                "embed_url": "https://open.spotify.com/embed/show/4LbFVsDKSmiivu5EcVQuw0?utm_source=generator&theme=0",
+                "desc": "El podcast diario #1 sobre economía, negocios y política de Colombia."
+            },
+            {
+                "id": "mexico",
+                "title": "La Estrategia del Día México",
+                "host": "Jimena Tolama",
+                "spotify_show_id": "0NXF3nHMLWO7qEdaUsp99b",
+                "spotify_url": "https://open.spotify.com/show/0NXF3nHMLWO7qEdaUsp99b",
+                "embed_url": "https://open.spotify.com/embed/show/0NXF3nHMLWO7qEdaUsp99b?utm_source=generator&theme=0",
+                "desc": "Análisis matutino de Banxico, Pemex, nearshoring y mercados mexicanos."
+            },
+            {
+                "id": "argentina",
+                "title": "La Estrategia del Día Argentina",
+                "host": "Francisco Aldaya",
+                "spotify_show_id": "2GlHSIiVaIUGHHfhGBCTcV",
+                "spotify_url": "https://open.spotify.com/show/2GlHSIiVaIUGHHfhGBCTcV",
+                "embed_url": "https://open.spotify.com/embed/show/2GlHSIiVaIUGHHfhGBCTcV?utm_source=generator&theme=0",
+                "desc": "Cobertura diaria sobre el Banco Central, bonos soberanos e inflación."
+            }
+        ]
+    }
+    _news_cache["_live_tv"] = {"timestamp": now, "data": data}
+    return data
 
 
 # Static Frontend mount (Vite build output in web/static)

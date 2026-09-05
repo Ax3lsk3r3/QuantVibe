@@ -11,7 +11,7 @@ import { BloombergNewsSection } from './BloombergNewsSection'
 export const BloombergTerminal: React.FC = () => {
   const [activeUniverse, setActiveUniverse] = useState<string>('sp10')
   const [customTickers, setCustomTickers] = useState<string>('PLTR, SMCI, ARM, COIN, MSTR')
-  const [showBloombergTV, setShowBloombergTV] = useState<boolean>(false)
+  const [showBloombergTV, setShowBloombergTV] = useState<boolean>(true)
 
   const marketQuotesContainerRef = useRef<HTMLDivElement>(null)
   const screenerContainerRef = useRef<HTMLDivElement>(null)
@@ -250,7 +250,7 @@ export const BloombergTerminal: React.FC = () => {
               </div>
               <div className="relative w-full aspect-video sm:h-[480px]">
                 <iframe
-                  src="https://www.youtube-nocookie.com/embed/live_stream?channel=UCUMZ7gohGI9HcU9VNsr2FJQ&autoplay=1"
+                  src="https://www.youtube-nocookie.com/embed/QB5BNdBFujE?autoplay=1&mute=1&enablejsapi=1"
                   title="Bloomberg Television Live Broadcast"
                   className="w-full h-full border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
