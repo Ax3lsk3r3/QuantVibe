@@ -106,21 +106,14 @@ nohup python scripts/start_web.py --port 80 > web.log 2>&1 &
 
 ---
 
-## 🌐 5. Cómo Vincular tu Dominio y Obtener SSL (HTTPS Gratis)
+## 5. Dominio Oficial y Configuración SSL / HTTPS (Cloudflare)
 
-Actualmente, el sitio responde directamente en:
-👉 `http://47.85.111.6`
-
-### Método Recomendado: Conectar mediante Cloudflare (HTTPS Automático)
-1. **Comprar el dominio** (en Alibaba Cloud Domains, Namecheap, GoDaddy, etc.).
-2. **Crear cuenta gratuita en Cloudflare** ([cloudflare.com](https://cloudflare.com)) y agregar tu dominio.
-3. En la sección **DNS** de Cloudflare, crear un registro:
-   * **Type:** `A`
-   * **Name:** `@` (o `quantvibe` si es subdominio)
-   * **IPv4 Address:** `47.85.111.6`
-   * **Proxy Status:** `Proxied` (Nube naranja activada)
-4. En Cloudflare ir a **SSL/TLS** -> seleccionar modo **Flexible**.
-5. ¡Listo! En 2 minutos tu sitio cargará con candadito verde seguro: `https://tudominio.com`.
+El sitio cuenta con dominio oficial propio con certificado SSL activo:
+- URL de Producción: **https://quantvibeapp.com**
+- IP de Origen: `47.85.111.6` (Puerto 80)
+- Proveedor de Dominio: Alibaba Cloud Domains
+- Gestión DNS y Proxy SSL: Cloudflare (Nameservers: `rachel.ns.cloudflare.com`, `roan.ns.cloudflare.com`)
+- Modo SSL/TLS: **Flexible** (HTTPS seguro al usuario, comunicación HTTP puerto 80 con el origen)
 
 ---
 

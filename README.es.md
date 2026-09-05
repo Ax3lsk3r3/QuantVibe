@@ -7,7 +7,8 @@
 ![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fax3lsk3r3%2Fquantvibe-2496ED?logo=docker&logoColor=white)
 [![Licencia: MIT](https://img.shields.io/badge/Licencia-MIT-yellow.svg)](LICENSE)
 
-Idioma: [English](README.md) | **Español**
+Idioma: [English](README.md) | **Español**  
+Terminal en Producción: [https://quantvibeapp.com](https://quantvibeapp.com)
 
 **Usa [Qlib](https://github.com/microsoft/qlib) como cerebro cuant y [Vibe-Trading](https://github.com/HKUDS/Vibe-Trading) como manos.**
 
