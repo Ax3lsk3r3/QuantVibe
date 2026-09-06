@@ -1,5 +1,8 @@
 import type {
+  BrokerInfo,
+  BrokerTestResult,
   EvaluationData,
+  FeatureAttributionResponse,
   OrdersPlan,
   SignalsResponse,
   SystemStatus,
@@ -65,4 +68,31 @@ export async function executeOrders(allowLive: boolean, orderCmdTemplate?: strin
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`)
   return res.json()
 }
+
+export async function fetchBrokerCatalog(): Promise<BrokerInfo[]> {
+  const res = await apiFetch('/brokers/catalog')
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`)
+  return res.json()
+}
+
+export async function testBrokerConnection(
+  brokerId: string,
+  environment: 'paper' | 'live',
+  credentials?: Record<string, string>
+): Promise<BrokerTestResult> {
+  const res = await apiFetch('/brokers/test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ broker_id: brokerId, environment, credentials }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`)
+  return res.json()
+}
+
+export async function fetchFeatureAttribution(): Promise<FeatureAttributionResponse> {
+  const res = await apiFetch('/features/attribution')
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`)
+  return res.json()
+}
+
 

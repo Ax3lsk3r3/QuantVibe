@@ -125,3 +125,64 @@ export interface TrackRecordResponse {
   records: TrackRecordItem[]
   daily_context: Record<string, number>
 }
+
+export interface BrokerField {
+  key: string
+  label: string
+  type: 'text' | 'password'
+  placeholder: string
+}
+
+export interface BrokerInfo {
+  id: string
+  name: string
+  category: string
+  icon: string
+  description: string
+  assets: string[]
+  license: string
+  status: 'ready' | 'connected' | 'simulated'
+  latency_ms: number
+  default_template: string
+  supported_modes: string[]
+  fields: BrokerField[]
+}
+
+export interface BrokerTestResult {
+  ok: boolean
+  broker_id: string
+  latency_ms: number
+  environment: string
+  message: string
+  account_info?: {
+    account_id: string
+    currency: string
+    status: string
+    buying_power?: string
+  }
+}
+
+export interface FactorAttributionItem {
+  name: string
+  family: string
+  weight_pct: number
+  direction: 'positive' | 'negative'
+  formula: string
+  description: string
+}
+
+export interface AgentReasoningItem {
+  instrument: string
+  conviction: 'ALTA' | 'MODERADA' | 'ESTRICTA'
+  catalyst: string
+  risk_notes: string
+  allocation_pct: number
+}
+
+export interface FeatureAttributionResponse {
+  top_factors: FactorAttributionItem[]
+  agent_reasoning: AgentReasoningItem[]
+  sizing_modes: string[]
+  active_mode: string
+}
+
