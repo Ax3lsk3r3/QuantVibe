@@ -55,7 +55,7 @@ const FALLBACK_BROKERS: BrokerInfo[] = [
         key: 'account',
         label: 'Número de Cuenta (Login ID)',
         type: 'text',
-        placeholder: 'Ej: 10849204 (Ver barra superior en MT5)',
+        placeholder: 'Ej: 10849204 (Visible en la barra superior de MT5)',
       },
       {
         key: 'password',
@@ -293,36 +293,36 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
   const utilization = totalTarget > 0 ? (estimatedTotal / totalTarget) * 100 : 0
 
   return (
-    <div className="w-full space-y-10 font-sans">
+    <div className="w-full space-y-12 font-sans pb-16">
       {/* ═══════════════ 1. EXPANSIVE EDITORIAL COCKPIT HEAD ═══════════════ */}
       <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
         <div>
           <Eyebrow>
             <span className="flex items-center gap-2">
               <StatusDot tone={allowLive ? 'neg' : 'pos'} ping={allowLive} />
-              Mesa de órdenes · agente vibe-trading multi-broker
+              Mesa de ejecución institucional · agente vibe-trading
             </span>
           </Eyebrow>
-          <h1 className="mt-3 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
-            Ejecución con <span className="text-[#86868B] font-semibold">doble candado.</span>
+          <h1 className="mt-3 font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-[-0.038em] text-white">
+            Ejecución con <span className="metallic-text-bright">doble candado.</span>
           </h1>
           <p className="editorial-subhead mt-3 max-w-3xl text-sm leading-relaxed text-[#86868B]">
-            El agente LLM lee las señales emitidas por Microsoft Qlib y dimensiona el portafolio con
-            criterios de paridad de riesgo. Las órdenes se enrutan de forma nativa a MetaTrader 5 (MT5),
-            Alpaca Markets, Interactive Brokers, Cripto 24/7 o Webhooks firmados con hash SHA-256.
+            El agente LLM evalúa las señales cuantitativas de Microsoft Qlib y dimensiona el portafolio
+            con criterios de paridad de riesgo. Las órdenes se enrutan de forma nativa a MetaTrader 5 (MT5),
+            Alpaca Markets, Interactive Brokers, Cripto 24/7 o Webhooks firmados bajo digest SHA-256 inmutable.
           </p>
         </div>
 
-        {/* Physical safety toggle */}
+        {/* Physical safety toggle (Apple Pro Tactile feel) */}
         <div
           className={cn(
-            'flex shrink-0 items-center gap-3 self-start rounded-full border p-1.5 pl-4 transition-colors lg:self-auto backdrop-blur-xl',
+            'flex shrink-0 items-center gap-3 self-start rounded-full border p-1.5 pl-4 transition-all duration-300 lg:self-auto backdrop-blur-2xl',
             allowLive
-              ? 'border-[#FF453A]/40 bg-[#FF453A]/[0.08] shadow-[0_0_30px_rgba(255,69,58,0.2)]'
+              ? 'border-[#FF453A]/40 bg-[#FF453A]/[0.08] shadow-[0_0_35px_rgba(255,69,58,0.22)]'
               : 'border-white/[0.08] bg-white/[0.03]'
           )}
         >
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#86868B]">
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#86868B]">
             Papel (Simulado)
           </span>
           <button
@@ -332,7 +332,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
             aria-label="Activar transmisión real a mercado"
             onClick={() => setAllowLive(!allowLive)}
             className={cn(
-              'relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200',
+              'apple-press relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200',
               allowLive ? 'bg-[#FF453A]' : 'bg-[#3A3A3C]'
             )}
           >
@@ -347,7 +347,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
           </button>
           <span
             className={cn(
-              'pr-2 font-mono text-[10px] font-bold uppercase tracking-[0.16em]',
+              'pr-2 font-mono text-[10px] font-bold uppercase tracking-[0.18em]',
               allowLive ? 'text-[#FF453A]' : 'text-[#86868B]'
             )}
           >
@@ -368,7 +368,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
             <div className="space-y-3 rounded-2xl border border-[#FF453A]/30 bg-[#FF453A]/[0.06] p-5">
               <div className="flex items-center gap-2 text-sm font-semibold text-[#FF453A]">
                 <ShieldAlert className="h-4 w-4" />
-                <span>ADVERTENCIA: Entorno Real Habilitado (Transmisión con capital de mercado)</span>
+                <span>ADVERTENCIA DE SEGURIDAD: Entorno Real Habilitado (Transmisión con capital de mercado)</span>
               </div>
               <p className="text-xs leading-relaxed text-[#D1D1D6]">
                 El motor transmitirá órdenes reales al broker seleccionado utilizando la variable de entorno{' '}
@@ -382,15 +382,15 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
         )}
       </AnimatePresence>
 
-      {/* ═══════════════ 2. FULL-WIDTH MULTI-BROKER SELECTION & CONFIGURATION ═══════════════ */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#050507]/70 backdrop-blur-xl">
-        {/* Seamless Platform Selector Bar */}
+      {/* ═══════════════ 2. FULL-WIDTH MULTI-BROKER DESK (TradingView & Bloomberg Dock) ═══════════════ */}
+      <div className="glass-panel specular-hairline overflow-hidden rounded-3xl">
+        {/* Precision Broker Ribbon Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.07] px-6 py-4">
           <div className="flex items-center gap-3">
-            <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-[#86868B]">
-              Destino de Ejecución:
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#86868B]">
+              Enrutamiento Algorítmico:
             </span>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
               {brokers.map((b) => {
                 const isSelected = b.id === selectedBrokerId
                 return (
@@ -398,17 +398,17 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                     key={b.id}
                     onClick={() => handleSelectBroker(b)}
                     className={cn(
-                      'apple-press relative flex items-center gap-2 rounded-full px-3.5 py-1.5 font-mono text-xs font-medium transition-all',
+                      'apple-press relative flex items-center gap-2 rounded-full px-4 py-2 font-mono text-xs transition-all duration-200',
                       isSelected
-                        ? 'bg-white text-black shadow-md font-bold'
+                        ? 'bg-white text-black shadow-lg font-bold'
                         : 'text-[#86868B] hover:text-white hover:bg-white/[0.04]'
                     )}
                   >
                     <span>{b.name}</span>
                     <span
                       className={cn(
-                        'text-[9px] px-1.5 py-0.2 rounded-full',
-                        isSelected ? 'bg-black/10 text-black' : 'bg-white/[0.06] text-[#A1A1A6]'
+                        'text-[9px] px-1.5 py-0.5 rounded-full font-mono',
+                        isSelected ? 'bg-black/15 text-black font-bold' : 'bg-white/[0.06] text-[#A1A1A6]'
                       )}
                     >
                       {b.latency_ms}ms
@@ -420,28 +420,28 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
           </div>
 
           <div className="flex items-center gap-2 font-mono text-xs text-[#86868B] self-start sm:self-auto">
-            <ShieldCheck className="h-3.5 w-3.5 text-[#30D158]" />
-            <span>Zero-Custodial · Sin Retiros</span>
+            <ShieldCheck className="h-4 w-4 text-[#30D158]" />
+            <span>Zero-Custodial · Permisos de Retiro Bloqueados</span>
           </div>
         </div>
 
         {/* Widescreen 2-Column Split: Connection Details + Live Ping Terminal */}
         <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-white/[0.07]">
           {/* Left Column (7 cols): Parameters & MT5 Explanations */}
-          <div className="lg:col-span-7 p-6 sm:p-7 space-y-5">
+          <div className="lg:col-span-7 p-6 sm:p-8 space-y-5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.05] text-white">
-                  {selectedBroker.id === 'mt5' && <Cpu className="h-4 w-4 text-blue-400" />}
-                  {selectedBroker.id === 'alpaca' && <Zap className="h-4 w-4 text-emerald-400" />}
-                  {selectedBroker.id === 'ibkr' && <Globe className="h-4 w-4 text-amber-400" />}
-                  {selectedBroker.id === 'crypto' && <Layers className="h-4 w-4 text-yellow-400" />}
-                  {selectedBroker.id === 'webhook' && <Send className="h-4 w-4 text-purple-400" />}
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/[0.1] bg-white/[0.05] text-white">
+                  {selectedBroker.id === 'mt5' && <Cpu className="h-5 w-5 text-blue-400" />}
+                  {selectedBroker.id === 'alpaca' && <Zap className="h-5 w-5 text-emerald-400" />}
+                  {selectedBroker.id === 'ibkr' && <Globe className="h-5 w-5 text-amber-400" />}
+                  {selectedBroker.id === 'crypto' && <Layers className="h-5 w-5 text-yellow-400" />}
+                  {selectedBroker.id === 'webhook' && <Send className="h-5 w-5 text-purple-400" />}
                 </span>
                 <div>
-                  <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
                     <span>{selectedBroker.name}</span>
-                    <span className="text-[10px] font-mono text-[#86868B] bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.06]">
+                    <span className="text-[10px] font-mono text-[#86868B] bg-white/[0.04] px-2 py-0.5 rounded-full border border-white/[0.06]">
                       {selectedBroker.license}
                     </span>
                   </h3>
@@ -473,20 +473,20 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="rounded-xl border border-blue-500/20 bg-blue-500/[0.05] p-4 space-y-3 text-xs">
+                  <div className="rounded-2xl border border-blue-500/20 bg-blue-500/[0.05] p-5 space-y-3 text-xs">
                     <div className="font-mono text-[10px] uppercase tracking-widest text-blue-300 font-bold flex items-center gap-1.5">
                       <Sparkles className="h-3.5 w-3.5" />
-                      <span>Cómo conectar MetaTrader 5 sin API Keys</span>
+                      <span>Cómo conectar MetaTrader 5 sin complicaciones de API Keys</span>
                     </div>
                     <ul className="space-y-2 text-[#D1D1D6] leading-relaxed">
                       <li>
-                        <strong className="text-white">1. En MT5 no hay API Keys:</strong> Los brokers (IC Markets, FTMO, Darwinex) te entregan únicamente tu <span className="text-white font-mono">Número de Cuenta (Login)</span>, <span className="text-white font-mono">Contraseña</span> y <span className="text-white font-mono">Servidor</span>.
+                        <strong className="text-white">1. En MT5 no existen API Keys:</strong> Los brokers (IC Markets, FTMO, Darwinex) te entregan únicamente tu <span className="text-white font-mono">Número de Cuenta (Login ID)</span>, <span className="text-white font-mono">Contraseña</span> y <span className="text-white font-mono">Servidor</span>.
                       </li>
                       <li>
-                        <strong className="text-white">2. ¿Dónde los ves?</strong> En tu MT5 de escritorio, ve al menú superior: <span className="text-white font-mono">Archivo → Conectarse a la cuenta comercial</span>. Allí aparecen exactamente estos 3 campos.
+                        <strong className="text-white">2. ¿Dónde los encuentras?</strong> En tu MT5 de escritorio, ve al menú superior: <span className="text-white font-mono">Archivo → Conectarse a la cuenta comercial</span>. Allí aparecen exactamente estos 3 campos.
                       </li>
                       <li>
-                        <strong className="text-white">3. Detección Automática 1-Clic:</strong> Si ya tienes tu MT5 abierto en este equipo Windows, puedes activar el switch inferior para enlazarte directamente sin tener que ingresar contraseñas.
+                        <strong className="text-white">3. Detección Automática 1-Clic:</strong> Si ya tienes tu MT5 abierto en este equipo Windows, el conector nativo en Python se engancha directamente al proceso <span className="text-white font-mono">terminal64.exe</span> sin pedir contraseñas.
                       </li>
                     </ul>
                   </div>
@@ -496,7 +496,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
 
             {/* 1-Click Terminal Switch for MT5 */}
             {selectedBroker.id === 'mt5' && (
-              <div className="flex items-center justify-between p-3.5 rounded-xl border border-white/[0.08] bg-black/40">
+              <div className="flex items-center justify-between p-4 rounded-2xl border border-white/[0.08] bg-black/40">
                 <div className="flex items-center gap-2.5">
                   <span className="h-2 w-2 rounded-full bg-[#30D158]" />
                   <span className="text-xs text-[#D1D1D6] font-medium">
@@ -507,9 +507,9 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                   type="button"
                   onClick={() => setUseOpenTerminal(!useOpenTerminal)}
                   className={cn(
-                    'apple-press px-3 py-1 rounded-full font-mono text-[10px] uppercase tracking-wider font-bold transition-colors',
+                    'apple-press px-4 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider font-bold transition-colors',
                     useOpenTerminal
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]'
                       : 'border border-white/10 bg-white/5 text-[#86868B]'
                   )}
                 >
@@ -520,10 +520,10 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
 
             {/* Fields Inputs (for brokers or manual MT5) */}
             {(!useOpenTerminal || selectedBroker.id !== 'mt5') && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 pt-1">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
                 {selectedBroker.fields.map((f) => (
-                  <div key={f.key} className="space-y-1">
-                    <label className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#86868B] block">
+                  <div key={f.key} className="space-y-1.5">
+                    <label className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#86868B] block">
                       {f.label}
                     </label>
                     <input
@@ -533,7 +533,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                         setCredentials((prev) => ({ ...prev, [f.key]: e.target.value }))
                       }
                       placeholder={f.placeholder}
-                      className="w-full rounded-lg border border-white/[0.08] bg-black/50 px-3 py-2 font-mono text-xs text-white placeholder-[#555] transition-colors focus:border-white/30 focus:outline-none"
+                      className="w-full rounded-xl border border-white/[0.08] bg-black/60 px-3.5 py-2.5 font-mono text-xs text-white placeholder-[#555] transition-colors focus:border-white/40 focus:outline-none"
                     />
                   </div>
                 ))}
@@ -543,45 +543,45 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
             {/* CLI Command Bar */}
             <div className="space-y-1.5 pt-1">
               <div className="flex items-center justify-between">
-                <label className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#86868B]">
+                <label className="font-mono text-[9px] uppercase tracking-[0.16em] text-[#86868B]">
                   Comando CLI autogenerado para {selectedBroker.name}
                 </label>
                 <CopyChip text={orderCmdTemplate} label="Copiar comando" />
               </div>
-              <div className="rounded-lg border border-white/[0.07] bg-black/60 px-3.5 py-2 font-mono text-xs text-[#D1D1D6] truncate">
+              <div className="rounded-xl border border-white/[0.07] bg-black/60 px-4 py-2.5 font-mono text-xs text-[#D1D1D6] truncate">
                 {orderCmdTemplate}
               </div>
             </div>
           </div>
 
           {/* Right Column (5 cols): Ping Test & Status Console */}
-          <div className="lg:col-span-5 p-6 sm:p-7 space-y-5 flex flex-col justify-between bg-black/20">
+          <div className="lg:col-span-5 p-6 sm:p-8 space-y-5 flex flex-col justify-between bg-black/25">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#86868B]">
-                  Telemetría de Conexión
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#86868B]">
+                  Telemetría del Enlace
                 </span>
                 <span className="flex items-center gap-1.5 font-mono text-[10px] text-[#30D158]">
                   <StatusDot tone="pos" ping={isTestingPing} />
-                  {isTestingPing ? 'Midiendo…' : 'Enlace Listo'}
+                  {isTestingPing ? 'Midiendo Latencia…' : 'Enlace Listo'}
                 </span>
               </div>
 
-              <div className="rounded-xl border border-white/[0.06] bg-black/50 p-4 space-y-3 font-mono text-xs">
-                <div className="flex items-center justify-between border-b border-white/[0.05] pb-2">
+              <div className="rounded-2xl border border-white/[0.06] bg-black/50 p-5 space-y-3 font-mono text-xs">
+                <div className="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
                   <span className="text-[#86868B]">Plataforma:</span>
                   <span className="text-white font-bold">{selectedBroker.name}</span>
                 </div>
-                <div className="flex items-center justify-between border-b border-white/[0.05] pb-2">
-                  <span className="text-[#86868B]">Latencia Base:</span>
+                <div className="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                  <span className="text-[#86868B]">Latencia Estimada:</span>
                   <span className="text-[#30D158] font-bold">{selectedBroker.latency_ms} ms</span>
                 </div>
-                <div className="flex items-center justify-between border-b border-white/[0.05] pb-2">
-                  <span className="text-[#86868B]">Modo:</span>
+                <div className="flex items-center justify-between border-b border-white/[0.05] pb-2.5">
+                  <span className="text-[#86868B]">Entorno:</span>
                   <span className="text-white font-bold">{allowLive ? 'MERCADO REAL' : 'CUENTA SOMBRA'}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[#86868B]">Seguridad:</span>
+                  <span className="text-[#86868B]">Firma del Lote:</span>
                   <span className="text-white">HMAC SHA-256</span>
                 </div>
               </div>
@@ -592,7 +592,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                   initial={{ opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={cn(
-                    'p-3.5 rounded-xl border text-xs leading-relaxed',
+                    'p-4 rounded-2xl border text-xs leading-relaxed',
                     pingResult.ok
                       ? 'border-[#30D158]/30 bg-[#30D158]/[0.05] text-[#D1D1D6]'
                       : 'border-[#FF453A]/30 bg-[#FF453A]/[0.05] text-[#D1D1D6]'
@@ -600,12 +600,12 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                 >
                   <div className="flex items-center gap-2 font-bold mb-1">
                     {pingResult.ok ? (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-[#30D158]" />
+                      <CheckCircle2 className="h-4 w-4 text-[#30D158]" />
                     ) : (
-                      <AlertCircle className="h-3.5 w-3.5 text-[#FF453A]" />
+                      <AlertCircle className="h-4 w-4 text-[#FF453A]" />
                     )}
                     <span className={pingResult.ok ? 'text-[#30D158]' : 'text-[#FF453A]'}>
-                      {pingResult.ok ? 'Conexión Exitosa' : 'Fallo en Enlace'}
+                      {pingResult.ok ? 'Conexión Verificada' : 'Fallo en Enlace'}
                     </span>
                     <span className="ml-auto font-mono text-[10px] text-white">
                       {pingResult.latency_ms} ms
@@ -619,26 +619,27 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
             <Btn
               variant="secondary"
               size="md"
-              className="w-full"
+              className="w-full py-3"
               loading={isTestingPing}
               onClick={handleTestPing}
             >
-              {!isTestingPing && <RefreshCw className="h-3.5 w-3.5" />}
+              {!isTestingPing && <RefreshCw className="h-4 w-4" />}
               <span>Probar Conexión con {selectedBroker.name.split(' ')[0]} (Ping)</span>
             </Btn>
           </div>
         </div>
       </div>
 
-      {/* ═══════════════ 3. DUAL INTELLIGENCE: QLIB + VIBE (Widescreen Hairline Rows) ═══════════════ */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#050507]/70 backdrop-blur-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.07] px-6 py-4">
+      {/* ═══════════════ 3. DUAL INTELLIGENCE: QLIB + VIBE (Bloomberg PORT style) ═══════════════ */}
+      <div className="glass-panel specular-hairline overflow-hidden rounded-3xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.07] px-6 py-5">
           <div>
-            <h3 className="text-sm font-semibold tracking-tight text-white">
-              Inteligencia Integrada: Microsoft Qlib + HKUDS Vibe-Trading
+            <Eyebrow rule={false}>ATRIBUCIÓN DE MODELO MATEMÁTICO</Eyebrow>
+            <h3 className="text-lg font-bold text-white mt-1">
+              Microsoft Qlib (Factores Alpha158) + HKUDS Vibe-Trading (Agente Autónomo)
             </h3>
             <p className="text-xs text-[#86868B] mt-0.5">
-              Transparencia matemática completa: inspecciona la importancia de los 158 factores y la tesis del agente para cada orden.
+              Transparencia analítica completa: inspecciona la importancia predictiva de los 158 factores y la tesis del agente para cada orden.
             </p>
           </div>
 
@@ -714,7 +715,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
             ]).map((factor, idx) => (
               <div
                 key={factor.name}
-                className="grid grid-cols-1 md:grid-cols-12 items-baseline gap-4 px-6 py-4 transition-colors hover:bg-white/[0.015]"
+                className="grid grid-cols-1 md:grid-cols-12 items-baseline gap-4 px-6 py-5 transition-colors hover:bg-white/[0.015]"
               >
                 <div className="font-mono text-xs text-[#48484A] md:col-span-1">
                   0{idx + 1}
@@ -723,11 +724,11 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                 <div className="md:col-span-3 space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="font-sans text-base font-bold text-white">{factor.name}</span>
-                    <span className="font-mono text-[9px] text-[#86868B] bg-white/[0.04] px-1.5 py-0.5 rounded border border-white/[0.06]">
+                    <span className="font-mono text-[9px] text-[#86868B] bg-white/[0.04] px-2 py-0.5 rounded-full border border-white/[0.06]">
                       {factor.family}
                     </span>
                   </div>
-                  <div className="font-mono text-[10px] text-[#A1A1A6]">
+                  <div className="font-mono text-[11px] text-[#A1A1A6]">
                     <code>{factor.formula}</code>
                   </div>
                 </div>
@@ -737,7 +738,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                 </div>
 
                 <div className="md:col-span-2 md:text-right font-mono">
-                  <div className="text-sm font-bold text-[#30D158]">
+                  <div className="text-base font-bold text-[#30D158]">
                     +{factor.weight_pct.toFixed(1)}%
                   </div>
                   <div className="text-[9px] uppercase text-[#636366] tracking-wider">
@@ -797,7 +798,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
             ]).map((reason, idx) => (
               <div
                 key={reason.instrument}
-                className="grid grid-cols-1 md:grid-cols-12 items-baseline gap-4 px-6 py-4 transition-colors hover:bg-white/[0.015]"
+                className="grid grid-cols-1 md:grid-cols-12 items-baseline gap-4 px-6 py-5 transition-colors hover:bg-white/[0.015]"
               >
                 <div className="font-mono text-xs text-[#48484A] md:col-span-1">
                   0{idx + 1}
@@ -805,19 +806,19 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
 
                 <div className="md:col-span-3 space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-sans text-base font-bold text-white">{reason.instrument}</span>
+                    <span className="font-sans text-lg font-bold text-white">{reason.instrument}</span>
                     <span
                       className={cn(
-                        'font-mono text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider',
+                        'font-mono text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider',
                         reason.conviction === 'ALTA'
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                          : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                          ? 'badge-terminal-green'
+                          : 'badge-terminal-neutral'
                       )}
                     >
                       {reason.conviction}
                     </span>
                   </div>
-                  <div className="font-mono text-[10px] text-[#86868B]">
+                  <div className="font-mono text-[11px] text-[#86868B]">
                     Asignación: <strong className="text-white">{reason.allocation_pct}%</strong>
                   </div>
                 </div>
@@ -828,7 +829,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                 </div>
 
                 <div className="md:col-span-3 text-xs text-[#86868B] leading-relaxed border-l border-white/[0.06] pl-4">
-                  <span className="text-[#A1A1A6] font-mono uppercase text-[9px] block">
+                  <span className="text-[#A1A1A6] font-mono uppercase text-[9px] block mb-0.5">
                     Control de Riesgo:
                   </span>
                   {reason.risk_notes}
@@ -867,26 +868,26 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
         ]}
       />
 
-      {/* ═══════════════ 5. STAGED ORDERS — DENSE TERMINAL TABLE ═══════════════ */}
-      <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#050507]/70 backdrop-blur-xl">
-        <div className="flex items-center justify-between border-b border-white/[0.07] px-6 py-4">
+      {/* ═══════════════ 5. STAGED ORDERS — DENSE TERMINAL TABLE (EMSX Desk) ═══════════════ */}
+      <div className="glass-panel specular-hairline overflow-hidden rounded-3xl">
+        <div className="flex items-center justify-between border-b border-white/[0.07] px-6 py-5">
           <div>
-            <h3 className="text-sm font-semibold tracking-tight text-white">
-              Órdenes staged listas para ejecución
+            <h3 className="text-base font-bold text-white tracking-tight">
+              Órdenes staged listas para transmisión
             </h3>
-            <p className="text-xs text-[#86868B]">
+            <p className="text-xs text-[#86868B] mt-0.5">
               Generadas automáticamente por el agente y verificadas contra el firewall matemático.
             </p>
           </div>
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#636366]">
-            {orderList.length} órdenes staged
+          <span className="font-mono text-xs uppercase tracking-wider text-[#A1A1A6] bg-white/[0.04] px-3 py-1 rounded-full border border-white/[0.07]">
+            {orderList.length} Posiciones Staged
           </span>
         </div>
 
         {orderList.length === 0 ? (
-          <div className="py-16 text-center">
-            <Lock className="mx-auto mb-2 h-7 w-7 text-[#2C2C2E]" />
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#636366]">
+          <div className="py-20 text-center space-y-3">
+            <Lock className="mx-auto h-8 w-8 text-[#48484A]" />
+            <p className="font-mono text-xs uppercase tracking-widest text-[#86868B]">
               Sin plan de órdenes activo · Ejecuta el pipeline primero
             </p>
           </div>
@@ -894,13 +895,13 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
           <div className="overflow-x-auto">
             <table className="w-full min-w-[680px] text-left font-mono text-xs">
               <thead>
-                <tr className="border-b border-white/[0.07] text-[10px] uppercase tracking-[0.14em] text-[#636366]">
-                  <th className="px-6 py-3 font-medium">Acción</th>
-                  <th className="px-6 py-3 font-medium">Instrumento</th>
-                  <th className="px-6 py-3 font-medium">Rank Qlib</th>
-                  <th className="px-6 py-3 text-right font-medium">Cantidad</th>
-                  <th className="px-6 py-3 text-right font-medium">Precio est.</th>
-                  <th className="px-6 py-3 text-right font-medium">Notional</th>
+                <tr className="border-b border-white/[0.07] text-[10px] uppercase tracking-[0.16em] text-[#636366]">
+                  <th className="px-6 py-3.5 font-medium">Acción</th>
+                  <th className="px-6 py-3.5 font-medium">Instrumento</th>
+                  <th className="px-6 py-3.5 font-medium">Rank Qlib</th>
+                  <th className="px-6 py-3.5 text-right font-medium">Cantidad</th>
+                  <th className="px-6 py-3.5 text-right font-medium">Precio est.</th>
+                  <th className="px-6 py-3.5 text-right font-medium">Notional</th>
                 </tr>
               </thead>
               <tbody>
@@ -910,20 +911,20 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.04, duration: 0.25 }}
-                    className="border-b border-white/[0.05] transition-colors last:border-b-0 hover:bg-white/[0.025]"
+                    className="border-b border-white/[0.05] transition-colors last:border-b-0 hover:bg-white/[0.02]"
                   >
-                    <td className="px-6 py-3.5">
-                      <span className="rounded bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+                    <td className="px-6 py-4">
+                      <span className="badge-terminal-green rounded px-2.5 py-1 text-[10px] font-bold">
                         {ord.action}
                       </span>
                     </td>
-                    <td className="px-6 py-3.5 text-sm font-bold text-white">{ord.instrument}</td>
-                    <td className="px-6 py-3.5 text-[#636366]">#{ord.rank}</td>
-                    <td className="tnum px-6 py-3.5 text-right text-[#D2D2D7]">×{ord.qty}</td>
-                    <td className="tnum px-6 py-3.5 text-right text-[#86868B]">
+                    <td className="px-6 py-4 text-sm font-bold text-white">{ord.instrument}</td>
+                    <td className="px-6 py-4 text-[#636366]">#{ord.rank}</td>
+                    <td className="tnum px-6 py-4 text-right text-[#D2D2D7]">×{ord.qty}</td>
+                    <td className="tnum px-6 py-4 text-right text-[#86868B]">
                       ${ord.est_price.toFixed(2)}
                     </td>
-                    <td className="tnum px-6 py-3.5 text-right font-semibold text-white">
+                    <td className="tnum px-6 py-4 text-right font-bold text-white">
                       ${ord.est_notional.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </td>
                   </motion.tr>
@@ -934,14 +935,15 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
         )}
 
         {/* Transmit action bar */}
-        <div className="flex flex-col items-start justify-between gap-4 border-t border-white/[0.07] px-6 py-4 sm:flex-row sm:items-center">
-          <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#86868B]">
-            <Lock className="h-3.5 w-3.5 text-[#30D158]" />
-            Doble candado activo · Transmitiendo hacia {selectedBroker.name}
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-white/[0.07] px-6 py-5 bg-black/40">
+          <div className="flex items-center gap-2 text-xs font-mono text-[#86868B]">
+            <Lock className="h-4 w-4 text-[#30D158]" />
+            <span>Destino: <strong className="text-white">{selectedBroker.name}</strong></span>
+          </div>
+
           <Btn
             variant={allowLive ? 'danger' : 'primary'}
-            size="md"
+            size="lg"
             loading={isSubmitting}
             disabled={isSubmitting || orderList.length === 0}
             onClick={() => (allowLive ? setShowConfirmModal(true) : handleExecute())}
@@ -966,13 +968,13 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             className={cn(
-              'overflow-hidden rounded-2xl border bg-[#030304]/95 backdrop-blur-xl',
+              'overflow-hidden rounded-3xl border bg-[#030304]/95 backdrop-blur-xl shadow-2xl',
               submitOutput.ok ? 'border-[#30D158]/25' : 'border-[#FF453A]/30'
             )}
           >
             <div
               className={cn(
-                'flex items-center justify-between border-b px-6 py-3.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em]',
+                'flex items-center justify-between border-b px-6 py-4 font-mono text-xs font-bold uppercase tracking-[0.16em]',
                 submitOutput.ok
                   ? 'border-[#30D158]/20 text-[#30D158]'
                   : 'border-[#FF453A]/25 text-[#FF453A]'
@@ -981,12 +983,12 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
               <div className="flex items-center gap-2">
                 <StatusDot tone={submitOutput.ok ? 'pos' : 'neg'} />
                 {submitOutput.ok
-                  ? `Transmisión Exitosa en ${selectedBroker.name}`
+                  ? `Transmisión Exitosa · ${selectedBroker.name}`
                   : 'Fallo en Transmisión de Órdenes'}
               </div>
-              <span className="text-[#86868B]">Código de Retorno: {submitOutput.ok ? 0 : 1}</span>
+              <span className="text-[#86868B]">RetCode: {submitOutput.ok ? 0 : 1}</span>
             </div>
-            <pre className="max-h-64 overflow-y-auto px-6 py-4 font-mono text-xs leading-relaxed whitespace-pre-wrap text-[#A1A1A6]">
+            <pre className="max-h-64 overflow-y-auto px-6 py-5 font-mono text-xs leading-relaxed whitespace-pre-wrap text-[#A1A1A6]">
               {submitOutput.text}
             </pre>
           </motion.div>
@@ -1009,7 +1011,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
               exit={{ opacity: 0, scale: 0.96, y: 12 }}
               transition={{ type: 'spring', stiffness: 420, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-panel specular-hairline w-full max-w-md space-y-5 rounded-3xl p-7"
+              className="glass-panel specular-hairline w-full max-w-md space-y-6 rounded-3xl p-8"
               role="alertdialog"
               aria-modal="true"
             >
@@ -1018,7 +1020,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-lg font-bold tracking-tight text-white">
+                <h3 className="text-xl font-bold tracking-tight text-white">
                   ¿Confirmas la transmisión real a {selectedBroker.name}?
                 </h3>
                 <p className="text-xs leading-relaxed text-[#86868B]">
@@ -1028,7 +1030,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                 </p>
               </div>
 
-              <div className="flex gap-3 pt-1">
+              <div className="flex gap-3 pt-2">
                 <Btn
                   variant="secondary"
                   className="flex-1"
@@ -1042,7 +1044,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                   loading={isSubmitting}
                   onClick={handleExecute}
                 >
-                  {!isSubmitting && <Send className="h-3.5 w-3.5" />}
+                  {!isSubmitting && <Send className="h-4 w-4" />}
                   <span>Confirmar & Transmitir</span>
                 </Btn>
               </div>
