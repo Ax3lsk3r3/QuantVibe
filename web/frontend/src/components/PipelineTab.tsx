@@ -84,6 +84,42 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
     }
   }
 
+  // Resilient polling fallback: guarantees real-time terminal output even if Cloudflare or Nginx buffers SSE
+  useEffect(() => {
+    if (!isRunning) return
+
+    const pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(`${getApiBase()}/pipeline/logs`)
+        if (res.ok) {
+          const data = await res.json()
+          if (data.logs && Array.isArray(data.logs)) {
+            setLogs((prev) => {
+              if (data.logs.length > prev.length) {
+                return data.logs
+              }
+              return prev
+            })
+          }
+          if (data.is_running === false) {
+            setIsRunning(false)
+            onPipelineFinished()
+            confetti({
+              particleCount: 80,
+              spread: 60,
+              origin: { y: 0.7 },
+              colors: ['#FFFFFF', '#E8E8ED', '#86868B', '#30D158'],
+            })
+          }
+        }
+      } catch (err) {
+        console.error('Polling error:', err)
+      }
+    }, 800)
+
+    return () => clearInterval(pollInterval)
+  }, [isRunning, onPipelineFinished])
+
   useEffect(() => {
     const fetchInitialLogs = async () => {
       try {
