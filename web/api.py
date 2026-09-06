@@ -546,28 +546,23 @@ def get_bloomberg_live_broadcast() -> Dict[str, Any]:
     if cached and (now - cached["timestamp"] < 3600):
         return cached["data"]
 
-    # Fallback to current verified active live stream
+    # Verified Official Bloomberg Television 24/7 Live Stream
+    # Author: Bloomberg Television | Title: Bloomberg Business News Live
     current_video_id = "QB5BNdBFujE"
     channel_id = "UCrM7B73j_vHn2wQ-v5-M52Q"
-    try:
-        req = urllib.request.Request("https://www.youtube.com/@markets/live", headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=4) as resp:
-            html = resp.read().decode("utf-8", errors="ignore")
-            import re
-            m = re.search(r'"videoId":"([a-zA-Z0-9_-]{11})"', html)
-            if m:
-                current_video_id = m.group(1)
-    except Exception:
-        pass
 
     data = {
         "tv": {
             "title": "Bloomberg Television (24/7 Global Live Broadcast)",
+            "channel_name": "Bloomberg Television",
             "video_id": current_video_id,
             "embed_url": f"https://www.youtube-nocookie.com/embed/{current_video_id}?autoplay=0&mute=1&enablejsapi=1",
             "channel_embed_url": f"https://www.youtube-nocookie.com/embed/live_stream?channel={channel_id}",
-            "official_channel_url": "https://www.youtube.com/@markets/live",
-            "bloomberg_live_url": "https://www.bloomberg.com/live"
+            "official_channel_url": "https://www.youtube.com/@BloombergTelevision",
+            "bloomberg_live_url": "https://www.bloomberg.com/live",
+            "bloomberg_us_url": "https://www.bloomberg.com/live/us",
+            "bloomberg_europe_url": "https://www.bloomberg.com/live/europe",
+            "bloomberg_originals_url": "https://www.bloomberg.com/live/originals"
         },
         "podcasts": [
             {

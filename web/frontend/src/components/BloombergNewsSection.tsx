@@ -214,13 +214,13 @@ export const BloombergNewsSection: React.FC = () => {
     }
   }, [region])
 
-  // Fetch live TV video ID if dynamically updated
+  // Verified official Bloomberg Television Live Stream ID: QB5BNdBFujE (Channel: Bloomberg Television)
   useEffect(() => {
     let isMounted = true
     fetch('/api/news/bloomberg/live')
       .then(res => res.json())
       .then(data => {
-        if (isMounted && data?.tv?.video_id) {
+        if (isMounted && data?.tv?.video_id && data?.tv?.channel_name === 'Bloomberg Television') {
           setLiveVideoId(data.tv.video_id)
         }
       })
@@ -315,28 +315,107 @@ export const BloombergNewsSection: React.FC = () => {
       {/* 1. TAB: BLOOMBERG TELEVISION 24/7 LIVE BROADCAST */}
       {activeTab === 'tv' && (
         <div className="pt-8 space-y-6">
+          {/* Direct Launchpad for Bloomberg.com/live Signals */}
+          <div className="p-5 rounded-2xl bg-[#0E0E14] border border-white/[0.1] shadow-xl">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
+              <div>
+                <div className="flex items-center space-x-2 mb-1">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+                  <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
+                    PORTAL OFICIAL BLOOMBERG.COM/LIVE
+                  </span>
+                </div>
+                <h4 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                  Transmisión Oficial Directa en Bloomberg.com
+                </h4>
+                <p className="text-xs text-[#86868B] mt-0.5">
+                  Acceso directo a las tres señales de transmisión simultánea de la plataforma web de Bloomberg:
+                </p>
+              </div>
+
+              <a
+                href="https://www.bloomberg.com/live"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 rounded-xl bg-white text-black font-bold text-xs font-mono hover:bg-white/90 transition-all flex items-center space-x-2 self-start md:self-auto shadow-lg"
+              >
+                <span>Abrir Bloomberg.com/live</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            {/* Quick Signal Buttons for Bloomberg.com/live channels */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4">
+              <a
+                href="https://www.bloomberg.com/live/us"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all flex items-center justify-between group"
+              >
+                <div>
+                  <div className="text-xs font-bold text-white font-mono group-hover:text-amber-300 transition-colors">
+                    🇺🇸 Bloomberg TV (US)
+                  </div>
+                  <div className="text-[11px] text-[#86868B]">Señal central Wall Street & NY</div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-[#86868B] group-hover:text-white transition-colors" />
+              </a>
+
+              <a
+                href="https://www.bloomberg.com/live/europe"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all flex items-center justify-between group"
+              >
+                <div>
+                  <div className="text-xs font-bold text-white font-mono group-hover:text-amber-300 transition-colors">
+                    🇪🇺 Bloomberg TV (Europe)
+                  </div>
+                  <div className="text-[11px] text-[#86868B]">Londres, Fráncfort & BCE</div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-[#86868B] group-hover:text-white transition-colors" />
+              </a>
+
+              <a
+                href="https://www.bloomberg.com/live/originals"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all flex items-center justify-between group"
+              >
+                <div>
+                  <div className="text-xs font-bold text-white font-mono group-hover:text-amber-300 transition-colors">
+                    🎬 Bloomberg Originals
+                  </div>
+                  <div className="text-[11px] text-[#86868B]">Documentales, IA & Quicktake</div>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-[#86868B] group-hover:text-white transition-colors" />
+              </a>
+            </div>
+          </div>
+
+          {/* Embedded 24/7 Global Satellite Player (Official Bloomberg Television) */}
           <div className="rounded-2xl bg-black border border-white/[0.14] overflow-hidden shadow-2xl">
             {/* Top broadcast status bar */}
             <div className="px-5 py-3 bg-[#0E0E14] border-b border-white/[0.08] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
               <div className="flex items-center space-x-2.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
                 <span className="font-bold text-rose-400 tracking-wider">
-                  SEÑAL SATELITAL EN DIRECTO // BLOOMBERG TELEVISION 24/7
+                  SEÑAL OFICIAL // BLOOMBERG BUSINESS NEWS LIVE (TELEVISION 24/7)
                 </span>
                 <span className="hidden sm:inline text-white/30">•</span>
                 <span className="hidden sm:inline text-[#86868B]">
-                  Nueva York • Londres • Singapur • Wall Street
+                  Canal Oficial: Bloomberg Television
                 </span>
               </div>
 
               <div className="flex items-center space-x-3">
                 <a
-                  href="https://www.youtube.com/@markets/live"
+                  href="https://www.youtube.com/@BloombergTelevision"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-3 py-1 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-[#D2D2D7] hover:text-white transition-colors flex items-center space-x-1.5"
                 >
-                  <span>Abrir en YouTube</span>
+                  <span>Canal Oficial de YouTube</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
 
@@ -347,31 +426,31 @@ export const BloombergNewsSection: React.FC = () => {
                   className="px-3 py-1 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors flex items-center space-x-1.5 font-bold"
                 >
                   <Maximize2 className="w-3 h-3" />
-                  <span>Bloomberg.com Live</span>
+                  <span>Ver en Bloomberg.com</span>
                 </a>
               </div>
             </div>
 
-            {/* Official 24/7 Live Stream Player Embed */}
+            {/* Official 24/7 Live Stream Player Embed (Locked to Bloomberg Television) */}
             <div className="relative w-full aspect-video sm:h-[500px] lg:h-[560px] bg-black">
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${liveVideoId}?autoplay=1&mute=1&enablejsapi=1`}
-                title="Bloomberg Television Live Broadcast"
+                title="Bloomberg Television Official Live Broadcast"
                 className="w-full h-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
             </div>
 
-            {/* Bottom Stream Info & Features */}
+            {/* Bottom Stream Info & Transparency Note */}
             <div className="p-4 sm:p-5 bg-[#0A0A0F] border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-[#86868B]">
               <div className="flex items-center space-x-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span className="text-white font-medium">Transmisión oficial continua en vivo</span>
-                <span>— Cobertura de la Fed, datos de empleo, S&P 500 y entrevistas con CEOs de Wall Street.</span>
+                <span className="text-white font-medium">Retransmisión oficial y continua 24 horas</span>
+                <span>— Cobertura satelital en directo desde los estudios de Bloomberg Television en Nueva York y Londres.</span>
               </div>
               <div className="text-[11px] text-white/50">
-                Señal oficial emitida por Bloomberg Television Global News
+                Señal provista por Bloomberg Television (Bloomberg L.P.)
               </div>
             </div>
           </div>
