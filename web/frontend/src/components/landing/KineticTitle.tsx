@@ -5,6 +5,7 @@ interface KineticTitleProps {
   text: string
   highlightWord?: string
   italicWord?: string
+  serif?: boolean
   className?: string
 }
 
@@ -12,6 +13,7 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
   text,
   highlightWord,
   italicWord,
+  serif = false,
   className = '',
 }) => {
   const words = text.split(' ')
@@ -21,8 +23,8 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.04,
-        delayChildren: 0.04,
+        staggerChildren: 0.045,
+        delayChildren: 0.05,
       },
     },
   }
@@ -30,7 +32,7 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
   const child = {
     hidden: {
       opacity: 0,
-      y: 28,
+      y: 30,
       filter: 'blur(8px)',
     },
     visible: {
@@ -51,7 +53,11 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
       variants={container}
       initial="hidden"
       animate="visible"
-      className={`font-sans font-bold text-[#FFFFFF] tracking-[-0.045em] ${className}`}
+      className={
+        serif
+          ? `font-serif font-normal leading-[1.03] tracking-[-0.015em] text-white ${className}`
+          : `editorial-display font-sans font-extrabold text-white ${className}`
+      }
     >
       {words.map((word, index) => {
         const isHighlight = highlightWord && word.toLowerCase().includes(highlightWord.toLowerCase())
@@ -61,11 +67,11 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
           <motion.span
             key={index}
             variants={child}
-            className={`inline-block mr-[0.24em] last:mr-0 ${
+            className={`mr-[0.22em] inline-block last:mr-0 ${
               isItalic
-                ? 'text-[#86868B] font-extrabold tracking-[-0.03em]'
+                ? 'italic text-[#86868B]'
                 : isHighlight
-                ? 'bg-gradient-to-b from-white via-[#E1E1E6] to-[#71717A] bg-clip-text text-transparent drop-shadow-[0_4px_20px_rgba(255,255,255,0.18)] font-extrabold'
+                ? 'titanium-text-gradient'
                 : 'text-white'
             }`}
           >

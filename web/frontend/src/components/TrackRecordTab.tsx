@@ -1,15 +1,7 @@
 import React, { useState, useMemo } from 'react'
-import { motion } from 'framer-motion'
-import {
-  Percent,
-  Search,
-  ArrowUpRight,
-  ArrowDownRight,
-  Database,
-  History,
-  Activity,
-} from 'lucide-react'
+import { Search, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import type { TrackRecordResponse } from '../types'
+import { Eyebrow, MetricRail, StatusDot, cn } from './ui'
 
 interface TrackRecordTabProps {
   trackRecord: TrackRecordResponse | null
@@ -17,8 +9,8 @@ interface TrackRecordTabProps {
 
 export const TrackRecordTab: React.FC<TrackRecordTabProps> = ({ trackRecord }) => {
   const [searchTerm, setSearchTerm] = useState('')
-  const models = trackRecord?.models || []
-  const records = trackRecord?.records || []
+  const models = trackRecord?.models ?? []
+  const records = useMemo(() => trackRecord?.records ?? [], [trackRecord])
 
   const filteredRecords = records.filter(
     (r) =>
@@ -27,179 +19,217 @@ export const TrackRecordTab: React.FC<TrackRecordTabProps> = ({ trackRecord }) =
       r.source_model.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  // Generate an illustrative cumulative equity curve from settled records
-  const settledPoints = useMemo(() => {
-    return records
-      .filter((r) => r.fwd_return_1d !== null)
-      .slice(0, 30)
-      .reverse()
-  }, [records])
+  /* Illustrative cumulative equity curve from settled records */
+  const settledPoints = useMemo(
+    () =>
+      records
+        .filter((r) => r.fwd_return_1d !== null)
+        .slice(0, 30)
+        .reverse(),
+    [records]
+  )
 
-  const { equityPoints, cumulativeTotal } = useMemo(() => {
+  const cumulativeTotal = useMemo(() => {
     let cumulative = 1.0
-    const points = settledPoints.map((r) => {
+    settledPoints.forEach((r) => {
       cumulative *= 1 + (r.fwd_return_1d || 0)
-      return cumulative
     })
-    return { equityPoints: points, cumulativeTotal: cumulative }
+    return cumulative
   }, [settledPoints])
 
-  return (
-    <div className="space-y-8 font-sans">
-      {/* Top Models Performance Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {models.map((m) => (
-          <motion.div
-            key={m.source_model}
-            whileHover={{ y: -3 }}
-            className="rounded-3xl p-6 bg-[#0C0C10] border border-white/[0.08] hover:border-white/[0.18] shadow-2xl relative overflow-hidden group transition-all"
-          >
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.15] to-transparent pointer-events-none" />
+  const totalSettled = models.reduce((acc, m) => acc + m.settled_signals, 0)
+  const totalSignals = models.reduce((acc, m) => acc + m.total_signals, 0)
+  const avgReturn = models.length
+    ? models.reduce((acc, m) => acc + m.avg_return_1d * m.settled_signals, 0) /
+      Math.max(totalSettled, 1)
+    : 0
 
-            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3.5 mb-4">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-8 h-8 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white flex items-center justify-center font-bold">
-                  <Database className="w-4 h-4" />
-                </div>
-                <span className="font-bold text-sm text-[#F5F5F7] tracking-tight">
+  return (
+    <div className="space-y-10 font-sans">
+      {/* 1. Editorial head */}
+      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+        <div>
+          <Eyebrow>
+            <span className="flex items-center gap-2">
+              <StatusDot tone={trackRecord?.has_db ? 'pos' : 'muted'} ping={trackRecord?.has_db} />
+              Auditoría histórica · ledger SQLite
+            </span>
+          </Eyebrow>
+          <h1 className="mt-3 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
+            Cada retorno, <em className="italic text-[#6E6E73]">liquidado y sellado.</em>
+          </h1>
+          <p className="editorial-subhead mt-3 max-w-2xl text-sm leading-relaxed text-[#86868B]">
+            Libro mayor inmutable en{' '}
+            <code className="font-mono text-[#D1D1D6]">artifacts/track_record.db</code> con
+            liquidación de precios reales y exceso de retorno frente a la mediana del universo.
+          </p>
+        </div>
+
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#636366]" />
+          <input
+            type="text"
+            placeholder="Buscar activo, fecha o modelo…"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            aria-label="Buscar en el ledger"
+            className="w-full rounded-full border border-white/[0.1] bg-black/50 py-2 pl-9 pr-4 font-mono text-xs text-white placeholder-[#636366] transition-colors focus:border-white/30 focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* 2. Audit summary rail */}
+      <MetricRail
+        cols={4}
+        items={[
+          {
+            label: 'Señales liquidadas',
+            value: `${totalSettled} / ${totalSignals}`,
+            sub: 'con retorno forward real',
+          },
+          {
+            label: 'Retorno medio (1d)',
+            value: `${avgReturn >= 0 ? '+' : ''}${(avgReturn * 100).toFixed(3)}%`,
+            sub: 'ponderado por modelo',
+            tone: avgReturn >= 0 ? 'pos' : 'neg',
+          },
+          {
+            label: 'Curva reciente (30)',
+            value: `${cumulativeTotal >= 1 ? '+' : ''}${((cumulativeTotal - 1) * 100).toFixed(2)}%`,
+            sub: settledPoints.length > 0 ? 'compuesto sobre liquidadas' : 'sin datos aún',
+            tone: cumulativeTotal >= 1 ? 'pos' : 'neg',
+          },
+          {
+            label: 'Modelos auditados',
+            value: `${models.length}`,
+            sub: 'agrupados por source_model',
+          },
+        ]}
+      />
+
+      {/* 3. Model performance — dense hairline rows (anti-card) */}
+      {models.length > 0 && (
+        <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#050507]/70 backdrop-blur-xl">
+          <div className="border-b border-white/[0.07] px-5 py-3.5">
+            <h3 className="text-sm font-semibold tracking-tight text-white">
+              Desempeño por modelo
+            </h3>
+          </div>
+          {models.map((m) => (
+            <div
+              key={m.source_model}
+              className="group grid grid-cols-2 items-center gap-4 border-b border-white/[0.06] px-5 py-4 transition-colors last:border-b-0 hover:bg-white/[0.025] md:grid-cols-12"
+            >
+              <div className="col-span-2 flex items-center gap-3 md:col-span-4">
+                <StatusDot tone={m.avg_return_1d >= 0 ? 'pos' : 'neg'} />
+                <span className="truncate font-mono text-sm font-bold text-white">
                   {m.source_model}
                 </span>
               </div>
-              <span className="text-[11px] font-mono px-2.5 py-0.5 rounded-full bg-white/[0.06] text-[#A1A1A6] border border-white/[0.08]">
-                {m.settled_signals}/{m.total_signals} liquidadas
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="text-[11px] text-[#86868B] uppercase tracking-wider block font-medium">Retorno Medio (1d)</span>
-                <span
-                  className={`text-xl font-bold font-mono flex items-center mt-1.5 ${
-                    m.avg_return_1d >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'
-                  }`}
-                >
-                  {m.avg_return_1d >= 0 ? (
-                    <ArrowUpRight className="w-4 h-4 mr-0.5" />
-                  ) : (
-                    <ArrowDownRight className="w-4 h-4 mr-0.5" />
-                  )}
-                  {(m.avg_return_1d * 100).toFixed(3)}%/día
-                </span>
+              <div className="font-mono text-xs text-[#86868B] md:col-span-3">
+                <span className="tnum text-[#D2D2D7]">
+                  {m.settled_signals}/{m.total_signals}
+                </span>{' '}
+                liquidadas
               </div>
-
-              <div>
-                <span className="text-[11px] text-[#86868B] uppercase tracking-wider block font-medium">Hit-Rate Real</span>
-                <span className="text-xl font-bold font-mono text-[#F5F5F7] flex items-center mt-1.5">
-                  <Percent className="w-4 h-4 text-[#30D158] mr-1" />
-                  {(m.hit_rate * 100).toFixed(1)}%
-                </span>
+              <div
+                className={cn(
+                  'tnum flex items-center font-mono text-sm font-bold',
+                  m.avg_return_1d >= 0 ? 'text-[#30D158]' : 'text-[#FF453A]'
+                )}
+                md:col-span-3
+              >
+                {m.avg_return_1d >= 0 ? (
+                  <ArrowUpRight className="mr-1 h-4 w-4" />
+                ) : (
+                  <ArrowDownRight className="mr-1 h-4 w-4" />
+                )}
+                {(m.avg_return_1d * 100).toFixed(3)}%/día
+              </div>
+              <div className="tnum text-right font-mono text-sm font-bold text-white md:col-span-2">
+                {(m.hit_rate * 100).toFixed(1)}%{' '}
+                <span className="text-[10px] font-medium text-[#636366]">hit</span>
               </div>
             </div>
+          ))}
+        </div>
+      )}
 
-            {/* Micro curve preview if equity points exist */}
-            {equityPoints.length > 1 && (
-              <div className="mt-4 pt-3.5 border-t border-white/[0.06] flex items-center justify-between text-xs text-[#86868B]">
-                <span className="flex items-center gap-1.5">
-                  <Activity className="w-3.5 h-3.5 text-white/70" />
-                  Curva de Capital Reciente
-                </span>
-                <span className="font-mono text-[#30D158] font-bold">
-                  +{((cumulativeTotal - 1) * 100).toFixed(2)}%
-                </span>
-              </div>
-            )}
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Historical Ledger Table Card */}
-      <div className="rounded-3xl overflow-hidden bg-[#0C0C10] border border-white/[0.09] shadow-2xl relative">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.15] to-transparent pointer-events-none" />
-
-        <div className="p-6 border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center space-x-3.5">
-            <div className="w-10 h-10 rounded-2xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-white">
-              <History className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-[#F5F5F7] tracking-tight">
-                Libro Mayor Histórico de Auditoría
-              </h3>
-              <p className="text-xs text-[#86868B] mt-0.5">
-                Almacenado inmutable en <code className="text-[#D1D1D6] font-mono">artifacts/track_record.db</code> con liquidación de precios reales.
-              </p>
-            </div>
-          </div>
-
-          <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3.5 top-2.5 text-[#86868B]" />
-            <input
-              type="text"
-              placeholder="Buscar activo, fecha..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-black/50 border border-white/[0.1] rounded-full pl-9 pr-4 py-1.5 text-xs font-mono text-white placeholder-[#86868B] focus:outline-none focus:border-white/30 w-full sm:w-64"
-            />
-          </div>
+      {/* 4. Historical ledger — dense terminal table */}
+      <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-[#050507]/70 backdrop-blur-xl">
+        <div className="flex items-center justify-between border-b border-white/[0.07] px-5 py-3.5">
+          <h3 className="text-sm font-semibold tracking-tight text-white">
+            Libro mayor histórico de auditoría
+          </h3>
+          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#636366]">
+            {filteredRecords.length} registros
+          </span>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse font-sans">
+          <table className="w-full min-w-[760px] text-left border-collapse">
             <thead>
-              <tr className="border-b border-white/[0.08] bg-white/[0.02] text-xs font-semibold text-[#86868B] uppercase tracking-wider">
-                <th className="py-3.5 px-5">Fecha (as_of)</th>
-                <th className="py-3.5 px-5">Activo</th>
-                <th className="py-3.5 px-5">Rank</th>
-                <th className="py-3.5 px-5">Score Qlib</th>
-                <th className="py-3.5 px-5">Modelo</th>
-                <th className="py-3.5 px-5">Retorno Real (1d)</th>
-                <th className="py-3.5 px-5 text-right">Exceso vs Universo</th>
+              <tr className="border-b border-white/[0.07] bg-white/[0.015] font-mono text-[10px] uppercase tracking-[0.14em] text-[#636366]">
+                <th className="px-5 py-3 font-medium">Fecha (as_of)</th>
+                <th className="px-5 py-3 font-medium">Activo</th>
+                <th className="px-5 py-3 font-medium">Rank</th>
+                <th className="px-5 py-3 text-right font-medium">Score Qlib</th>
+                <th className="px-5 py-3 font-medium">Modelo</th>
+                <th className="px-5 py-3 text-right font-medium">Retorno real (1d)</th>
+                <th className="px-5 py-3 text-right font-medium">Exceso vs universo</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/[0.06] text-xs font-mono">
+            <tbody className="font-mono text-xs">
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-[#86868B] font-sans text-sm">
-                    No se encontraron registros de señales en la base de datos de auditoría.
+                  <td colSpan={7} className="px-5 py-14 text-center font-sans text-sm text-[#636366]">
+                    {trackRecord?.has_db
+                      ? 'Sin registros que coincidan con la búsqueda.'
+                      : 'Aún no hay señales liquidadas en la base de auditoría.'}
                   </td>
                 </tr>
               ) : (
                 filteredRecords.map((r, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-3.5 px-5 text-[#A1A1A6]">{r.as_of}</td>
-                    <td className="py-3.5 px-5 font-bold text-[#F5F5F7] text-sm">{r.instrument}</td>
-                    <td className="py-3.5 px-5 text-[#86868B]">#{r.rank}</td>
-                    <td className="py-3.5 px-5 text-[#D1D1D6] tnum">{r.score.toFixed(4)}</td>
-                    <td className="py-3.5 px-5 text-[#86868B]">{r.source_model}</td>
-                    <td className="py-3.5 px-5">
-                      {r.fwd_return_1d !== null ? (
-                        <span
-                          className={`font-semibold px-2.5 py-0.5 rounded-full ${
-                            r.fwd_return_1d >= 0
-                              ? 'bg-[#30D158]/15 text-[#30D158] border border-[#30D158]/30'
-                              : 'bg-[#FF453A]/15 text-[#FF453A] border border-[#FF453A]/30'
-                          }`}
-                        >
-                          {(r.fwd_return_1d * 100).toFixed(2)}%
-                        </span>
-                      ) : (
-                        <span className="text-[#86868B] italic">Pendiente</span>
-                      )}
+                  <tr
+                    key={`${r.instrument}-${r.as_of}-${idx}`}
+                    className="border-b border-white/[0.05] transition-colors last:border-b-0 hover:bg-white/[0.025]"
+                  >
+                    <td className="px-5 py-3 text-[#A1A1A6]">{r.as_of}</td>
+                    <td className="px-5 py-3 text-sm font-bold text-white">{r.instrument}</td>
+                    <td className="px-5 py-3 text-[#636366]">#{r.rank}</td>
+                    <td className="tnum px-5 py-3 text-right text-[#D1D1D6]">
+                      {r.score.toFixed(4)}
                     </td>
-                    <td className="py-3.5 px-5 text-right">
-                      {r.excess_return !== null ? (
-                        <span
-                          className={`font-semibold px-2.5 py-0.5 rounded-full ${
-                            r.excess_return >= 0
-                              ? 'bg-[#30D158]/15 text-[#30D158] border border-[#30D158]/30'
-                              : 'bg-[#FF453A]/15 text-[#FF453A] border border-[#FF453A]/30'
-                          }`}
-                        >
-                          {(r.excess_return * 100).toFixed(2)}%
-                        </span>
-                      ) : (
-                        <span className="text-[#86868B]">—</span>
+                    <td className="max-w-[160px] truncate px-5 py-3 text-[#86868B]">
+                      {r.source_model}
+                    </td>
+                    <td
+                      className={cn(
+                        'tnum px-5 py-3 text-right font-bold',
+                        r.fwd_return_1d === null
+                          ? 'text-[#48484A]'
+                          : r.fwd_return_1d >= 0
+                          ? 'text-[#30D158]'
+                          : 'text-[#FF453A]'
                       )}
+                    >
+                      {r.fwd_return_1d !== null
+                        ? `${r.fwd_return_1d >= 0 ? '+' : ''}${(r.fwd_return_1d * 100).toFixed(2)}%`
+                        : 'pendiente'}
+                    </td>
+                    <td
+                      className={cn(
+                        'tnum px-5 py-3 text-right font-semibold',
+                        r.excess_return === null
+                          ? 'text-[#48484A]'
+                          : r.excess_return >= 0
+                          ? 'text-[#30D158]'
+                          : 'text-[#FF453A]'
+                      )}
+                    >
+                      {r.excess_return !== null
+                        ? `${r.excess_return >= 0 ? '+' : ''}${(r.excess_return * 100).toFixed(2)}%`
+                        : '—'}
                     </td>
                   </tr>
                 ))

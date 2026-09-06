@@ -9,7 +9,6 @@ import { ArchitectureTab } from './components/ArchitectureTab'
 import { LandingPage } from './components/LandingPage'
 import { TradingViewTickerTape } from './components/TradingViewTickerTape'
 import { BloombergTerminal } from './components/BloombergTerminal'
-import { FloatingCollapsibleNav } from './components/FloatingCollapsibleNav'
 import {
   fetchStatus,
   fetchSignals,
@@ -24,6 +23,7 @@ import type {
   OrdersPlan,
   TrackRecordResponse,
 } from './types'
+import { StatusDot } from './components/ui'
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('landing')
@@ -58,31 +58,34 @@ export const App: React.FC = () => {
     loadData()
   }, [loadData])
 
+  const navigate = useCallback((tab: string) => {
+    setActiveTab(tab)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   return (
-    <div className="min-h-screen bg-[#000000] text-[#F5F5F7] flex flex-col selection:bg-white/20 selection:text-white relative overflow-x-hidden font-sans">
-      {/* Apple Pro Subtle Atmospheric Rim Light */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-15%] left-1/2 -translate-x-1/2 w-[900px] h-[550px] rounded-full bg-white/[0.025] blur-[160px]" />
-        <div className="absolute top-[40%] right-[-10%] w-[600px] h-[600px] rounded-full bg-white/[0.015] blur-[180px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-white/[0.01] blur-[200px]" />
+    <div className="relative flex min-h-screen flex-col overflow-x-hidden bg-[#000000] font-sans text-[#F5F5F7] selection:bg-white/20 selection:text-white">
+      {/* Ambient aurora depth layer (monochrome, fixed) */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
+        <div className="absolute left-1/2 top-[-18%] h-[600px] w-[1100px] -translate-x-1/2 rounded-full bg-white/[0.03] blur-[160px]" />
+        <div className="absolute right-[-12%] top-[38%] h-[650px] w-[650px] rounded-full bg-white/[0.018] blur-[180px]" />
+        <div className="absolute bottom-[-15%] left-[-8%] h-[600px] w-[600px] rounded-full bg-white/[0.012] blur-[200px]" />
       </div>
 
-      {/* Frosted Apple Navigation Header */}
+      {/* Single source of navigation: frosted sticky header */}
       <Header
         status={status}
         evaluation={evaluation}
-        signals={signals}
         loading={loading}
         onRefresh={loadData}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={navigate}
       />
 
-      {/* TradingView Live Streaming Ticker Tape Carousel */}
+      {/* Live market tape — real streaming data */}
       <TradingViewTickerTape />
 
-      {/* Main Workspace Container with Animated Tab Transition */}
-      <main className="flex-1 max-w-[1720px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-8 relative z-10">
+      <main className="relative z-10 mx-auto w-full max-w-[1720px] flex-1 px-4 py-10 sm:px-6 lg:px-8 xl:px-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -92,7 +95,11 @@ export const App: React.FC = () => {
             transition={{ type: 'spring', stiffness: 360, damping: 28 }}
           >
             {activeTab === 'landing' && (
-              <LandingPage onNavigateToTab={setActiveTab} />
+              <LandingPage
+                onNavigateToTab={navigate}
+                signals={signals}
+                evaluation={evaluation}
+              />
             )}
 
             {activeTab === 'overview' && (
@@ -100,7 +107,7 @@ export const App: React.FC = () => {
                 signals={signals}
                 evaluation={evaluation}
                 orders={orders}
-                onNavigateToTab={setActiveTab}
+                onNavigateToTab={navigate}
               />
             )}
 
@@ -114,30 +121,48 @@ export const App: React.FC = () => {
               <ExecutionTab orders={orders} onRefresh={loadData} />
             )}
 
-            {activeTab === 'trackrecord' && (
-              <TrackRecordTab trackRecord={trackRecord} />
-            )}
+            {activeTab === 'trackrecord' && <TrackRecordTab trackRecord={trackRecord} />}
 
             {activeTab === 'architecture' && <ArchitectureTab />}
           </motion.div>
         </AnimatePresence>
       </main>
 
-      {/* Floating Collapsible Navigation Dock (Follows scroll & collapses into button) */}
-      <FloatingCollapsibleNav activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      {/* Translucent Apple Glass Footer */}
-      <footer className="border-t border-white/[0.08] bg-[#000000]/80 backdrop-blur-2xl py-8 px-4 sm:px-6 lg:px-8 text-xs text-[#86868B] relative z-10">
-        <div className="max-w-[1720px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center space-x-3">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            <span className="text-[#F5F5F7] font-medium tracking-tight">QuantVibe Live Production Terminal</span>
-            <span className="text-white/20">•</span>
-            <span className="text-[#86868B]">Engineered for Precision & Zero-Latency</span>
+      {/* Editorial hairline footer */}
+      <footer className="relative z-10 border-t border-white/[0.07] bg-black/70 backdrop-blur-2xl">
+        <div className="mx-auto flex max-w-[1720px] flex-col gap-8 px-4 py-10 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8 xl:px-10">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2.5">
+              <span className="font-serif text-2xl italic text-white">QuantVibe</span>
+              <StatusDot tone="pos" ping={!loading} />
+            </div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#636366]">
+              Terminal de producción en vivo · v1.0.1
+            </p>
           </div>
 
-          <div className="text-center sm:text-right text-[#86868B] text-[11px] tracking-tight">
-            Microsoft Qlib Intelligence × Vibe-Trading Autonomous Agent • SHA-256 Tamper-Proof Vault
+          <nav className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-[11px] text-[#86868B]" aria-label="Accesos rápidos">
+            {[
+              { id: 'overview', label: 'Alpha Studio' },
+              { id: 'bloomberg', label: 'Terminal Bloomberg' },
+              { id: 'pipeline', label: 'Pipeline' },
+              { id: 'execution', label: 'Mesa de Órdenes' },
+              { id: 'trackrecord', label: 'Auditoría' },
+              { id: 'architecture', label: 'Arquitectura' },
+            ].map((l) => (
+              <button
+                key={l.id}
+                onClick={() => navigate(l.id)}
+                className="transition-colors hover:text-white"
+              >
+                {l.label}
+              </button>
+            ))}
+          </nav>
+
+          <div className="space-y-1 text-right font-mono text-[10px] leading-relaxed text-[#48484A]">
+            <p>Qlib ML Brain × Vibe-Trading Agent · Bóveda SHA-256</p>
+            <p>Alibaba Cloud ECS · FastAPI · Despliegue continuo</p>
           </div>
         </div>
       </footer>

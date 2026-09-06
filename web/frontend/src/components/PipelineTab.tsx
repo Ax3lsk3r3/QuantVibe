@@ -1,20 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import {
   Play,
   Terminal as TermIcon,
   Copy,
   Trash2,
-  Loader2,
-  Sliders,
-  Sparkles,
   Search,
   Check,
-  Zap,
 } from 'lucide-react'
 import { runPipeline, getApiBase } from '../api'
 import type { SystemStatus } from '../types'
+import { Btn, Eyebrow, Segmented, StatusDot, cn } from './ui'
 
 interface PipelineTabProps {
   status: SystemStatus | null
@@ -50,6 +46,15 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
     }
   }, [status])
 
+  const celebrate = () => {
+    confetti({
+      particleCount: 80,
+      spread: 60,
+      origin: { y: 0.7 },
+      colors: ['#FFFFFF', '#E8E8ED', '#86868B', '#30D158'],
+    })
+  }
+
   const connectSSE = () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close()
@@ -67,12 +72,7 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
         if (data.done) {
           setIsRunning(false)
           onPipelineFinished()
-          confetti({
-            particleCount: 80,
-            spread: 60,
-            origin: { y: 0.7 },
-            colors: ['#FFFFFF', '#E8E8ED', '#86868B', '#30D158'],
-          })
+          celebrate()
           es.close()
         }
       } catch (err) {
@@ -95,22 +95,12 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
         if (res.ok) {
           const data = await res.json()
           if (data.logs && Array.isArray(data.logs)) {
-            setLogs((prev) => {
-              if (data.logs.length > prev.length) {
-                return data.logs
-              }
-              return prev
-            })
+            setLogs((prev) => (data.logs.length > prev.length ? data.logs : prev))
           }
           if (data.is_running === false) {
             setIsRunning(false)
             onPipelineFinished()
-            confetti({
-              particleCount: 80,
-              spread: 60,
-              origin: { y: 0.7 },
-              colors: ['#FFFFFF', '#E8E8ED', '#86868B', '#30D158'],
-            })
+            celebrate()
           }
         }
       } catch (err) {
@@ -146,6 +136,7 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
         eventSourceRef.current.close()
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -178,14 +169,16 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
     try {
       await runPipeline(mode, selectedSteps)
       connectSSE()
-    } catch (err: any) {
-      setLogs((prev) => [...prev, `[ERROR AL INICIAR] ${err.message}`])
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err)
+      setLogs((prev) => [...prev, `[ERROR AL INICIAR] ${message}`])
       setIsRunning(false)
+      setErrorMsg(`No se pudo iniciar el pipeline: ${message}`)
     }
   }
 
   const handleCopyLogs = () => {
-    navigator.clipboard.writeText(logs.join('\n'))
+    navigator.clipboard.writeText(logs.join('\n')).catch(() => {})
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -199,223 +192,186 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
     : logs
 
   return (
-    <div className="space-y-8 font-sans">
-      {/* Configuration Header Card */}
-      <div className="rounded-3xl p-6 sm:p-8 bg-[#0C0C10] border border-white/[0.09] shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.15] to-transparent pointer-events-none" />
-
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.08] pb-6 mb-6">
-          <div className="flex items-center space-x-3.5">
-            <div className="w-11 h-11 rounded-2xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-[#F5F5F7]">
-              <Sliders className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-[#F5F5F7] tracking-[-0.03em]">
-                Centro de Mando del Pipeline
-              </h3>
-              <p className="text-xs text-[#86868B] mt-0.5">
-                Control de ciclo cerrado: Ingesta → Modelado Machine Learning → Evaluación y Firma Criptográfica.
-              </p>
-            </div>
-          </div>
-
-          {/* Mode Selector - Apple Segmented Pill */}
-          <div className="flex items-center p-1 rounded-full bg-[#1C1C1E] border border-white/[0.08] self-start sm:self-auto">
-            <button
-              onClick={() => setMode('demo')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                mode === 'demo'
-                  ? 'bg-white text-black shadow-sm'
-                  : 'text-[#86868B] hover:text-[#F5F5F7]'
-              }`}
-            >
-              <div className="flex items-center space-x-1.5">
-                <Zap className="w-3.5 h-3.5" />
-                <span>Modo Demo</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => setMode('real')}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                mode === 'real'
-                  ? 'bg-white text-black shadow-sm'
-                  : 'text-[#86868B] hover:text-[#F5F5F7]'
-              }`}
-            >
-              <div className="flex items-center space-x-1.5">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Modo Qlib Real (Alpha158)</span>
-              </div>
-            </button>
-          </div>
+    <div className="space-y-10 font-sans">
+      {/* 1. Editorial command head + mode selector */}
+      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+        <div>
+          <Eyebrow>
+            <span className="flex items-center gap-2">
+              <StatusDot tone={isRunning ? 'pos' : 'muted'} ping={isRunning} />
+              Consola de factores · ciclo cerrado
+            </span>
+          </Eyebrow>
+          <h1 className="mt-3 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
+            Centro de mando del <em className="italic text-[#6E6E73]">pipeline.</em>
+          </h1>
+          <p className="editorial-subhead mt-3 max-w-xl text-sm leading-relaxed text-[#86868B]">
+            Ingesta → modelado ML → evaluación y firma criptográfica. La telemetría fluye en tiempo
+            real vía SSE con respaldo de polling resistente a proxies.
+          </p>
         </div>
 
-        {/* Phase Selector Grid */}
-        <div className="space-y-3">
-          <label className="text-[11px] font-semibold text-[#86868B] uppercase tracking-wider block">
-            Fases del Pipeline Activas
-          </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-            {ALL_STEPS.map((step) => {
-              const isSelected = selectedSteps.includes(step.id)
+        <Segmented
+          layoutId="pipelineMode"
+          value={mode}
+          onChange={(id) => setMode(id as 'demo' | 'real')}
+          options={[
+            { id: 'demo', label: 'Modo Demo' },
+            { id: 'real', label: 'Qlib Real (Alpha158)' },
+          ]}
+        />
+      </div>
 
-              return (
-                <motion.button
-                  key={step.id}
-                  whileTap={{ scale: 0.97 }}
-                  type="button"
-                  onClick={() => handleToggleStep(step.id)}
-                  className={`p-4 rounded-2xl border text-left transition-all relative overflow-hidden ${
-                    isSelected
-                      ? 'bg-[#141418] border-white/[0.22] text-[#F5F5F7] shadow-lg shadow-black/40'
-                      : 'bg-[#08080A] border-white/[0.05] text-[#86868B] hover:bg-[#101014] hover:text-[#D1D1D6]'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold tracking-tight">{step.label}</span>
-                    <div
-                      className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${
-                        isSelected
-                          ? 'bg-white text-black font-black'
-                          : 'bg-white/[0.05] text-transparent'
-                      }`}
-                    >
-                      {isSelected ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : null}
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-[#86868B] leading-tight">{step.desc}</p>
-                </motion.button>
-              )
-            })}
-          </div>
+      {/* 2. Phase selector — hairline matrix rail (toggle cells) */}
+      <div>
+        <div className="mb-3 flex items-center justify-between">
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#86868B]">
+            Fases activas · {selectedSteps.length}/{ALL_STEPS.length}
+          </span>
+          <span className="font-mono text-[10px] text-[#48484A]">click para alternar</span>
         </div>
-
-        {/* Validation Error Banner */}
-        {errorMsg && (
-          <div className="mt-4 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-xs font-mono text-rose-300 flex items-center justify-between animate-in fade-in duration-200">
-            <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-rose-500" />
-              <span>{errorMsg}</span>
-            </div>
-            <button
-              onClick={() => setErrorMsg(null)}
-              className="px-2 py-0.5 rounded hover:bg-rose-500/20 text-rose-300 transition-colors"
-            >
-              Descartar
-            </button>
-          </div>
-        )}
-
-        {/* Launch Button Strip */}
-        <div className="mt-8 pt-5 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="text-xs text-[#86868B] flex items-center gap-2">
-            {isRunning ? (
-              <span className="text-[#F5F5F7] font-medium flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin text-white" />
-                Ejecutando en subproceso asíncrono con captura continua...
-              </span>
-            ) : (
-              <span>Parámetros configurados. La telemetría fluirá en tiempo real abajo.</span>
-            )}
-          </div>
-
-          <motion.button
-            whileHover={{ scale: isRunning ? 1 : 1.02 }}
-            whileTap={{ scale: isRunning ? 1 : 0.98 }}
-            onClick={handleRunPipeline}
-            disabled={isRunning}
-            className={`flex items-center space-x-2.5 px-8 py-3 rounded-full font-semibold text-xs sm:text-sm tracking-tight transition shadow-xl ${
-              isRunning
-                ? 'bg-[#1C1C1E] text-[#86868B] cursor-not-allowed border border-white/[0.08]'
-                : 'apple-btn-primary'
-            }`}
-          >
-            {isRunning ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Ejecutando Pipeline...</span>
-              </>
-            ) : (
-              <>
-                <Play className="w-4 h-4 fill-current" />
-                <span>Lanzar Pipeline Completo</span>
-              </>
-            )}
-          </motion.button>
+        <div className="grid grid-cols-1 border-l border-t border-white/[0.07] sm:grid-cols-2 lg:grid-cols-5">
+          {ALL_STEPS.map((step) => {
+            const isSelected = selectedSteps.includes(step.id)
+            return (
+              <button
+                key={step.id}
+                type="button"
+                onClick={() => handleToggleStep(step.id)}
+                aria-pressed={isSelected}
+                className={cn(
+                  'group border-b border-r border-white/[0.07] p-4 text-left transition-colors',
+                  isSelected ? 'bg-white/[0.05]' : 'hover:bg-white/[0.02]'
+                )}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span
+                    className={cn(
+                      'text-xs font-bold tracking-tight',
+                      isSelected ? 'text-white' : 'text-[#86868B]'
+                    )}
+                  >
+                    {step.label}
+                  </span>
+                  <span
+                    className={cn(
+                      'flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors',
+                      isSelected
+                        ? 'border-white bg-white text-black'
+                        : 'border-white/20 text-transparent'
+                    )}
+                  >
+                    <Check className="h-2.5 w-2.5 stroke-[3]" />
+                  </span>
+                </div>
+                <p className="mt-1.5 text-[11px] leading-tight text-[#636366]">{step.desc}</p>
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      {/* macOS Pro Terminal Console */}
-      <div className="rounded-3xl overflow-hidden bg-[#070709] border border-white/[0.1] shadow-2xl">
-        {/* Terminal Header Bar */}
-        <div className="p-3.5 sm:px-5 bg-[#121216] border-b border-white/[0.08] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center space-x-3.5">
-            {/* macOS Traffic Lights */}
-            <div className="flex space-x-2">
-              <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]/60 inline-block shadow-sm" />
-              <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]/60 inline-block shadow-sm" />
-              <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]/60 inline-block shadow-sm" />
-            </div>
+      {/* Validation error banner (explicit error state) */}
+      {errorMsg && (
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-[#FF453A]/30 bg-[#FF453A]/[0.07] px-4 py-3 font-mono text-xs text-[#FF8A80]">
+          <span className="flex items-center gap-2">
+            <StatusDot tone="neg" ping />
+            {errorMsg}
+          </span>
+          <button
+            onClick={() => setErrorMsg(null)}
+            className="shrink-0 rounded px-2 py-0.5 transition-colors hover:bg-[#FF453A]/20"
+          >
+            Descartar
+          </button>
+        </div>
+      )}
 
-            <div className="h-4 w-[1px] bg-white/[0.12]" />
+      {/* 3. Launch bar */}
+      <div className="flex flex-col items-start justify-between gap-4 border-y border-white/[0.07] py-5 sm:flex-row sm:items-center">
+        <span className="font-mono text-[11px] text-[#636366]">
+          {isRunning
+            ? 'ejecutando en subproceso asíncrono con captura continua…'
+            : 'parámetros configurados · la telemetría fluirá abajo en tiempo real'}
+        </span>
+        <Btn size="lg" loading={isRunning} disabled={isRunning} onClick={handleRunPipeline}>
+          {!isRunning && <Play className="h-4 w-4 fill-current" />}
+          <span>{isRunning ? 'Ejecutando pipeline…' : 'Lanzar pipeline completo'}</span>
+        </Btn>
+      </div>
 
-            <div className="flex items-center space-x-2 text-xs font-mono text-[#A1A1A6]">
-              <TermIcon className="w-4 h-4 text-[#F5F5F7]" />
-              <span>pipeline.stream • {logs.length} líneas</span>
-              {isRunning && (
-                <span className="w-2 h-2 rounded-full bg-[#30D158] animate-ping" />
+      {/* 4. Terminal console */}
+      <div className="glass-panel specular-hairline overflow-hidden rounded-2xl">
+        {/* Console chrome */}
+        <div className="flex flex-col gap-3 border-b border-white/[0.07] bg-[#0A0A0D]/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="flex items-center gap-3 font-mono text-xs text-[#A1A1A6]">
+            <span
+              className={cn(
+                'flex items-center gap-2 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest',
+                isRunning
+                  ? 'border-[#30D158]/30 bg-[#30D158]/10 text-[#30D158]'
+                  : 'border-white/[0.1] bg-white/[0.03] text-[#636366]'
               )}
-            </div>
+            >
+              <StatusDot tone={isRunning ? 'pos' : 'muted'} ping={isRunning} />
+              {isRunning ? 'Live' : 'Idle'}
+            </span>
+            <TermIcon className="h-4 w-4 text-[#F5F5F7]" />
+            <span>pipeline.stream · {logs.length} líneas</span>
           </div>
 
-          {/* Search & Actions */}
-          <div className="flex items-center space-x-2.5">
+          <div className="flex items-center gap-2.5">
             <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2 text-[#86868B]" />
+              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#636366]" />
               <input
                 type="text"
-                placeholder="Buscar en consola..."
+                placeholder="Buscar en consola…"
                 value={searchLog}
                 onChange={(e) => setSearchLog(e.target.value)}
-                className="bg-black/50 border border-white/[0.1] rounded-full pl-8 pr-3 py-1 text-xs font-mono text-white placeholder-[#86868B] focus:outline-none focus:border-white/30 w-36 sm:w-48"
+                aria-label="Buscar en los logs"
+                className="w-36 rounded-full border border-white/[0.1] bg-black/50 py-1 pl-8 pr-3 font-mono text-xs text-white placeholder-[#636366] transition-colors focus:border-white/30 focus:outline-none sm:w-48"
               />
             </div>
 
-            <label className="flex items-center space-x-1.5 text-xs text-[#86868B] cursor-pointer ml-1">
+            <label className="ml-1 flex cursor-pointer items-center gap-1.5 font-mono text-[11px] text-[#86868B]">
               <input
                 type="checkbox"
                 checked={autoScroll}
                 onChange={(e) => setAutoScroll(e.target.checked)}
-                className="rounded bg-white/[0.05] border-white/[0.1] text-white focus:ring-0 w-3.5 h-3.5 accent-white"
+                className="h-3.5 w-3.5 rounded border-white/[0.1] bg-white/[0.05] accent-white"
               />
-              <span className="text-[11px] font-mono">Auto-scroll</span>
+              Auto-scroll
             </label>
 
             <button
               onClick={handleCopyLogs}
-              className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.12] text-[#A1A1A6] hover:text-[#F5F5F7] transition"
+              aria-label="Copiar registros"
               title="Copiar registros"
+              className="rounded-lg bg-white/[0.05] p-1.5 text-[#A1A1A6] transition-colors hover:bg-white/[0.12] hover:text-white"
             >
-              {copied ? <Check className="w-4 h-4 text-[#30D158]" /> : <Copy className="w-4 h-4" />}
+              {copied ? <Check className="h-4 w-4 text-[#30D158]" /> : <Copy className="h-4 w-4" />}
             </button>
 
             <button
               onClick={handleClearLogs}
-              className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.12] text-[#A1A1A6] hover:text-[#FF453A] transition"
+              aria-label="Limpiar pantalla"
               title="Limpiar pantalla"
+              className="rounded-lg bg-white/[0.05] p-1.5 text-[#A1A1A6] transition-colors hover:bg-white/[0.12] hover:text-[#FF453A]"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="h-4 w-4" />
             </button>
           </div>
         </div>
 
-        {/* Terminal Text Body */}
-        <div className="p-5 font-mono text-xs text-[#D1D1D6] min-h-[360px] max-h-[520px] overflow-y-auto space-y-1.5 bg-[#050507] select-text">
+        {/* Console body */}
+        <div className="max-h-[520px] min-h-[360px] select-text space-y-1.5 overflow-y-auto bg-[#030304] p-5 font-mono text-xs text-[#D1D1D6]">
           {filteredLogs.length === 0 ? (
-            <div className="text-[#86868B] py-16 text-center select-none font-sans text-sm">
-              <TermIcon className="w-8 h-8 text-[#48484A] mx-auto mb-2 opacity-60" />
-              Esperando ejecución del pipeline. Presiona &quot;Lanzar Pipeline&quot; arriba para ver la telemetría en vivo.
+            <div className="select-none py-16 text-center">
+              <TermIcon className="mx-auto mb-2 h-8 w-8 text-[#2C2C2E]" />
+              <span className="font-sans text-sm text-[#636366]">
+                Esperando ejecución. Presiona «Lanzar pipeline completo» para ver la telemetría en
+                vivo.
+              </span>
             </div>
           ) : (
             filteredLogs.map((line, idx) => {
@@ -425,22 +381,23 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
               const isGuard = line.includes('[GUARDIA]')
 
               return (
-                <div key={idx} className="flex items-start space-x-3 leading-relaxed">
-                  <span className="text-[#48484A] text-[10px] w-8 text-right select-none font-mono pt-0.5">
+                <div key={idx} className="flex items-start gap-3 leading-relaxed">
+                  <span className="w-8 shrink-0 pt-0.5 text-right font-mono text-[10px] text-[#3A3A3C] select-none">
                     {idx + 1}
                   </span>
                   <div
-                    className={`flex-1 whitespace-pre-wrap break-all ${
+                    className={cn(
+                      'flex-1 break-all whitespace-pre-wrap',
                       isSuccess
-                        ? 'text-[#30D158] font-semibold'
+                        ? 'font-semibold text-[#30D158]'
                         : isError
-                        ? 'text-[#FF453A] font-semibold'
+                        ? 'font-semibold text-[#FF453A]'
                         : isHeader
-                        ? 'text-[#F5F5F7] font-bold border-l-2 border-white/40 pl-2'
+                        ? 'border-l-2 border-white/40 pl-2 font-bold text-[#F5F5F7]'
                         : isGuard
                         ? 'text-[#FFD60A]'
                         : 'text-[#D1D1D6]'
-                    }`}
+                    )}
                   >
                     {line}
                   </div>

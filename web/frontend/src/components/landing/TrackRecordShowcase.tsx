@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Award, Calendar, Database } from 'lucide-react'
+import { Calendar } from 'lucide-react'
+import { Eyebrow, MetricRail, Reveal } from '../ui'
 
 interface DataPoint {
   month: string
@@ -26,7 +27,6 @@ const HISTORICAL_DATA: DataPoint[] = [
 export const TrackRecordShowcase: React.FC = () => {
   const [hoveredPoint, setHoveredPoint] = useState<DataPoint | null>(null)
 
-  // SVG dimensions
   const width = 800
   const height = 260
   const paddingX = 40
@@ -40,7 +40,6 @@ export const TrackRecordShowcase: React.FC = () => {
   const getY = (val: number) =>
     height - paddingY - ((val - minY) / (maxY - minY)) * (height - paddingY * 2)
 
-  // Build SVG paths
   const strategyPath = HISTORICAL_DATA.reduce(
     (acc, pt, i) => `${acc} ${i === 0 ? 'M' : 'L'} ${getX(i)} ${getY(pt.strategy)}`,
     ''
@@ -53,43 +52,40 @@ export const TrackRecordShowcase: React.FC = () => {
   )
 
   return (
-    <div className="w-full py-12">
-      <div className="rounded-3xl bg-[#0C0C10] border border-white/[0.08] p-6 sm:p-8 lg:p-10 backdrop-blur-2xl relative overflow-hidden">
-        {/* Subtle top light */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
-
-        {/* Section Title */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/[0.05] border border-white/[0.12] text-[#A1A1A6] text-xs font-mono mb-2">
-              <Award className="w-3.5 h-3.5 text-white" />
-              <span>DESEMPEÑO HISTÓRICO AUDITADO</span>
-            </div>
-            <h3 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-[-0.035em] leading-[1.1]">
-              Curva de Equity vs <span className="text-[#86868B]">Benchmark S&P 500</span>
-            </h3>
-            <p className="text-xs sm:text-sm text-[#86868B] mt-1">
-              Backtest continuo rolling walk-forward (Alpha158 + LightGBM con costos de transacción 5bps).
-            </p>
-          </div>
-
-          <div className="flex items-center space-x-4 text-xs font-mono">
-            <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-white" />
-              <span className="text-white font-medium">QuantVibe Alpha (+36.2%)</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#48484A]" />
-              <span className="text-[#86868B]">S&P 500 (+13.8%)</span>
-            </div>
-          </div>
+    <div className="w-full">
+      {/* Editorial head */}
+      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+        <div>
+          <Eyebrow>Desempeño histórico · backtest walk-forward</Eyebrow>
+          <h2 className="mt-4 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
+            Curva de equity vs <em className="italic text-[#6E6E73]">benchmark S&P 500.</em>
+          </h2>
+          <p className="editorial-subhead mt-4 max-w-xl text-sm leading-relaxed text-[#86868B]">
+            Backtest continuo rolling walk-forward (Alpha158 + LightGBM) con costos de transacción
+            de 5 bps. Curva ilustrativa del histórico de simulación.
+          </p>
         </div>
 
-        {/* Interactive SVG Chart */}
-        <div className="relative w-full overflow-hidden bg-[#070709] rounded-2xl border border-white/[0.06] p-4">
+        <div className="flex shrink-0 items-center gap-6 self-start font-mono text-[11px] lg:self-auto">
+          <span className="flex items-center gap-2">
+            <span className="h-px w-6 bg-white" />
+            <span className="font-semibold text-white">QuantVibe +36.2%</span>
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="h-px w-6 border-t border-dashed border-[#636366]" />
+            <span className="text-[#86868B]">S&P 500 +13.8%</span>
+          </span>
+        </div>
+      </div>
+
+      {/* Interactive SVG chart stage */}
+      <Reveal delay={0.08}>
+        <div className="relative mt-10 overflow-hidden rounded-2xl border border-white/[0.07] bg-[#030304] p-4 sm:p-6">
           <svg
             viewBox={`0 0 ${width} ${height}`}
-            className="w-full h-48 sm:h-64 overflow-visible cursor-crosshair"
+            className="h-48 w-full cursor-crosshair overflow-visible sm:h-64"
+            role="img"
+            aria-label="Curva de equity de QuantVibe contra el benchmark S&P 500"
           >
             <defs>
               <linearGradient id="landingAreaGrad" x1="0" y1="0" x2="0" y2="1">
@@ -98,7 +94,6 @@ export const TrackRecordShowcase: React.FC = () => {
               </linearGradient>
             </defs>
 
-            {/* Horizontal Grid lines */}
             {[100, 110, 120, 130, 140].map((level) => {
               const y = getY(level)
               return (
@@ -111,42 +106,19 @@ export const TrackRecordShowcase: React.FC = () => {
                     stroke="rgba(255,255,255,0.05)"
                     strokeDasharray="4 4"
                   />
-                  <text
-                    x={paddingX - 10}
-                    y={y + 3}
-                    textAnchor="end"
-                    fill="#636366"
-                    fontSize="10"
-                    fontFamily="monospace"
-                  >
+                  <text x={paddingX - 10} y={y + 3} textAnchor="end" fill="#636366" fontSize="10" fontFamily="monospace">
                     {level}
                   </text>
                 </g>
               )
             })}
 
-            {/* Benchmark Area / Line */}
-            <path
-              d={benchmarkPath}
-              fill="none"
-              stroke="#48484A"
-              strokeWidth="2"
-              strokeDasharray="4 4"
-            />
-
-            {/* Strategy Area & Line */}
+            <path d={benchmarkPath} fill="none" stroke="#48484A" strokeWidth="2" strokeDasharray="4 4" />
             <path d={strategyArea} fill="url(#landingAreaGrad)" />
-            <path
-              d={strategyPath}
-              fill="none"
-              stroke="#FFFFFF"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            />
+            <path d={strategyPath} fill="none" stroke="#FFFFFF" strokeWidth="2.5" strokeLinecap="round" />
 
-            {/* Interactive Data Nodes */}
-            {HISTORICAL_DATA.map((pt, i) => {
-              const cx = getX(i)
+            {HISTORICAL_DATA.map((pt) => {
+              const cx = getX(HISTORICAL_DATA.indexOf(pt))
               const cy = getY(pt.strategy)
               const isHovered = hoveredPoint?.month === pt.month
 
@@ -161,7 +133,7 @@ export const TrackRecordShowcase: React.FC = () => {
                     cx={cx}
                     cy={cy}
                     r={isHovered ? 5.5 : 3.5}
-                    fill={isHovered ? '#FFFFFF' : '#141418'}
+                    fill={isHovered ? '#FFFFFF' : '#0A0A0D'}
                     stroke="#FFFFFF"
                     strokeWidth="2"
                     className="transition-all duration-150"
@@ -181,72 +153,48 @@ export const TrackRecordShowcase: React.FC = () => {
             })}
           </svg>
 
-          {/* Floating Tooltip */}
+          {/* Floating glass tooltip */}
           {hoveredPoint && (
             <motion.div
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
-              className="absolute top-4 right-4 bg-[#141418]/95 border border-white/20 rounded-2xl p-3.5 shadow-2xl backdrop-blur-xl text-xs font-mono space-y-1.5 z-20"
+              className="glass-panel absolute right-4 top-4 z-20 space-y-1.5 rounded-2xl p-3.5 font-mono text-xs backdrop-blur-2xl sm:right-6 sm:top-6"
             >
-              <div className="flex items-center space-x-2 text-white font-bold pb-1.5 border-b border-white/[0.08]">
-                <Calendar className="w-3.5 h-3.5 text-[#A1A1A6]" />
+              <div className="flex items-center gap-2 border-b border-white/[0.08] pb-1.5 font-bold text-white">
+                <Calendar className="h-3.5 w-3.5 text-[#A1A1A6]" />
                 <span>Mes: {hoveredPoint.month}</span>
               </div>
               <div className="text-white">
-                QuantVibe: <strong>{hoveredPoint.strategy.toFixed(1)}</strong> (+{(hoveredPoint.strategy - 100).toFixed(1)}%)
+                QuantVibe: <strong>{hoveredPoint.strategy.toFixed(1)}</strong> (+
+                {(hoveredPoint.strategy - 100).toFixed(1)}%)
               </div>
               <div className="text-[#86868B]">
-                S&P 500: {hoveredPoint.benchmark.toFixed(1)} (+{(hoveredPoint.benchmark - 100).toFixed(1)}%)
+                S&P 500: {hoveredPoint.benchmark.toFixed(1)} (+
+                {(hoveredPoint.benchmark - 100).toFixed(1)}%)
               </div>
-              <div className="text-emerald-400 text-[10px] font-semibold pt-0.5">
-                Alpha Spread: +{(hoveredPoint.strategy - hoveredPoint.benchmark).toFixed(1)}%
+              <div className="pt-0.5 text-[10px] font-semibold text-[#30D158]">
+                Alpha spread: +{(hoveredPoint.strategy - hoveredPoint.benchmark).toFixed(1)}%
               </div>
             </motion.div>
           )}
         </div>
+      </Reveal>
 
-        {/* Audited Metrics Ribbon */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-6 pt-6 border-t border-white/[0.06]">
-          <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08]">
-            <span className="text-[11px] text-[#86868B] block mb-1">Alpha Anualizado</span>
-            <span className="text-lg font-bold text-emerald-400 font-mono">+28.4%</span>
-            <span className="text-[9px] text-[#86868B] block mt-0.5">vs +11.2% benchmark</span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08]">
-            <span className="text-[11px] text-[#86868B] block mb-1">Sharpe Ratio</span>
-            <span className="text-lg font-bold text-white font-mono">2.41</span>
-            <span className="text-[9px] text-emerald-400 block mt-0.5">Excelente (&gt; 2.0)</span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08]">
-            <span className="text-[11px] text-[#86868B] block mb-1">Max Drawdown</span>
-            <span className="text-lg font-bold text-rose-400 font-mono">-8.2%</span>
-            <span className="text-[9px] text-[#86868B] block mt-0.5">S&P 500: -19.4%</span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08]">
-            <span className="text-[11px] text-[#86868B] block mb-1">Win Rate</span>
-            <span className="text-lg font-bold text-white font-mono">64.2%</span>
-            <span className="text-[9px] text-[#86868B] block mt-0.5">Operaciones liquidadas</span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08]">
-            <span className="text-[11px] text-[#86868B] block mb-1">Profit Factor</span>
-            <span className="text-lg font-bold text-white font-mono">2.18</span>
-            <span className="text-[9px] text-[#86868B] block mt-0.5">Gross Profit / Loss</span>
-          </div>
-
-          <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08]">
-            <span className="text-[11px] text-[#86868B] block mb-1">Auditoría SQLite</span>
-            <span className="text-lg font-bold text-emerald-400 font-mono flex items-center space-x-1">
-              <Database className="w-3.5 h-3.5 text-emerald-400" />
-              <span>100%</span>
-            </span>
-            <span className="text-[9px] text-[#86868B] block mt-0.5">Ledger inmutable</span>
-          </div>
-        </div>
-      </div>
+      {/* Audited metrics — full-bleed hairline rail */}
+      <Reveal delay={0.12}>
+        <MetricRail
+          className="mt-10"
+          cols={6}
+          items={[
+            { label: 'Alfa anualizado', value: '+28.4%', sub: 'vs +11.2% benchmark', tone: 'pos' },
+            { label: 'Sharpe ratio', value: '2.41', sub: 'excelente (> 2.0)' },
+            { label: 'Max drawdown', value: '-8.2%', sub: 'S&P 500: -19.4%', tone: 'neg' },
+            { label: 'Win rate', value: '64.2%', sub: 'operaciones liquidadas' },
+            { label: 'Profit factor', value: '2.18', sub: 'gross profit / loss' },
+            { label: 'Auditoría SQLite', value: '100%', sub: 'ledger inmutable', tone: 'pos' },
+          ]}
+        />
+      </Reveal>
     </div>
   )
 }

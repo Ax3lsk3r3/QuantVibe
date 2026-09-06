@@ -1,228 +1,170 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Cpu, ShieldCheck, Database, Server, CheckCircle2, Sparkles, Binary } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
+import { Eyebrow, Reveal, StatusDot } from './ui'
+
+const ZONES = [
+  {
+    n: '01',
+    env: 'venvs/qlib',
+    title: 'Qlib ML Brain',
+    desc: 'Computación cuantitativa pesada: ingesta OHLCV, extracción de factores Alpha158 y entrenamiento LightGBM en ventanas walk-forward.',
+    artifacts: ['prepare_data.py', 'train_model.py (LGBModel)', 'evaluate.py (Gate IC/ICIR)'],
+  },
+  {
+    n: '02',
+    env: 'bridge · IPC sellado',
+    title: 'Bóveda Criptográfica & MCP',
+    desc: 'Contrato firmado con SHA-256 canónico inmutable y servidor FastMCP read-only. Única vía de comunicación entre cerebros.',
+    artifacts: ['signal_store.py (SHA-256)', 'mcp_server.py (FastMCP SDK)', 'track_record.py (SQLite ledger)'],
+    emphasized: true,
+  },
+  {
+    n: '03',
+    env: 'venvs/vibe',
+    title: 'Vibe-Trading Agent',
+    desc: 'Agente LLM que consume señales vía MCP, dimensiona la asignación de capital y supervisa guardarraíles de ejecución.',
+    artifacts: ['execute_signals.py', 'orders_plan.json (staged)', 'guardia: VIBE_ALLOW_ORDERS'],
+  },
+]
+
+const MCP_TOOLS = [
+  {
+    sig: 'get_latest_signals(top_n: int = 0)',
+    desc: 'Entrega el lote de señales validadas con su checksum SHA-256.',
+  },
+  {
+    sig: 'list_universe()',
+    desc: 'Retorna la lista de activos monitorizados en la cartera.',
+  },
+  {
+    sig: 'signal_health()',
+    desc: 'Monitorea horas de vigencia y determina si las señales requieren refresco.',
+  },
+]
+
+const CODE_GRAPHS = [
+  {
+    name: 'CodeGraph',
+    detail: '.codegraph/codegraph.db · índice estructural de símbolos y llamadas',
+  },
+  {
+    name: 'codebase-memory-mcp',
+    detail: '.codebase-memory/graph.db.zst · grafo de conocimiento compartible',
+  },
+]
 
 export const ArchitectureTab: React.FC = () => {
   return (
-    <div className="space-y-8 font-sans">
-      {/* Visual Integration Architecture Card */}
-      <div className="rounded-3xl p-6 sm:p-8 bg-[#0C0C10] border border-white/[0.09] shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white/[0.15] to-transparent pointer-events-none" />
-
-        <div className="flex items-center space-x-3.5 border-b border-white/[0.08] pb-6 mb-8">
-          <div className="w-11 h-11 rounded-2xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-white">
-            <Cpu className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-[#F5F5F7] tracking-[-0.03em]">
-              Topología de Integración Desacoplada
-            </h3>
-            <p className="text-xs text-[#86868B] mt-0.5">
-              Arquitectura de cero acoplamiento (Zero-Import IPC) uniendo Machine Learning y Agentes Autónomos.
-            </p>
-          </div>
-        </div>
-
-        {/* 3 Pillars Visualization with Apple Device Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
-          {/* Pillar 1: Qlib Side */}
-          <motion.div
-            whileHover={{ y: -4 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-            className="rounded-2xl p-6 bg-[#121216] border border-white/[0.08] hover:border-white/[0.2] space-y-4 relative overflow-hidden transition-all shadow-xl"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white flex items-center justify-center font-bold">
-                <Binary className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-white/[0.06] text-[#D1D1D6] border border-white/[0.1] font-semibold">
-                venvs/qlib
-              </span>
-            </div>
-
-            <div>
-              <h4 className="text-base font-bold text-[#F5F5F7] tracking-tight">1. Qlib ML Brain</h4>
-              <p className="text-xs text-[#86868B] mt-1 leading-relaxed">
-                Computación cuantitativa pesada. Ingesta de OHLCV, extracción de factores Alpha158 y entrenamiento con LightGBM.
-              </p>
-            </div>
-
-            <div className="space-y-2 pt-3.5 border-t border-white/[0.06] text-xs font-mono text-[#D1D1D6]">
-              <div className="flex items-center space-x-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                <span>prepare_data.py</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                <span>train_model.py (LGBModel)</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                <span>evaluate.py (Gate IC/ICIR)</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Pillar 2: Bridge Layer */}
-          <motion.div
-            whileHover={{ y: -4 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-            className="rounded-2xl p-6 bg-[#121216] border border-white/[0.08] hover:border-white/[0.2] space-y-4 relative overflow-hidden transition-all shadow-xl"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white flex items-center justify-center font-bold">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-white/[0.06] text-[#D1D1D6] border border-white/[0.1] font-semibold">
-                Bridge IPC
-              </span>
-            </div>
-
-            <div>
-              <h4 className="text-base font-bold text-[#F5F5F7] tracking-tight">2. Bóveda Criptográfica & MCP</h4>
-              <p className="text-xs text-[#86868B] mt-1 leading-relaxed">
-                Contrato firmado con SHA-256 canónico inmutable y servidor FastMCP read-only para consumo del agente.
-              </p>
-            </div>
-
-            <div className="space-y-2 pt-3.5 border-t border-white/[0.06] text-xs font-mono text-[#D1D1D6]">
-              <div className="flex items-center space-x-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                <span>signal_store.py (Hash SHA-256)</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                <span>mcp_server.py (FastMCP SDK)</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                <span>track_record.py (SQLite Ledger)</span>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Pillar 3: Vibe-Trading Side */}
-          <motion.div
-            whileHover={{ y: -4 }}
-            transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-            className="rounded-2xl p-6 bg-[#121216] border border-white/[0.08] hover:border-white/[0.2] space-y-4 relative overflow-hidden transition-all shadow-xl"
-          >
-            <div className="flex items-center justify-between">
-              <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white flex items-center justify-center font-bold">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-white/[0.06] text-[#D1D1D6] border border-white/[0.1] font-semibold">
-                venvs/vibe
-              </span>
-            </div>
-
-            <div>
-              <h4 className="text-base font-bold text-[#F5F5F7] tracking-tight">3. Vibe-Trading Agent</h4>
-              <p className="text-xs text-[#86868B] mt-1 leading-relaxed">
-                Agente LLM que lee las señales vía MCP, calcula la asignación de capital y supervisa los guardarraíles de ejecución.
-              </p>
-            </div>
-
-            <div className="space-y-2 pt-3.5 border-t border-white/[0.06] text-xs font-mono text-[#D1D1D6]">
-              <div className="flex items-center space-x-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                <span>execute_signals.py</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                <span>orders_plan.json (Staged)</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                <span>Guardia: VIBE_ALLOW_ORDERS</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
+    <div className="space-y-12 font-sans">
+      {/* 1. Editorial head */}
+      <div>
+        <Eyebrow>Topología dual-brain · zero-import IPC</Eyebrow>
+        <h1 className="mt-3 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
+          Dos cerebros aislados, <em className="italic text-[#6E6E73]">un contrato sellado.</em>
+        </h1>
+        <p className="editorial-subhead mt-3 max-w-2xl text-sm leading-relaxed text-[#86868B]">
+          Qlib y Vibe-Trading operan en procesos independientes que jamás importan código mutuo.
+          La única frontera es el contrato firmado y el protocolo FastMCP read-only.
+        </p>
       </div>
 
-      {/* Code Graphs Status & FastMCP Tools */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Knowledge Graphs Card */}
-        <div className="rounded-3xl p-6 sm:p-7 bg-[#0C0C10] border border-white/[0.09] shadow-2xl space-y-5 relative overflow-hidden">
-          <div className="flex items-center space-x-3.5 border-b border-white/[0.08] pb-4">
-            <div className="w-9 h-9 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white flex items-center justify-center font-bold">
-              <Database className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="font-bold text-[#F5F5F7] text-base tracking-tight">Grafos de Código Indexados</h4>
-              <p className="text-xs text-[#86868B]">Motores MCP listos para cualquier sesión futura de agentes IA.</p>
-            </div>
-          </div>
+      {/* 2. Topology diagram — zones separated by vertical hairlines */}
+      <Reveal>
+        <div className="grid grid-cols-1 border-t border-white/[0.07] md:grid-cols-3 md:border-l md:border-white/[0.07]">
+          {ZONES.map((zone, i) => (
+            <motion.div
+              key={zone.n}
+              whileHover={{ backgroundColor: 'rgba(255,255,255,0.02)' }}
+              className={`relative border-b border-white/[0.07] p-7 transition-colors md:border-r ${
+                zone.emphasized ? 'bg-white/[0.015]' : ''
+              }`}
+            >
+              {i < ZONES.length - 1 && (
+                <div className="absolute -right-3 top-1/2 z-10 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/[0.1] bg-black md:flex">
+                  <ArrowRight className="h-3 w-3 text-[#636366]" />
+                </div>
+              )}
 
-          <div className="space-y-3">
-            <div className="p-4 rounded-2xl bg-[#121216] border border-white/[0.08] flex items-center justify-between">
-              <div>
-                <div className="font-bold text-[#F5F5F7] text-sm flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#30D158]" />
-                  CodeGraph (v1.6.0)
-                </div>
-                <div className="text-xs text-[#86868B] mt-1">
-                  Índice local en <code className="text-[#D1D1D6] font-mono">.codegraph/codegraph.db</code> • 958 nodos, 4,875 aristas.
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-[10px] text-[#48484A]">{zone.n}</span>
+                <span className="rounded-full border border-white/[0.1] bg-white/[0.03] px-2.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-[#A1A1A6]">
+                  {zone.env}
+                </span>
               </div>
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-[#30D158]/15 text-[#30D158] border border-[#30D158]/30">
-                ACTIVO
-              </span>
-            </div>
 
-            <div className="p-4 rounded-2xl bg-[#121216] border border-white/[0.08] flex items-center justify-between">
-              <div>
-                <div className="font-bold text-[#F5F5F7] text-sm flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-[#30D158]" />
-                  codebase-memory-mcp (v0.10.8)
-                </div>
-                <div className="text-xs text-[#86868B] mt-1">
-                  Grafo en <code className="text-[#D1D1D6] font-mono">.codebase-memory/graph.db.zst</code> • 1,040 nodos, 4,281 aristas.
-                </div>
-              </div>
-              <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold bg-[#30D158]/15 text-[#30D158] border border-[#30D158]/30">
-                ACTIVO
-              </span>
-            </div>
-          </div>
+              <h3 className="mt-5 font-serif text-2xl text-white">{zone.title}</h3>
+              <p className="mt-2.5 text-xs leading-relaxed text-[#86868B]">{zone.desc}</p>
+
+              <ul className="mt-6 space-y-2 border-t border-white/[0.06] pt-4">
+                {zone.artifacts.map((a) => (
+                  <li key={a} className="flex items-center gap-2.5 font-mono text-[11px] text-[#D1D1D6]">
+                    <StatusDot tone={zone.emphasized ? 'pos' : 'muted'} />
+                    {a}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ))}
         </div>
+      </Reveal>
 
-        {/* FastMCP Tools Card */}
-        <div className="rounded-3xl p-6 sm:p-7 bg-[#0C0C10] border border-white/[0.09] shadow-2xl space-y-5 relative overflow-hidden">
-          <div className="flex items-center space-x-3.5 border-b border-white/[0.08] pb-4">
-            <div className="w-9 h-9 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white flex items-center justify-center font-bold">
-              <Server className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="font-bold text-[#F5F5F7] text-base tracking-tight">Herramientas FastMCP Activas</h4>
-              <p className="text-xs text-[#86868B]">Expuestas en modo stdio y SSE para el agente LLM.</p>
+      {/* 3. MCP tools + code graphs — dense hairline columns */}
+      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-16">
+        <Reveal>
+          <div>
+            <Eyebrow>FastMCP · stdio + SSE · read-only</Eyebrow>
+            <h2 className="mt-3 font-serif text-2xl text-white sm:text-3xl">
+              Herramientas expuestas al agente
+            </h2>
+            <div className="mt-6 border-t border-white/[0.07]">
+              {MCP_TOOLS.map((tool) => (
+                <div
+                  key={tool.sig}
+                  className="group border-b border-white/[0.07] py-4 transition-colors hover:bg-white/[0.02]"
+                >
+                  <code className="font-mono text-xs font-bold text-white transition-colors group-hover:text-[#F5F5F7]">
+                    {tool.sig}
+                  </code>
+                  <p className="mt-1 text-xs leading-relaxed text-[#86868B]">{tool.desc}</p>
+                </div>
+              ))}
             </div>
           </div>
+        </Reveal>
 
-          <div className="space-y-3 font-mono text-xs">
-            <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08] space-y-1">
-              <div className="font-bold text-[#F5F5F7]">get_latest_signals(top_n: int = 0)</div>
-              <p className="text-[#86868B] font-sans text-xs">
-                Entrega el lote de señales validadas con su checksum SHA-256.
-              </p>
+        <Reveal delay={0.1}>
+          <div>
+            <Eyebrow>Trazabilidad · grafos de código indexados</Eyebrow>
+            <h2 className="mt-3 font-serif text-2xl text-white sm:text-3xl">
+              Motores de conocimiento estructural
+            </h2>
+            <div className="mt-6 border-t border-white/[0.07]">
+              {CODE_GRAPHS.map((g) => (
+                <div
+                  key={g.name}
+                  className="flex items-start justify-between gap-4 border-b border-white/[0.07] py-4 transition-colors hover:bg-white/[0.02]"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <StatusDot tone="pos" ping />
+                      <span className="text-sm font-bold tracking-tight text-white">{g.name}</span>
+                    </div>
+                    <p className="mt-1 truncate font-mono text-[11px] text-[#636366]">{g.detail}</p>
+                  </div>
+                  <span className="badge-terminal-green shrink-0 rounded-full px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest">
+                    Activo
+                  </span>
+                </div>
+              ))}
             </div>
-
-            <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08] space-y-1">
-              <div className="font-bold text-[#F5F5F7]">list_universe()</div>
-              <p className="text-[#86868B] font-sans text-xs">
-                Retorna la lista de activos monitorizados en la cartera (AAPL, NVDA, TSLA, etc.).
-              </p>
-            </div>
-
-            <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08] space-y-1">
-              <div className="font-bold text-[#F5F5F7]">signal_health()</div>
-              <p className="text-[#86868B] font-sans text-xs">
-                Monitorea horas de vigencia y determina si las señales requieren refresco.
-              </p>
-            </div>
+            <p className="mt-5 text-xs leading-relaxed text-[#636366]">
+              Ambos índices permiten a cualquier sesión futura de agentes IA consultar la
+              arquitectura completa (símbolos, llamadas, impacto de cambios) sin leer el código
+              fuente línea por línea.
+            </p>
           </div>
-        </div>
+        </Reveal>
       </div>
     </div>
   )

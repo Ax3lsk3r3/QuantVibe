@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useId } from 'react'
 
 interface SparklineProps {
   data?: number[]
@@ -11,12 +11,14 @@ interface SparklineProps {
 
 export const Sparkline: React.FC<SparklineProps> = ({
   data = [45, 52, 49, 60, 58, 65, 72, 68, 78, 85],
-  positive = true,
+  positive,
   width = 120,
   height = 36,
   className = '',
   strokeColor,
 }) => {
+  const gradientId = useId()
+
   if (!data || data.length < 2) return null
 
   const min = Math.min(...data)
@@ -29,7 +31,6 @@ export const Sparkline: React.FC<SparklineProps> = ({
     return { x, y }
   })
 
-  // Smooth cubic bezier or line path
   const pathD = points.reduce(
     (acc, curr, idx) => (idx === 0 ? `M ${curr.x} ${curr.y}` : `${acc} L ${curr.x} ${curr.y}`),
     ''
@@ -37,21 +38,16 @@ export const Sparkline: React.FC<SparklineProps> = ({
 
   const areaD = `${pathD} L ${width} ${height} L 0 ${height} Z`
 
-  // Apple Stocks aesthetic: sleek platinum/white or subtle Apple functional green/red
-  const resolvedStroke = strokeColor || (positive ? '#30D158' : '#FF453A')
-  const gradientId = `sparkline-grad-${Math.random().toString(36).substring(2, 9)}`
+  /* Monochrome platinum by default; semantic green/red only when P&L context is explicit */
+  const resolvedStroke =
+    strokeColor || (positive === undefined ? '#A1A1A6' : positive ? '#30D158' : '#FF453A')
 
   return (
     <div className={`inline-block overflow-hidden ${className}`}>
-      <svg
-        width={width}
-        height={height}
-        viewBox={`0 0 ${width} ${height}`}
-        className="overflow-visible"
-      >
+      <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="overflow-visible">
         <defs>
           <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={resolvedStroke} stopOpacity="0.18" />
+            <stop offset="0%" stopColor={resolvedStroke} stopOpacity="0.16" />
             <stop offset="100%" stopColor={resolvedStroke} stopOpacity="0.0" />
           </linearGradient>
         </defs>
@@ -60,7 +56,7 @@ export const Sparkline: React.FC<SparklineProps> = ({
           d={pathD}
           fill="none"
           stroke={resolvedStroke}
-          strokeWidth="1.75"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -68,4 +64,3 @@ export const Sparkline: React.FC<SparklineProps> = ({
     </div>
   )
 }
-

@@ -1,218 +1,197 @@
 import React from 'react'
-import { Check, X, ShieldAlert, Sparkles, Scale, Cpu, BrainCircuit } from 'lucide-react'
+import { Check, X } from 'lucide-react'
+import { Reveal, SectionHead } from '../ui'
+
+const CRITERIA = [
+  {
+    name: 'Factor Mining Continuo (158 Alphas)',
+    traditional: 'Parcial (modelos fijos)',
+    pureAi: 'Nulo (alucinaciones de texto)',
+    quantVibe: 'Alpha158 + LightGBM dinámico',
+  },
+  {
+    name: 'Firewall Matemático de Entrada (Gate IC/ICIR)',
+    traditional: 'Revisión manual semanal',
+    pureAi: 'Inexistente (riesgo fatal)',
+    quantVibe: 'Gate estricto IC/ICIR por lote',
+  },
+  {
+    name: 'Mitigación de Alucinaciones LLM',
+    traditional: 'N/A (no usa IA)',
+    pureAi: 'Riesgo crítico de quiebra',
+    quantVibe: '100% inmune (zero-import barrier)',
+  },
+  {
+    name: 'Sellado Criptográfico SHA-256',
+    traditional: 'Base de datos mutable',
+    pureAi: 'Logs volátiles no verificables',
+    quantVibe: 'Hash SHA-256 inmutable por lote',
+  },
+  {
+    name: 'Doble Blindaje de Ejecución (--submit)',
+    traditional: 'Aprobación telefónica lenta',
+    pureAi: 'API keys expuestas sin guardias',
+    quantVibe: 'Guarda de entorno + confirmación dual',
+  },
+  {
+    name: 'Construcción Adaptativa de Portafolio',
+    traditional: 'Rebalanceo rígido mensual',
+    pureAi: 'Caótico e inconsistente',
+    quantVibe: 'Agente LLM con restricción máx 20%',
+  },
+]
 
 export const ComparisonMatrix: React.FC = () => {
-  const criteria = [
-    {
-      name: 'Factor Mining Continuo (158 Alphas)',
-      traditional: 'Parcial (Modelos Fijos)',
-      pureAi: 'Nulo (Alucinaciones de texto)',
-      quantVibe: 'Alpha158 + LightGBM Dinámico',
-    },
-    {
-      name: 'Firewall Matemático de Entrada (Gate IC/ICIR)',
-      traditional: 'Revisión manual semanal',
-      pureAi: 'Inexistente (Riesgo fatal)',
-      quantVibe: 'Estricto IC ≥ 0.05, ICIR ≥ 0.50',
-    },
-    {
-      name: 'Mitigación de Alucinaciones LLM',
-      traditional: 'N/A (No usa IA)',
-      pureAi: 'Riesgo Crítico de Quiebra',
-      quantVibe: '100% Inmune (Zero-Import Barrier)',
-    },
-    {
-      name: 'Sellado Criptográfico SHA-256',
-      traditional: 'Base de datos mutable',
-      pureAi: 'Logs volátiles no verificables',
-      quantVibe: 'Hash SHA-256 Inmutable por Lote',
-    },
-    {
-      name: 'Doble Blindaje de Ejecución (--submit)',
-      traditional: 'Aprobación telefónica lenta',
-      pureAi: 'API keys expuestas sin guardias',
-      quantVibe: 'Hardware/Env Invariant Guard',
-    },
-    {
-      name: 'Construcción Adaptativa de Portafolio',
-      traditional: 'Rebalanceo rígido mensual',
-      pureAi: 'Caótico e inconsistente',
-      quantVibe: 'Agente LLM con Restricción Máx 20%',
-    },
-  ]
-
   return (
-    <div className="w-full py-16">
-      <div className="text-center max-w-3xl mx-auto mb-12">
-        <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/[0.05] border border-white/[0.12] text-[#A1A1A6] text-xs font-mono mb-4">
-          <Scale className="w-3.5 h-3.5 text-white" />
-          <span>PARADIGMA COMPARATIVO INSTITUCIONAL</span>
-        </div>
-        <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-[-0.035em] leading-[1.05]">
-          Por qué los Modelos Tradicionales se Quedan Atrás y la IA Sin Rigor Colapsa
-        </h2>
-        <p className="text-[#86868B] text-sm sm:text-base mt-4 leading-relaxed font-sans">
-          Los fondos cuantitativos tradicionales sufren de modelos rígidos e incapaces de razonar.
-          Los bots de IA generativa sufren de alucinaciones financieras fatales. QuantVibe crea una
-          síntesis con separación estricta: <strong className="text-white font-medium">matemáticas para predecir, agentes autónomos para ejecutar</strong>.
-        </p>
-      </div>
+    <div className="w-full">
+      <Reveal>
+        <SectionHead
+          align="center"
+          eyebrow="Paradigma comparativo institucional"
+          title="La síntesis que faltaba:"
+          accent="matemáticas para predecir, agentes para ejecutar."
+          sub="Los fondos cuantitativos tradicionales sufren de modelos rígidos incapaces de razonar. Los bots de IA generativa sufren de alucinaciones financieras fatales. QuantVibe separa los dos mundos con una frontera criptográfica."
+        />
+      </Reveal>
 
-      {/* Comparison Grid (Cards) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative mb-10">
-        {/* Column 1: Traditional Quant */}
-        <div className="rounded-3xl bg-[#09090D] border border-white/[0.08] p-6 lg:p-8 flex flex-col justify-between hover:border-white/15 transition-all">
-          <div>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-white/[0.06] text-white border border-white/[0.08]">
-                <Cpu className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-[#F5F5F7]">Quants Tradicionales</h3>
-                <span className="text-xs text-[#86868B] font-mono">Modelos Estadísticos Clásicos</span>
-              </div>
+      {/* Three editorial zones — separated by hairlines, winner emphasized */}
+      <Reveal delay={0.1}>
+        <div className="mt-14 grid grid-cols-1 border-t border-white/[0.07] md:grid-cols-3 md:border-l md:border-white/[0.07]">
+          {/* Traditional quant */}
+          <div className="flex flex-col justify-between border-b border-white/[0.07] p-7 md:border-r lg:p-9">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#636366]">
+                Modelos estadísticos clásicos
+              </span>
+              <h3 className="mt-2 font-serif text-2xl text-white">Quants tradicionales</h3>
+              <p className="mt-3 text-xs leading-relaxed text-[#86868B]">
+                Dependientes de scripts manuales y supuestos de distribución normal que fallan en
+                colapsos de liquidez.
+              </p>
+              <ul className="mt-6 space-y-3.5 text-xs">
+                {[
+                  { ok: false, t: 'Reentrenamiento lento y costoso por equipo humano' },
+                  { ok: false, t: 'Sin capacidad de sintetizar catalizadores contextuales' },
+                  { ok: true, t: 'Rigor formal, pero con decaimiento de alpha rápido' },
+                ].map((row) => (
+                  <li key={row.t} className="flex items-start gap-2.5 text-[#D2D2D7]">
+                    {row.ok ? (
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#A1A1A6]" />
+                    ) : (
+                      <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#48484A]" />
+                    )}
+                    <span className="leading-relaxed">{row.t}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-xs text-[#86868B] mb-6 leading-relaxed font-sans">
-              Dependientes de scripts manuales y supuestos de distribución normales que fallan en colapsos de liquidez.
-            </p>
-
-            <div className="space-y-4 text-xs">
-              <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-[#86868B] shrink-0 mt-0.5" />
-                <span>Reentrenamiento lento y costoso por equipo humano</span>
-              </div>
-              <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-[#86868B] shrink-0 mt-0.5" />
-                <span>Sin capacidad de sintetizar catalizadores contextuales</span>
-              </div>
-              <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <Check className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                <span>Rigor formal pero con decaimiento de alpha rápido</span>
-              </div>
+            <div className="mt-8 border-t border-white/[0.06] pt-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#636366]">
+              Diagnóstico · alpha decreciente
             </div>
           </div>
-          <div className="mt-8 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-[#86868B]">
-            DIAGNÓSTICO // ALPHA DECRECIENTE
-          </div>
-        </div>
 
-        {/* Column 2: Pure GenAI Bots (Dangerous) */}
-        <div className="rounded-3xl bg-[#0B0A0C] border border-white/[0.1] p-6 lg:p-8 flex flex-col justify-between relative overflow-hidden">
-          <div>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-white/[0.06] text-[#A1A1A6] border border-white/[0.1]">
-                <ShieldAlert className="w-5 h-5 text-white/80" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white">Bots GenAI Puros</h3>
-                <span className="text-xs text-[#86868B] font-mono">LLMs Operando Directamente</span>
-              </div>
+          {/* Pure GenAI bots */}
+          <div className="flex flex-col justify-between border-b border-white/[0.07] p-7 md:border-r lg:p-9">
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#636366]">
+                LLMs operando directamente
+              </span>
+              <h3 className="mt-2 font-serif text-2xl text-white">Bots GenAI puros</h3>
+              <p className="mt-3 text-xs leading-relaxed text-[#86868B]">
+                Agentes que leen noticias y compran tickers sin validación econométrica ni barreras
+                matemáticas de riesgo.
+              </p>
+              <ul className="mt-6 space-y-3.5 text-xs">
+                {[
+                  'Alucinación en precios objetivo y apalancamiento',
+                  'Sin Information Coefficient (IC) demostrable',
+                  'Riesgo existencial de liquidación en flash crashes',
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-2.5 text-[#D2D2D7]">
+                    <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#FF453A]" />
+                    <span className="leading-relaxed">{t}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-xs text-[#86868B] mb-6 leading-relaxed font-sans">
-              Agentes que leen noticias y compran tickers sin validación econométrica ni barreras matemáticas de riesgo.
-            </p>
-
-            <div className="space-y-4 text-xs">
-              <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-[#FF453A] shrink-0 mt-0.5" />
-                <span>Alucinación en precios objetivo y apalancamiento</span>
-              </div>
-              <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-[#FF453A] shrink-0 mt-0.5" />
-                <span>Sin Information Coefficient (IC) demostrable</span>
-              </div>
-              <div className="flex items-start space-x-2 text-[#D2D2D7]">
-                <X className="w-4 h-4 text-[#FF453A] shrink-0 mt-0.5" />
-                <span>Riesgo existencial de liquidación en flash crashes</span>
-              </div>
+            <div className="mt-8 border-t border-white/[0.06] pt-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[#FF453A]">
+              Diagnóstico · riesgo crítico de alucinación
             </div>
           </div>
-          <div className="mt-8 pt-4 border-t border-white/[0.06] text-[11px] font-mono text-[#FF453A]">
-            DIAGNÓSTICO // RIESGO CRÍTICO DE ALUCINACIÓN
-          </div>
-        </div>
 
-        {/* Column 3: QuantVibe (Winner) */}
-        <div className="rounded-3xl bg-[#111116] border border-white/[0.18] p-6 lg:p-8 flex flex-col justify-between relative shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
-          {/* Top badge */}
-          <div className="absolute -top-3 right-6 px-3 py-1 rounded-full bg-white text-black text-[10px] font-mono font-bold uppercase tracking-wider shadow-md">
-            ESTÁNDAR QUANTVIBE
-          </div>
-
-          <div>
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="p-2.5 rounded-xl bg-white/[0.1] text-white border border-white/20">
-                <BrainCircuit className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white flex items-center space-x-1.5">
-                  <span>QuantVibe</span>
-                  <Sparkles className="w-4 h-4 text-white" />
-                </h3>
-                <span className="text-xs text-[#A1A1A6] font-mono">Síntesis Dual-Brain Aislada</span>
-              </div>
+          {/* QuantVibe — winner zone */}
+          <div className="relative flex flex-col justify-between border-b border-white/[0.07] bg-white/[0.02] p-7 lg:p-9">
+            <span className="absolute right-6 top-0 -translate-y-1/2 rounded-full bg-white px-3 py-1 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-black shadow-[0_4px_20px_rgba(255,255,255,0.25)]">
+              Estándar QuantVibe
+            </span>
+            <div>
+              <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#A1A1A6]">
+                Síntesis dual-brain aislada
+              </span>
+              <h3 className="mt-2 font-serif text-2xl text-white">QuantVibe</h3>
+              <p className="mt-3 text-xs leading-relaxed text-[#D2D2D7]">
+                Separación total: Qlib produce y valida señales contra el gate IC/ICIR. El agente
+                Vibe sólo construye órdenes con invariantes estrictos sellados bajo SHA-256.
+              </p>
+              <ul className="mt-6 space-y-3.5 text-xs">
+                {[
+                  '158 Alphas de Qlib con árboles LightGBM continuos',
+                  'Gate matemático de calidad por lote evaluado',
+                  'Firma criptográfica SHA-256 y doble guardia',
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-2.5 text-[#F5F5F7]">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#30D158]" />
+                    <span className="leading-relaxed">{t}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <p className="text-xs text-[#D2D2D7] mb-6 leading-relaxed">
-              Separación total: Qlib produce y valida señales con IC ≥ 0.05. El Vibe Agent sólo construye
-              órdenes con invariantes estrictos sellados bajo SHA-256.
-            </p>
-
-            <div className="space-y-4 text-xs">
-              <div className="flex items-start space-x-2 text-[#F5F5F7]">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>158 Alphas de Qlib con árboles LightGBM continuos</span>
-              </div>
-              <div className="flex items-start space-x-2 text-[#F5F5F7]">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>Gate Matemático de Calidad: IC ≥ 0.05, ICIR ≥ 0.50</span>
-              </div>
-              <div className="flex items-start space-x-2 text-[#F5F5F7]">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <span>Firma Criptográfica SHA-256 y Doble Guardia</span>
-              </div>
+            <div className="mt-8 flex items-center justify-between border-t border-white/[0.08] pt-4 font-mono text-[10px] uppercase tracking-[0.16em]">
+              <span className="text-[#D2D2D7]">Rigor matemático + autonomía</span>
+              <span className="text-[#30D158]">Sharpe 2.45 (sim.)</span>
             </div>
-          </div>
-          <div className="mt-8 pt-4 border-t border-white/[0.1] text-[11px] font-mono text-[#D2D2D7] flex items-center justify-between">
-            <span>Rigor Matemático + Autonomía</span>
-            <span className="text-emerald-400 font-bold">Sharpe 2.45</span>
           </div>
         </div>
-      </div>
+      </Reveal>
 
-      {/* Detailed Technical Feature Matrix Table */}
-      <div className="rounded-2xl bg-[#0D0D11] border border-white/[0.08] overflow-hidden">
-        <div className="px-6 py-4 bg-white/[0.02] border-b border-white/[0.06] flex items-center justify-between">
-          <span className="text-xs font-mono font-semibold uppercase text-[#D2D2D7]">
-            Matriz de Comparación Detallada
-          </span>
-          <span className="text-xs font-mono text-[#A1A1A6]">Estándares Institucionales</span>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead>
-              <tr className="border-b border-white/[0.06] text-[#86868B] font-mono">
-                <th className="py-3 px-6">Dimensión Crítica</th>
-                <th className="py-3 px-6">Quants Clásicos</th>
-                <th className="py-3 px-6">Bots GenAI Puros</th>
-                <th className="py-3 px-6 text-white">QuantVibe Dual-Brain</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/[0.04] text-[#D2D2D7]">
-              {criteria.map((row) => (
-                <tr key={row.name} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="py-3.5 px-6 font-medium text-white">{row.name}</td>
-                  <td className="py-3.5 px-6 text-[#86868B]">{row.traditional}</td>
-                  <td className="py-3.5 px-6 text-rose-300/80">{row.pureAi}</td>
-                  <td className="py-3.5 px-6 font-semibold text-white flex items-center space-x-1.5">
-                    <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span>{row.quantVibe}</span>
-                  </td>
+      {/* Detailed technical matrix — dense terminal table */}
+      <Reveal delay={0.15}>
+        <div className="mt-14 overflow-hidden rounded-2xl border border-white/[0.07]">
+          <div className="flex items-center justify-between border-b border-white/[0.07] bg-white/[0.015] px-5 py-3">
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-[#D2D2D7]">
+              Matriz de comparación detallada
+            </span>
+            <span className="font-mono text-[10px] text-[#636366]">estándares institucionales</span>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[720px] text-left text-xs">
+              <thead>
+                <tr className="border-b border-white/[0.07] font-mono text-[10px] uppercase tracking-[0.12em] text-[#636366]">
+                  <th className="px-5 py-3 font-medium">Dimensión crítica</th>
+                  <th className="px-5 py-3 font-medium">Quants clásicos</th>
+                  <th className="px-5 py-3 font-medium">Bots GenAI puros</th>
+                  <th className="px-5 py-3 font-medium text-white">QuantVibe dual-brain</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-white/[0.05] text-[#D2D2D7]">
+                {CRITERIA.map((row) => (
+                  <tr key={row.name} className="transition-colors hover:bg-white/[0.02]">
+                    <td className="px-5 py-3.5 font-medium text-white">{row.name}</td>
+                    <td className="px-5 py-3.5 text-[#86868B]">{row.traditional}</td>
+                    <td className="px-5 py-3.5 text-[#FF8A80]/80">{row.pureAi}</td>
+                    <td className="px-5 py-3.5">
+                      <span className="flex items-center gap-1.5 font-semibold text-white">
+                        <Check className="h-3.5 w-3.5 shrink-0 text-[#30D158]" />
+                        {row.quantVibe}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </Reveal>
     </div>
   )
 }

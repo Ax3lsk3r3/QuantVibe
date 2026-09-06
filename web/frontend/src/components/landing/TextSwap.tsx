@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles } from 'lucide-react'
 
 interface TextSwapProps {
   phrases: string[]
@@ -24,25 +23,21 @@ export const TextSwap: React.FC<TextSwapProps> = ({
   }, [phrases.length, intervalMs])
 
   return (
-    <div className={`inline-flex items-center space-x-2.5 px-3.5 py-1 rounded-full bg-[#141418] border border-white/[0.1] shadow-sm overflow-hidden ${className}`}>
-      <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse" />
-      <div className="relative h-6 flex items-center min-w-[280px] sm:min-w-[400px]">
+    <div
+      className={`inline-flex max-w-full items-center gap-2.5 overflow-hidden rounded-full border border-white/[0.08] bg-white/[0.02] px-4 py-1.5 backdrop-blur-xl ${className}`}
+    >
+      <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-white/70" />
+      <div className="relative flex h-5 min-w-[260px] items-center sm:min-w-[400px]">
         <AnimatePresence mode="wait">
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 14, filter: 'blur(3px)' }}
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             exit={{ opacity: 0, y: -14, filter: 'blur(3px)' }}
-            transition={{
-              type: 'spring',
-              damping: 28,
-              stiffness: 320,
-              bounce: 0,
-            }}
-            className="absolute left-0 text-xs sm:text-[13px] font-medium text-[#D2D2D7] tracking-tight flex items-center space-x-2"
+            transition={{ type: 'spring', damping: 28, stiffness: 320, bounce: 0 }}
+            className="absolute left-0 flex items-center font-mono text-[11px] tracking-tight text-[#A1A1A6]"
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#A1A1A6]" />
-            <span>{phrases[index]}</span>
+            <span className="truncate">{phrases[index]}</span>
           </motion.div>
         </AnimatePresence>
       </div>

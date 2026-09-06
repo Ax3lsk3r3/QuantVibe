@@ -1,645 +1,572 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  ArrowRight,
-  ShieldCheck,
-  Cpu,
-  Layers,
-  Lock,
-  ChevronRight,
-  Globe,
-  CheckCircle2,
-  Fingerprint,
-} from 'lucide-react'
+import { ArrowRight, Lock, ShieldCheck, Fingerprint, Radio, Tv, Newspaper, Cpu } from 'lucide-react'
 import { KineticTitle } from './landing/KineticTitle'
 import { TextSwap } from './landing/TextSwap'
 import { InteractiveSimulator } from './landing/InteractiveSimulator'
 import { ComparisonMatrix } from './landing/ComparisonMatrix'
 import { SecurityVaultProof } from './landing/SecurityVaultProof'
 import { TrackRecordShowcase } from './landing/TrackRecordShowcase'
+import type { EvaluationData, SignalsResponse } from '../types'
+import {
+  Btn,
+  CopyChip,
+  DataRow,
+  Eyebrow,
+  Panel,
+  Reveal,
+  Section,
+  SectionHead,
+  Segmented,
+  StatusDot,
+  cn,
+} from './ui'
 
 interface LandingPageProps {
   onNavigateToTab: (tab: string) => void
+  signals: SignalsResponse | null
+  evaluation: EvaluationData | null
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToTab }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({
+  onNavigateToTab,
+  signals,
+  evaluation,
+}) => {
   const [consoleTab, setConsoleTab] = useState<'signals' | 'gate' | 'crypto'>('signals')
+
+  const payload = signals?.payload
+  const topSignals = payload?.signals?.slice(0, 5) ?? []
+  const maxScore = Math.max(...topSignals.map((s) => Math.abs(s.score)), 0.0001)
 
   const dynamicPhrases = [
     'Factor Mining con 158 Alphas de Microsoft Qlib',
-    'Gate Matemático Infranqueable (Mean IC ≥ 0.00, ICIR ≥ 0.00)',
-    'Construcción de Portafolio Autónoma mediante Agente LLM',
-    'Bóveda Criptográfica con Sellado SHA-256 Inmutable',
-    'Aislamiento Estricto Zero-Import entre Qlib y Vibe',
-    'Doble Blindaje de Ejecución (--submit + VIBE_ALLOW_ORDERS)',
+    'Gate matemático ineludible antes de cualquier orden',
+    'Construcción de portafolio autónoma mediante agente LLM',
+    'Bóveda criptográfica con sellado SHA-256 inmutable',
+    'Aislamiento estricto Zero-Import entre Qlib y Vibe',
+    'Doble blindaje de ejecución (--submit + VIBE_ALLOW_ORDERS)',
   ]
 
-  const liveTickers = [
-    { ticker: 'TSLA', score: '+0.128', rank: '#1', weight: '20.0%', action: 'BUY' },
-    { ticker: 'AAPL', score: '+0.101', rank: '#2', weight: '20.0%', action: 'BUY' },
-    { ticker: 'META', score: '+0.084', rank: '#3', weight: '20.0%', action: 'BUY' },
-    { ticker: 'JPM', score: '+0.054', rank: '#4', weight: '20.0%', action: 'BUY' },
-    { ticker: 'NVDA', score: '+0.047', rank: '#5', weight: '20.0%', action: 'BUY' },
+  const trustRail = [
+    { label: 'Motor', value: payload?.source_model ?? 'Alpha158 · LightGBM' },
+    { label: 'Universo', value: `${payload?.universe?.length ?? 10} activos` },
+    {
+      label: 'Mean IC',
+      value: evaluation ? `+${evaluation.mean_ic.toFixed(4)}` : '—',
+    },
+    {
+      label: 'Horizonte',
+      value: `${payload?.horizon_days ?? 1}d walk-forward`,
+    },
+  ]
+
+  const mediaCapabilities = [
+    {
+      n: '01',
+      icon: Tv,
+      title: 'Bloomberg Television 24/7',
+      desc: 'Señal satelital oficial en directo: Wall Street, bancos centrales y geopolítica.',
+    },
+    {
+      n: '02',
+      icon: Radio,
+      title: 'La Estrategia del Día',
+      desc: 'Podcast diario oficial (Colombia, México, Argentina) embebido desde Spotify.',
+    },
+    {
+      n: '03',
+      icon: Newspaper,
+      title: 'Wire Bloomberg Línea',
+      desc: 'RSS certificado con cobertura LatAm y EE. U. sincronizado cada 5 minutos.',
+    },
+    {
+      n: '04',
+      icon: Cpu,
+      title: 'Screener & Market Overview',
+      desc: 'Widgets institucionales de TradingView con datos reales de mercado en vivo.',
+    },
+  ]
+
+  const invariants = [
+    {
+      n: '01',
+      title: 'Cerebro Cuantitativo Qlib',
+      desc: '158 factores Alpha continuos y árboles gradient-boosted (LightGBM) sobre ventanas móviles walk-forward. Las predicciones nacen de estadística, nunca de texto.',
+      tag: 'Alpha158 · LGBModel',
+    },
+    {
+      n: '02',
+      title: 'Firewall Matemático (Gate)',
+      desc: 'Filtro implacable previo a cualquier orden: si el Information Coefficient o su estabilidad (ICIR) caen bajo el umbral, la puerta se cierra y el sistema aborta.',
+      tag: 'Fail-Safe Activo',
+      tagTone: 'text-[#30D158]' as const,
+    },
+    {
+      n: '03',
+      title: 'Manos Agénticas Vibe',
+      desc: 'El agente LLM dimensiona liquidez y tamaño de orden bajo invariantes estrictos: máximo 20% por posición, doble confirmación y registro inmutable en SQLite.',
+      tag: 'Max Cap 20% · Doble Guardia',
+    },
   ]
 
   return (
-    <div className="w-full flex flex-col space-y-32 py-6 sm:py-12 relative overflow-hidden">
-      {/* 1. HERO SECTION (Apple iPhone Pro Flagship Launch Style) */}
-      <section className="relative w-full flex flex-col items-center text-center pt-8 pb-12 overflow-hidden">
-        {/* Apple Atmospheric White Rim Halo */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[950px] h-[550px] bg-gradient-to-b from-white/[0.045] via-white/[0.015] to-transparent blur-[160px] pointer-events-none -z-10" />
+    <div className="relative w-full">
+      {/* ═══════════════ 1. HERO — Asymmetric editorial + live console (Z-depth) ═══════════════ */}
+      <section className="relative grid grid-cols-1 items-center gap-12 pb-20 pt-10 lg:grid-cols-12 lg:gap-8 lg:pb-28 lg:pt-16">
+        {/* Hero rim light */}
+        <div
+          className="pointer-events-none absolute -top-24 left-1/4 h-[480px] w-[720px] rounded-full bg-white/[0.04] blur-[150px]"
+          aria-hidden
+        />
 
-        {/* Asymmetric Luxury Pill Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-[#0E0E12]/90 border border-white/[0.12] backdrop-blur-2xl shadow-xl mb-8 group hover:border-white/30 transition-colors"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-          </span>
-          <span className="text-[11px] font-mono uppercase tracking-widest text-[#A1A1A6] font-medium">
-            QUANTITATIVE BRAIN × AUTONOMOUS HANDS
-          </span>
-          <span className="h-3 w-[1px] bg-white/[0.15]" />
-          <span className="text-[11px] font-mono text-white/90 font-semibold flex items-center gap-1">
-            <span>PRO</span>
-            <span className="text-[#86868B]">v1.0.1</span>
-          </span>
-        </motion.div>
+        {/* Left — monumental editorial column */}
+        <div className="relative lg:col-span-7 lg:pr-8">
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <Eyebrow>Quantitative Brain × Autonomous Hands</Eyebrow>
+          </motion.div>
 
-        {/* Dynamic Tagline Swap */}
-        <div className="mb-6">
-          <TextSwap phrases={dynamicPhrases} intervalMs={3400} />
+          <div className="mt-6">
+            <TextSwap phrases={dynamicPhrases} intervalMs={3400} />
+          </div>
+
+          <div className="mt-5">
+            <KineticTitle
+              serif
+              text="El rigor cuantitativo institucional, con manos autónomas"
+              italicWord="autónomas"
+              className="text-[2.6rem] sm:text-6xl lg:text-7xl xl:text-[5.2rem]"
+            />
+          </div>
+
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="editorial-subhead mt-7 max-w-xl text-[15px] leading-relaxed text-[#86868B]"
+          >
+            QuantVibe orquesta el pipeline completo de finanzas computacionales: minado de 158
+            factores con <strong className="font-medium text-[#F5F5F7]">Microsoft Qlib</strong>,
+            validación con firewall matemático ineludible y ejecución autónoma mediante agentes LLM
+            protegidos bajo digest criptográfico{' '}
+            <span className="font-mono text-[13px] font-semibold text-white">SHA-256</span>.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.42, ease: [0.16, 1, 0.3, 1] }}
+            className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
+          >
+            <Btn size="lg" onClick={() => onNavigateToTab('overview')}>
+              <span>Entrar a Alpha Studio</span>
+              <ArrowRight className="h-4 w-4" />
+            </Btn>
+            <Btn variant="secondary" size="lg" onClick={() => onNavigateToTab('bloomberg')}>
+              <StatusDot tone="neg" ping />
+              <span>Terminal Bloomberg en vivo</span>
+            </Btn>
+          </motion.div>
+
+          {/* Trust rail — hairline matrix, real data */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.6 }}
+            className="mt-12 grid max-w-2xl grid-cols-2 border-l border-t border-white/[0.07] sm:grid-cols-4"
+          >
+            {trustRail.map((t) => (
+              <div key={t.label} className="border-b border-r border-white/[0.07] px-4 py-3">
+                <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#636366]">
+                  {t.label}
+                </div>
+                <div className="tnum mt-1 truncate font-mono text-[13px] font-bold text-white">
+                  {t.value}
+                </div>
+              </div>
+            ))}
+          </motion.div>
         </div>
 
-        {/* Monumental Typographic Headline (Luxury Editorial + Geometric Sans) */}
-        <div className="max-w-6xl mx-auto px-4">
-          <KineticTitle
-            text="Donde el Rigor Cuantitativo Institucional Conoce la Autonomía Agéntica"
-            highlightWord="Cuantitativo"
-            italicWord="Agéntica"
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-[1.0] tracking-[-0.045em]"
-          />
-        </div>
-
-        {/* Editorial Subtitle with Calculated Optical Measure */}
-        <motion.p
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-3xl mx-auto mt-7 text-base sm:text-lg text-[#86868B] font-sans leading-relaxed px-4 tracking-[-0.015em] font-normal"
-        >
-          QuantVibe orquesta el pipeline completo de finanzas computacionales: minado de 158 factores con{' '}
-          <strong className="text-[#F5F5F7] font-medium">Microsoft Qlib</strong>, validación con firewall matemático ineludible{' '}
-          (<span className="text-white font-mono text-sm font-semibold">IC ≥ 0.00</span>), y ejecución autónoma mediante agentes LLM protegidos bajo digest criptográfico{' '}
-          <span className="text-white font-mono text-sm font-semibold">SHA-256</span>.
-        </motion.p>
-
-        {/* Primary CTA Action System */}
+        {/* Right — floating live console (glass, overlapping depth) */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 px-4 w-full sm:w-auto"
-        >
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => onNavigateToTab('overview')}
-            className="w-full sm:w-auto px-9 py-4 rounded-full bg-white text-black font-semibold text-sm tracking-tight shadow-[0_0_50px_rgba(255,255,255,0.25)] hover:bg-[#EAEAEA] flex items-center justify-center space-x-2.5 transition-all group"
-          >
-            <span>Explorar Alpha Studio</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </motion.button>
-
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => onNavigateToTab('bloomberg')}
-            className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#121216]/90 hover:bg-[#1C1C22] border border-white/[0.14] text-[#F5F5F7] font-medium text-sm tracking-tight shadow-lg flex items-center justify-center space-x-2.5 transition-colors backdrop-blur-xl"
-          >
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-            <span>Terminal Bloomberg en Vivo</span>
-          </motion.button>
-        </motion.div>
-
-        {/* ======================================================================= */}
-        {/* FLAGSHIP 3D PERSPECTIVE TERMINAL CONSOLE (Apple Keynote Reveal Object)   */}
-        {/* ======================================================================= */}
-        <motion.div
-          initial={{ opacity: 0, y: 45, scale: 0.97 }}
+          initial={{ opacity: 0, y: 40, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1.0, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-7xl mt-16 px-2 sm:px-4"
+          transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="relative lg:col-span-5"
         >
-          <div className="relative rounded-3xl bg-[#08080C]/90 border border-white/[0.12] p-1.5 sm:p-2 shadow-[0_30px_90px_rgba(0,0,0,0.95),inset_0_1px_0_rgba(255,255,255,0.14)] backdrop-blur-3xl overflow-hidden">
-            {/* Specular Glare Strip */}
-            <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none" />
-
-            {/* Terminal Top Chrome Bar */}
-            <div className="px-4 py-3 border-b border-white/[0.07] bg-[#0C0C10]/70 rounded-t-2xl flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center space-x-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-white/[0.18]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-white/[0.12]" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-white/[0.08]" />
-                </div>
-                <span className="text-xs font-mono text-[#86868B] tracking-tight">
-                  quantvibe-terminal // node: alibaba-ecs-production
-                </span>
-              </div>
-
-              {/* Interactive Console Navigation Tabs */}
-              <div className="flex items-center p-1 rounded-xl bg-black/50 border border-white/[0.08]">
-                <button
-                  onClick={() => setConsoleTab('signals')}
-                  className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
-                    consoleTab === 'signals'
-                      ? 'bg-white/15 text-white font-semibold shadow-sm'
-                      : 'text-[#86868B] hover:text-white'
-                  }`}
+          <div className="pointer-events-none absolute -inset-8 rounded-full bg-white/[0.025] blur-[90px]" aria-hidden />
+          <Panel
+            className="relative shadow-[0_40px_100px_-20px_rgba(0,0,0,0.95)]"
+            eyebrow={
+              <span className="flex items-center gap-2">
+                <StatusDot tone="pos" ping />
+                quantvibe-terminal · node: alibaba-ecs
+              </span>
+            }
+            title="Telemetría en vivo"
+            right={
+              <Segmented
+                size="sm"
+                layoutId="landingConsole"
+                value={consoleTab}
+                onChange={(id) => setConsoleTab(id as typeof consoleTab)}
+                options={[
+                  { id: 'signals', label: 'Señales' },
+                  { id: 'gate', label: 'Gate' },
+                  { id: 'crypto', label: 'Firma' },
+                ]}
+              />
+            }
+            bodyClass="p-0 min-h-[340px]"
+          >
+            <AnimatePresence mode="wait">
+              {/* Real top signals */}
+              {consoleTab === 'signals' && (
+                <motion.div
+                  key="signals"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.22 }}
                 >
-                  01. TOP SEÑALES
-                </button>
-                <button
-                  onClick={() => setConsoleTab('gate')}
-                  className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
-                    consoleTab === 'gate'
-                      ? 'bg-white/15 text-white font-semibold shadow-sm'
-                      : 'text-[#86868B] hover:text-white'
-                  }`}
-                >
-                  02. GATE DE SEGURIDAD
-                </button>
-                <button
-                  onClick={() => setConsoleTab('crypto')}
-                  className={`px-3 py-1 rounded-lg text-xs font-mono transition-all ${
-                    consoleTab === 'crypto'
-                      ? 'bg-white/15 text-white font-semibold shadow-sm'
-                      : 'text-[#86868B] hover:text-white'
-                  }`}
-                >
-                  03. FIRMA SHA-256
-                </button>
-              </div>
-
-              <div className="hidden sm:flex items-center space-x-2 text-xs font-mono text-emerald-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>ONLINE 200 OK</span>
-              </div>
-            </div>
-
-            {/* Terminal Interactive Stage */}
-            <div className="p-4 sm:p-8 bg-[#050508]/80 min-h-[300px] flex flex-col justify-center">
-              <AnimatePresence mode="wait">
-                {consoleTab === 'signals' && (
-                  <motion.div
-                    key="signals"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.25 }}
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3"
-                  >
-                    {liveTickers.map((t) => (
-                      <div
-                        key={t.ticker}
-                        className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-white/25 transition-all text-left flex flex-col justify-between group"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-lg font-bold text-white font-sans tracking-tight">
-                            {t.ticker}
+                  {topSignals.length === 0 ? (
+                    <ConsoleEmpty />
+                  ) : (
+                    topSignals.map((s) => (
+                      <DataRow key={s.instrument}>
+                        <div className="flex items-center gap-3">
+                          <span className="w-6 font-mono text-[10px] text-[#636366]">#{s.rank}</span>
+                          <span className="text-sm font-bold tracking-tight text-white">
+                            {s.instrument}
                           </span>
-                          <span className="px-2 py-0.5 rounded-md bg-white/10 text-[10px] font-mono text-[#D2D2D7]">
-                            {t.rank}
+                          <span className="badge-terminal-green rounded px-1.5 py-px font-mono text-[9px] font-bold">
+                            TOP-K
                           </span>
                         </div>
-                        <div className="space-y-1 font-mono text-xs">
-                          <div className="flex justify-between text-[#86868B]">
-                            <span>Alpha Score</span>
-                            <span className="text-white font-medium">{t.score}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="hidden h-1 w-24 overflow-hidden rounded-full bg-white/[0.06] sm:block">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(Math.abs(s.score) / maxScore) * 100}%` }}
+                              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                              className="h-full rounded-full bg-gradient-to-r from-[#86868B] to-white"
+                            />
                           </div>
-                          <div className="flex justify-between text-[#86868B]">
-                            <span>Ponderación</span>
-                            <span className="text-[#D2D2D7]">{t.weight}</span>
-                          </div>
-                        </div>
-                        <div className="mt-3 pt-2.5 border-t border-white/[0.06] flex items-center justify-between">
-                          <span className="text-[10px] font-mono text-emerald-400 font-semibold px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
-                            {t.action}
+                          <span className="tnum font-mono text-xs font-semibold text-white">
+                            {s.score >= 0 ? '+' : ''}
+                            {s.score.toFixed(4)}
                           </span>
-                          <span className="text-[10px] font-mono text-[#71717A]">STAGED</span>
                         </div>
+                      </DataRow>
+                    ))
+                  )}
+                  <div className="flex items-center justify-between px-4 py-3 font-mono text-[10px] text-[#636366]">
+                    <span>as_of: {payload?.as_of ?? '—'}</span>
+                    <button
+                      onClick={() => onNavigateToTab('overview')}
+                      className="flex items-center gap-1 text-[#A1A1A6] transition-colors hover:text-white"
+                    >
+                      Ver ranking completo <ArrowRight className="h-3 w-3" />
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Real gate metrics */}
+              {consoleTab === 'gate' && (
+                <motion.div
+                  key="gate"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.22 }}
+                  className="p-5"
+                >
+                  {!evaluation ? (
+                    <ConsoleEmpty />
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#86868B]">
+                          Veredicto del firewall
+                        </span>
+                        <span
+                          className={cn(
+                            'rounded-full px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-widest',
+                            evaluation.passed ? 'badge-terminal-green' : 'badge-terminal-red'
+                          )}
+                        >
+                          {evaluation.passed ? 'Aprobado' : 'Rechazado'}
+                        </span>
                       </div>
-                    ))}
-                  </motion.div>
-                )}
-
-                {consoleTab === 'gate' && (
-                  <motion.div
-                    key="gate"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.25 }}
-                    className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left"
-                  >
-                    <div className="p-5 rounded-2xl bg-[#0E0E14] border border-white/[0.08]">
-                      <div className="text-xs font-mono text-[#86868B] mb-1">CORRELACIÓN DE SPEARMAN (IC)</div>
-                      <div className="text-3xl font-extrabold text-white font-mono tracking-tight">+0.0681</div>
-                      <div className="text-xs text-emerald-400 font-mono mt-2 flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Umbral superado (≥ 0.000)</span>
-                      </div>
+                      {[
+                        { k: 'Mean IC (Spearman)', v: `+${evaluation.mean_ic.toFixed(4)}` },
+                        { k: 'ICIR (estabilidad)', v: `+${evaluation.icir.toFixed(3)}` },
+                        {
+                          k: 'Hit-Rate Top-K',
+                          v: `${(evaluation.hit_rate_topk * 100).toFixed(1)}%`,
+                        },
+                        { k: 'Sesiones walk-forward', v: `${evaluation.n_days}` },
+                      ].map((row) => (
+                        <div
+                          key={row.k}
+                          className="flex items-center justify-between border-b border-white/[0.06] pb-3 last:border-b-0"
+                        >
+                          <span className="text-xs text-[#86868B]">{row.k}</span>
+                          <span className="tnum font-mono text-base font-bold text-white">
+                            {row.v}
+                          </span>
+                        </div>
+                      ))}
+                      <p className="pt-1 font-mono text-[10px] leading-relaxed text-[#636366]">
+                        umbral mínimo: IC ≥ {evaluation.thresholds?.min_mean_ic ?? 0} · ICIR ≥{' '}
+                        {evaluation.thresholds?.min_icir ?? 0}
+                      </p>
                     </div>
+                  )}
+                </motion.div>
+              )}
 
-                    <div className="p-5 rounded-2xl bg-[#0E0E14] border border-white/[0.08]">
-                      <div className="text-xs font-mono text-[#86868B] mb-1">RATIO DE INFORMACIÓN (ICIR)</div>
-                      <div className="text-3xl font-extrabold text-white font-mono tracking-tight">+0.2035</div>
-                      <div className="text-xs text-emerald-400 font-mono mt-2 flex items-center gap-1">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Estabilidad de señal probada</span>
-                      </div>
-                    </div>
-
-                    <div className="p-5 rounded-2xl bg-[#0E0E14] border border-white/[0.08]">
-                      <div className="text-xs font-mono text-[#86868B] mb-1">TOP-K HIT RATE & RETORNO</div>
-                      <div className="text-3xl font-extrabold text-white font-mono tracking-tight">57.1%</div>
-                      <div className="text-xs text-[#A1A1A6] font-mono mt-2">
-                        Retorno medio +0.118% vs universo +0.031%
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-
-                {consoleTab === 'crypto' && (
-                  <motion.div
-                    key="crypto"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.25 }}
-                    className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] text-left space-y-4 font-mono"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 text-xs text-[#86868B]">
-                        <Fingerprint className="w-4 h-4 text-white" />
-                        <span>CANONICAL SHA-256 INTEGRITY DIGEST</span>
-                      </div>
-                      <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        CRYPTOGRAPHICALLY VERIFIED
-                      </span>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-black/60 border border-white/[0.06] text-xs text-[#E5E5EA] break-all select-all">
-                      1154c789fed7e23cabf14f413561c4425ebe01e9c6d0311836c08d77a4bb0715
-                    </div>
-
-                    <div className="text-xs text-[#86868B] flex flex-wrap gap-4 pt-1">
-                      <span>• Schema: v1.0.0 Validated</span>
-                      <span>• Contiguous Ranks: Verified 1..5</span>
-                      <span>• Nonce & As-Of: 2026-09-04</span>
-                      <span>• Agent Barrier: Zero-Import Enforced</span>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
+              {/* Real checksum */}
+              {consoleTab === 'crypto' && (
+                <motion.div
+                  key="crypto"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.22 }}
+                  className="space-y-4 p-5"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#86868B]">
+                      <Fingerprint className="h-3.5 w-3.5 text-white" />
+                      Digest SHA-256 canónico
+                    </span>
+                    <span
+                      className={cn(
+                        'rounded-full px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest',
+                        signals?.verified ? 'badge-terminal-green' : 'badge-terminal-neutral'
+                      )}
+                    >
+                      {signals?.verified ? 'Verificado' : 'Pendiente'}
+                    </span>
+                  </div>
+                  <div className="rounded-xl border border-white/[0.07] bg-black/60 p-3.5 font-mono text-[11px] leading-relaxed text-[#E5E5EA] select-all break-all">
+                    {signals?.checksum ?? 'sincronizando firma del lote…'}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {signals?.checksum && <CopyChip text={signals.checksum} label="Copiar hash" />}
+                    <span className="font-mono text-[10px] text-[#636366]">
+                      computed: {signals?.computed_checksum ? 'match ✓' : '—'}
+                    </span>
+                  </div>
+                  <p className="font-mono text-[10px] leading-relaxed text-[#636366]">
+                    schema v{payload?.schema_version ?? '1.0'} · ranks contiguos verificados ·
+                    barrera zero-import activa
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Panel>
         </motion.div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 2. ASYMMETRICAL ARCHITECTURAL EXHIBITS (Breaking the box grid)             */}
-      {/* ========================================================================= */}
-      <section className="w-full space-y-20">
-        {/* Section Lead Editorial */}
-        <div className="max-w-3xl">
-          <span className="text-xs font-mono uppercase tracking-widest text-[#86868B] font-medium block mb-3">
-            INGENIERÍA SISTEMÁTICA
-          </span>
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-[-0.035em] leading-[1.05]">
-            Invariantes de Diseño.<br />
-            <span className="text-[#86868B]">Cero Alucinaciones Financieras.</span>
-          </h2>
+      {/* ═══════════════ 2. INVARIANTES — full-bleed editorial rows ═══════════════ */}
+      <Section>
+        <Reveal>
+          <SectionHead
+            eyebrow="Ingeniería sistemática"
+            title="Invariantes de diseño."
+            accent="Cero alucinaciones financieras."
+            sub="Tres fronteras innegociables separan la predicción estadística de la ejecución autónoma. Ninguna orden existe sin cruzarlas."
+          />
+        </Reveal>
+
+        {/* Monumental real IC exhibit — asymmetric split */}
+        {evaluation && (
+          <Reveal delay={0.1}>
+            <div className="mt-14 grid grid-cols-1 items-end gap-8 lg:grid-cols-12">
+              <div className="lg:col-span-7">
+                <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-[#636366]">
+                  Mean Information Coefficient · N = {evaluation.n_days.toLocaleString('en-US')} días
+                </div>
+                <div className="tnum titanium-text-gradient mt-2 font-mono text-[4.5rem] font-extrabold leading-none tracking-tighter sm:text-[7rem]">
+                  +{evaluation.mean_ic.toFixed(4)}
+                </div>
+                <div className="mt-4 flex flex-wrap gap-x-8 gap-y-2 border-t border-white/[0.07] pt-4 font-mono text-xs text-[#86868B]">
+                  <span>
+                    ICIR <strong className="text-white">+{evaluation.icir.toFixed(3)}</strong>
+                  </span>
+                  <span>
+                    Hit-Rate Top-K{' '}
+                    <strong className="text-white">
+                      {(evaluation.hit_rate_topk * 100).toFixed(1)}%
+                    </strong>
+                  </span>
+                  <span>
+                    Gate{' '}
+                    <strong className={evaluation.passed ? 'text-[#30D158]' : 'text-[#FF453A]'}>
+                      {evaluation.passed ? 'PASS' : 'FAIL'}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+              <div className="border-l border-white/[0.07] pl-6 lg:col-span-5">
+                <p className="text-sm leading-relaxed text-[#A1A1A6]">
+                  El agente autónomo tiene prohibido emitir órdenes si el modelo no demuestra
+                  correlación de rango positiva en ventanas walk-forward. La autorización se evalúa
+                  sobre el retorno posterior a la señal para impedir fuga de información:
+                </p>
+                <div className="mt-4 rounded-lg border-l-2 border-white/25 bg-white/[0.02] px-4 py-3 font-mono text-[11px] text-white">
+                  IC = SpearmanCorr(score_t, r_t+1..t+2) ≥ umbral
+                </div>
+              </div>
+            </div>
+          </Reveal>
+        )}
+
+        {/* Invariant rows — hairline list, not boxes */}
+        <div className="mt-16 border-t border-white/[0.07]">
+          {invariants.map((inv, i) => (
+            <Reveal key={inv.n} delay={i * 0.08}>
+              <div className="group grid grid-cols-1 items-baseline gap-2 border-b border-white/[0.07] py-8 transition-colors hover:bg-white/[0.015] md:grid-cols-12 md:gap-6 md:px-4">
+                <div className="font-mono text-xs text-[#48484A] md:col-span-1">{inv.n}</div>
+                <h3 className="text-xl font-bold tracking-tight text-white md:col-span-3">
+                  {inv.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-[#86868B] md:col-span-6">{inv.desc}</p>
+                <div
+                  className={cn(
+                    'font-mono text-[10px] uppercase tracking-[0.16em] md:col-span-2 md:text-right',
+                    inv.tagTone ?? 'text-[#636366]'
+                  )}
+                >
+                  {inv.tag}
+                </div>
+              </div>
+            </Reveal>
+          ))}
         </div>
+      </Section>
 
-        {/* EXHIBIT A: The Statistical Firewall (Split Monument Layout) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Left Monumental Typographic Exhibit (7 cols) */}
-          <div className="lg:col-span-7 relative p-8 sm:p-14 rounded-3xl bg-[#09090D] border border-white/[0.08] overflow-hidden">
-            {/* Hairline Technical Crosshairs */}
-            <div className="absolute top-4 left-4 text-white/20 font-mono text-xs">+</div>
-            <div className="absolute top-4 right-4 text-white/20 font-mono text-xs">+</div>
-            <div className="absolute bottom-4 left-4 text-white/20 font-mono text-xs">+</div>
-            <div className="absolute bottom-4 right-4 text-white/20 font-mono text-xs">+</div>
-
-            <div className="space-y-6">
-              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/[0.06] border border-white/[0.1] text-xs font-mono text-[#D2D2D7]">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>INVARIANTE I • GATE DE BACKTEST INFRANQUEABLE</span>
-              </div>
-
-              <div className="space-y-1">
-                <div className="text-6xl sm:text-8xl md:text-9xl font-extrabold text-white font-mono tracking-tighter leading-none">
-                  +0.068
-                </div>
-                <div className="text-sm font-mono text-[#86868B] tracking-tight">
-                  MEAN INFORMATION COEFFICIENT (IC) // N = 1,459 DÍAS
-                </div>
-              </div>
-
-              <p className="text-[#A1A1A6] text-sm sm:text-base leading-relaxed max-w-xl font-sans">
-                El agente autónomo tiene prohibido emitir órdenes si el modelo de machine learning no demuestra correlación de rango positiva comprobable en ventanas walk-forward. Si el IC cae por debajo del umbral, la puerta se cierra automáticamente.
-              </p>
-
-              <div className="pt-4 border-t border-white/[0.08] grid grid-cols-2 gap-4 text-xs font-mono">
-                <div>
-                  <div className="text-[#86868B]">ICIR (ESTABILIDAD)</div>
-                  <div className="text-lg font-bold text-white">+0.2035</div>
-                </div>
-                <div>
-                  <div className="text-[#86868B]">HIT RATE TOP-K</div>
-                  <div className="text-lg font-bold text-white">57.1%</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Floating Explanatory Narrative (5 cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            <div className="p-7 rounded-3xl bg-[#0E0E14]/80 border border-white/[0.08] backdrop-blur-xl space-y-4">
-              <span className="text-xs font-mono text-[#86868B] uppercase">Fórmula de Autorización</span>
-              <div className="p-3.5 rounded-xl bg-black/60 border border-white/[0.06] font-mono text-xs text-white">
-                IC = SpearmanCorr(score_t, (P_t+2 / P_t+1) - 1) ≥ 0.00
-              </div>
-              <p className="text-xs text-[#86868B] leading-relaxed">
-                Evaluado rigurosamente sobre el retorno a dos días posteriores a la señal para garantizar que no haya fuga de información (lookahead bias).
-              </p>
-            </div>
-
-            <div className="p-7 rounded-3xl bg-[#0E0E14]/80 border border-white/[0.08] backdrop-blur-xl space-y-3">
-              <span className="text-xs font-mono text-[#86868B] uppercase">Aislamiento de Entornos</span>
-              <h4 className="text-lg font-bold text-white">Zero-Import Architecture</h4>
-              <p className="text-xs text-[#86868B] leading-relaxed">
-                Qlib (entorno de investigación) y Vibe-Trading (entorno de ejecución) operan en procesos aislados. Nunca importan código mutuo. La única vía de comunicación es el contrato firmado SHA-256 y el protocolo FastMCP.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* EXHIBIT B: The Three Foundation Pillars in Staggered Asymmetry */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="p-8 rounded-3xl bg-[#09090D] border border-white/[0.08] hover:border-white/20 transition-all flex flex-col justify-between group">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-white mb-6">
-                <Cpu className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-mono text-[#86868B] block mb-2">01 // INVESTIGACIÓN</span>
-              <h3 className="text-xl font-bold text-white mb-3 tracking-tight">
-                Cerebro Cuantitativo Qlib
-              </h3>
-              <p className="text-sm text-[#86868B] leading-relaxed">
-                Cálculo distribuido de 158 factores Alpha continuos y entrenamiento de árboles gradient-boosted con LightGBM sobre ventanas móviles walk-forward.
-              </p>
-            </div>
-            <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono text-[#86868B]">
-              <span>Dataset Alpha158</span>
-              <span className="text-white">LGBModel</span>
-            </div>
-          </div>
-
-          <div className="p-8 rounded-3xl bg-[#09090D] border border-white/[0.08] hover:border-white/20 transition-all flex flex-col justify-between group">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-emerald-400 mb-6">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-mono text-emerald-400 block mb-2">02 // VERIFICACIÓN</span>
-              <h3 className="text-xl font-bold text-white mb-3 tracking-tight">
-                Firewall Matemático (Gate)
-              </h3>
-              <p className="text-sm text-[#86868B] leading-relaxed">
-                Filtro implacable previo a cualquier orden: IC ≥ 0.00 e ICIR ≥ 0.00. Si el modelo sufre de degradación de señal, el sistema aborta de inmediato.
-              </p>
-            </div>
-            <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono text-[#86868B]">
-              <span>Filtro IC</span>
-              <span className="text-emerald-400 font-semibold">Fail-Safe Activo</span>
-            </div>
-          </div>
-
-          <div className="p-8 rounded-3xl bg-[#09090D] border border-white/[0.08] hover:border-white/20 transition-all flex flex-col justify-between group">
-            <div>
-              <div className="w-12 h-12 rounded-2xl bg-white/[0.06] border border-white/[0.1] flex items-center justify-center text-white mb-6">
-                <Layers className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-mono text-[#86868B] block mb-2">03 // EJECUCIÓN</span>
-              <h3 className="text-xl font-bold text-white mb-3 tracking-tight">
-                Manos Agénticas Vibe
-              </h3>
-              <p className="text-sm text-[#86868B] leading-relaxed">
-                El agente optimiza el tamaño de orden y balance de liquidez respetando invariantes: máximo 20% por posición, doble confirmación y registro en SQLite.
-              </p>
-            </div>
-            <div className="mt-8 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs font-mono text-[#86868B]">
-              <span>Max Cap 20%</span>
-              <span className="text-white">Doble Guardia</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. INTERACTIVE SIMULATOR */}
-      <section className="w-full">
+      {/* ═══════════════ 3. INTERACTIVE SIMULATOR ═══════════════ */}
+      <Section>
         <InteractiveSimulator onNavigateToTab={onNavigateToTab} />
-      </section>
+      </Section>
 
-      {/* 4. BLOOMBERG MACRO PULSE & NEWS WIRE SHOWCASE (Dedicated Teaser linking to full Bloomberg Terminal) */}
-      <section className="w-full rounded-3xl bg-[#09090D] border border-white/[0.12] p-8 sm:p-12 relative overflow-hidden shadow-2xl">
-        {/* Specular Amber Hairline */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/40 via-white/30 to-amber-500/40" />
-
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-8 border-b border-white/[0.08]">
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-              <span className="text-xs font-mono font-bold tracking-widest text-amber-400 uppercase">
-                BLOOMBERG PULSE // COBERTURA MACRO & WALL STREET
+      {/* ═══════════════ 4. BLOOMBERG MEDIA DESK — one narrative, one CTA ═══════════════ */}
+      <Section>
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          <Reveal className="lg:col-span-5">
+            <Eyebrow>
+              <span className="flex items-center gap-2">
+                <StatusDot tone="neg" ping /> Bloomberg Pulse · 24/7
               </span>
-              <span className="h-3 w-[1px] bg-white/20" />
-              <span className="text-[11px] font-mono text-emerald-400">EN VIVO 24/7</span>
-            </div>
-
-            <h3 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-[-0.035em] leading-[1.08]">
-              Inteligencia Macro Bloomberg <span className="text-[#86868B]">& Teletipo Global</span>
-            </h3>
-
-            <p className="text-sm sm:text-base text-[#86868B] max-w-3xl leading-relaxed font-sans font-normal">
-              Supervisión continua de liquidez interbancaria, tasas de bancos centrales, tipos de cambio en tiempo real (USD/COP, USD/MXN), y la señal oficial satelital de Bloomberg Television sin costo de suscripción.
+            </Eyebrow>
+            <h2 className="mt-4 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
+              La pulsación macro global, <em className="italic text-[#6E6E73]">en tu terminal.</em>
+            </h2>
+            <p className="editorial-subhead mt-5 max-w-md text-sm leading-relaxed text-[#86868B]">
+              Televisión oficial en directo, podcast diario de Bloomberg Línea, wire RSS certificado
+              y widgets institucionales de mercado. Todo el desk macro concentrado en una sola
+              pestaña operativa.
             </p>
-          </div>
+            <Btn className="mt-8" size="lg" onClick={() => onNavigateToTab('bloomberg')}>
+              <span>Abrir Terminal Bloomberg</span>
+              <ArrowRight className="h-4 w-4" />
+            </Btn>
+          </Reveal>
 
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.96 }}
-            onClick={() => onNavigateToTab('bloomberg')}
-            className="self-start lg:self-center px-8 py-4 rounded-full bg-white text-black font-semibold text-sm tracking-tight shadow-xl hover:bg-[#EAEAEA] flex items-center space-x-2.5 transition-all group shrink-0"
-          >
-            <span>Abrir Terminal Bloomberg Completo</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </motion.button>
+          <Reveal delay={0.12} className="lg:col-span-7">
+            <div className="border-t border-white/[0.07]">
+              {mediaCapabilities.map((cap) => {
+                const Icon = cap.icon
+                return (
+                  <button
+                    key={cap.n}
+                    onClick={() => onNavigateToTab('bloomberg')}
+                    className="group flex w-full items-center gap-5 border-b border-white/[0.07] px-2 py-5 text-left transition-colors hover:bg-white/[0.02]"
+                  >
+                    <span className="font-mono text-[10px] text-[#48484A]">{cap.n}</span>
+                    <Icon className="h-4 w-4 shrink-0 text-[#636366] transition-colors group-hover:text-white" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold tracking-tight text-white">
+                        {cap.title}
+                      </span>
+                      <span className="mt-0.5 block text-xs leading-relaxed text-[#86868B]">
+                        {cap.desc}
+                      </span>
+                    </span>
+                    <ArrowRight className="h-4 w-4 shrink-0 -translate-x-1 text-[#48484A] opacity-0 transition-all group-hover:translate-x-0 group-hover:text-white group-hover:opacity-100" />
+                  </button>
+                )
+              })}
+            </div>
+          </Reveal>
         </div>
+      </Section>
 
-        {/* 4 Key Macro Telemetry Pills */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 py-8 border-b border-white/[0.08]">
-          <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono">
-            <div className="text-[11px] text-[#86868B] mb-1">DÓLAR TRM COLOMBIA</div>
-            <div className="text-xl font-bold text-white tracking-tight">$4,028.50 COP</div>
-            <div className="text-xs text-emerald-400 mt-0.5">-0.42% (Apreciación)</div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono">
-            <div className="text-[11px] text-[#86868B] mb-1">S&P 500 FUTURES</div>
-            <div className="text-xl font-bold text-white tracking-tight">5,842.10 PTS</div>
-            <div className="text-xs text-emerald-400 mt-0.5">+0.45% (Rally)</div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono">
-            <div className="text-[11px] text-[#86868B] mb-1">US 10-YR YIELD</div>
-            <div className="text-xl font-bold text-white tracking-tight">4.182%</div>
-            <div className="text-xs text-rose-400 mt-0.5">+1.2 bps</div>
-          </div>
-
-          <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono">
-            <div className="text-[11px] text-[#86868B] mb-1">TASA BANREP COLOMBIA</div>
-            <div className="text-xl font-bold text-white tracking-tight">11.75%</div>
-            <div className="text-xs text-[#A1A1A6] mt-0.5">Política Monetaria</div>
-          </div>
-        </div>
-
-        {/* 3 Interactive Feature Preview Pillars */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
-          <div
-            onClick={() => onNavigateToTab('bloomberg')}
-            className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer group"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-mono text-rose-400 font-bold uppercase flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-                TELEVISIÓN 24/7
-              </span>
-              <ChevronRight className="w-4 h-4 text-[#86868B] group-hover:text-white transition-colors" />
-            </div>
-            <h4 className="text-base font-bold text-white mb-1.5 group-hover:text-amber-300 transition-colors">
-              Bloomberg TV Oficial en Vivo
-            </h4>
-            <p className="text-xs text-[#86868B] leading-relaxed">
-              Transmisión satelital continua de Wall Street, análisis de apertura y debates geopolíticos en tiempo real.
-            </p>
-          </div>
-
-          <div
-            onClick={() => onNavigateToTab('bloomberg')}
-            className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer group"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                PODCAST DIARIO SPOTIFY
-              </span>
-              <ChevronRight className="w-4 h-4 text-[#86868B] group-hover:text-white transition-colors" />
-            </div>
-            <h4 className="text-base font-bold text-white mb-1.5 group-hover:text-emerald-300 transition-colors">
-              La Estrategia del Día
-            </h4>
-            <p className="text-xs text-[#86868B] leading-relaxed">
-              Cápsulas matutinas oficiales con conductores en Colombia, México y Argentina sobre banca central y divisas.
-            </p>
-          </div>
-
-          <div
-            onClick={() => onNavigateToTab('bloomberg')}
-            className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer group"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-mono text-amber-400 font-bold uppercase flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-400" />
-                RSS WIRE CERTIFICADO
-              </span>
-              <ChevronRight className="w-4 h-4 text-[#86868B] group-hover:text-white transition-colors" />
-            </div>
-            <h4 className="text-base font-bold text-white mb-1.5 group-hover:text-amber-200 transition-colors">
-              Noticias Bloomberg Línea
-            </h4>
-            <p className="text-xs text-[#86868B] leading-relaxed">
-              Artículos completos de Colombia y EE.UU. con imágenes, autores, fechas e impacto en mercados financieros.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. INSTITUTIONAL COMPARISON MATRIX */}
-      <section className="w-full">
+      {/* ═══════════════ 5. COMPARISON MATRIX ═══════════════ */}
+      <Section>
         <ComparisonMatrix />
-      </section>
+      </Section>
 
-      {/* 6. AUDITED HISTORICAL TRACK RECORD */}
-      <section className="w-full">
+      {/* ═══════════════ 6. AUDITED TRACK RECORD ═══════════════ */}
+      <Section>
         <TrackRecordShowcase />
-      </section>
+      </Section>
 
-      {/* 7. CRYPTOGRAPHIC VAULT & ZERO-IMPORT PROOF */}
-      <section className="w-full">
+      {/* ═══════════════ 7. CRYPTOGRAPHIC VAULT PROOF ═══════════════ */}
+      <Section>
         <SecurityVaultProof />
-      </section>
+      </Section>
 
-      {/* ========================================================================= */}
-      {/* 8. MONUMENTAL PRODUCTION DEPLOYMENT CALLOUT                               */}
-      {/* ========================================================================= */}
-      <section className="w-full rounded-3xl bg-[#08080C] border border-white/[0.1] p-10 sm:p-16 relative overflow-hidden text-center shadow-2xl">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none" />
-
-        <div className="max-w-3xl mx-auto space-y-6">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-white/[0.06] border border-white/[0.12] text-[#A1A1A6] text-xs font-mono">
-            <Globe className="w-3.5 h-3.5 text-white" />
-            <span>DESPLIEGUE CLOUD PRIVADO // ALIBABA ECS + LOCAL</span>
+      {/* ═══════════════ 8. FINAL CTA — single action, no conflicts ═══════════════ */}
+      <section className="relative overflow-hidden border-t border-white/[0.07] py-24 text-center sm:py-32">
+        <div
+          className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-white/[0.035] blur-[140px]"
+          aria-hidden
+        />
+        <Reveal>
+          <div className="relative mx-auto max-w-3xl space-y-7 px-4">
+            <Eyebrow className="justify-center" rule={false}>
+              <Lock className="h-3 w-3" /> Soberanía de código · Alibaba ECS + local
+            </Eyebrow>
+            <h2 className="font-serif text-4xl leading-[1.05] text-white sm:text-6xl">
+              Despliega tu mesa cuantitativa <em className="italic text-[#6E6E73]">institucional.</em>
+            </h2>
+            <p className="editorial-subhead mx-auto max-w-xl text-sm leading-relaxed text-[#86868B]">
+              Sin suscripciones opacas. Servidor FastAPI nativo con trazabilidad total: cada señal,
+              cada orden y cada retorno liquidado queda sellado y auditado.
+            </p>
+            <div className="flex justify-center pt-2">
+              <Btn size="lg" onClick={() => onNavigateToTab('overview')} className="shadow-[0_0_60px_-10px_rgba(255,255,255,0.4)]">
+                <ShieldCheck className="h-4 w-4" />
+                <span>Entrar al terminal en vivo</span>
+              </Btn>
+            </div>
           </div>
-
-          <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-[-0.04em]">
-            Despliega tu Mesa Cuantitativa Institucional
-          </h2>
-
-          <p className="text-[#86868B] text-sm sm:text-base leading-relaxed max-w-2xl mx-auto font-sans font-normal">
-            Sin suscripciones opacas ni dependencias en la nube ajena. QuantVibe opera con soberanía de código:
-            servidor FastAPI nativo en puerto 8000/80 con trazabilidad total en grafos de conocimiento.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => onNavigateToTab('overview')}
-              className="w-full sm:w-auto px-9 py-4 rounded-full bg-white text-black font-semibold text-sm tracking-tight shadow-xl hover:bg-[#EAEAEA] flex items-center justify-center space-x-2"
-            >
-              <span>Abrir Alpha Studio en Vivo</span>
-              <ChevronRight className="w-4 h-4" />
-            </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => onNavigateToTab('execution')}
-              className="w-full sm:w-auto px-9 py-4 rounded-full bg-[#14141A] hover:bg-[#202028] border border-white/[0.14] text-white font-medium text-sm tracking-tight flex items-center justify-center space-x-2 transition-colors"
-            >
-              <Lock className="w-4 h-4 text-[#A1A1A6]" />
-              <span>Inspeccionar Mesa de Órdenes</span>
-            </motion.button>
-          </div>
-        </div>
+        </Reveal>
       </section>
     </div>
   )
 }
+
+/* Loading state for console panels awaiting telemetry */
+const ConsoleEmpty: React.FC = () => (
+  <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 p-6 text-center">
+    <motion.div
+      animate={{ opacity: [0.3, 1, 0.3] }}
+      transition={{ duration: 1.8, repeat: Infinity }}
+      className="h-1.5 w-1.5 rounded-full bg-white"
+    />
+    <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#636366]">
+      Sincronizando telemetría…
+    </span>
+  </div>
+)

@@ -227,6 +227,15 @@
   width: 6px;
   height: 6px;
 }
+
+/* Hidden scrollbar utility (used by header nav & segmented controls) */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
 ::-webkit-scrollbar-track {
   background: transparent;
 }

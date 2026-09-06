@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
-  Tv,
   Radio,
-  Newspaper,
-  Globe,
   ExternalLink,
   Clock,
   RefreshCw,
@@ -13,8 +10,9 @@ import {
   Play,
   Award,
   Sparkles,
-  Maximize2
+  ArrowUpRight,
 } from 'lucide-react'
+import { Btn, Eyebrow, MetricRail, Panel, Reveal, Segmented, StatusDot } from './ui'
 
 export interface NewsArticle {
   title: string
@@ -28,7 +26,7 @@ export interface NewsArticle {
   tag?: string
 }
 
-// 100% STATIC VERIFIED BLOOMBERG LÍNEA ARTICLES (Instant load with 0ms latency)
+/* Verified static Bloomberg Línea articles — instant load, zero latency fallback */
 const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
   colombia: [
     {
@@ -40,7 +38,7 @@ const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
       image: 'https://www.bloomberglinea.com/resizer/v2/YM33I42JPNGQ7AQAGIYB3YARHM.jpg?auth=6b73b1f6a59da66e07ab9f5c176c6882056a22ff9ddf625636d089505da700ba&smart=true&width=1200&height=675',
       region: 'colombia',
       source: 'Bloomberg Línea Colombia',
-      tag: 'MINERÍA & ENERGÍA'
+      tag: 'MINERÍA & ENERGÍA',
     },
     {
       title: '¿Cuánto le pueden cobrar de interés en su tarjeta de crédito en septiembre 2026? La tasa de usura bajó',
@@ -51,7 +49,7 @@ const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
       image: 'https://www.bloomberglinea.com/resizer/v2/F5625YQCXZH7ZH4OJ7RCEI5KGM.jpg?auth=d91b4ad74a2fc97bf87b9c9f697ca6f6345ec46894c2514c330f69a912bb0e18&smart=true&width=1200&height=675',
       region: 'colombia',
       source: 'Bloomberg Línea Colombia',
-      tag: 'TASAS & CRÉDITO'
+      tag: 'TASAS & CRÉDITO',
     },
     {
       title: 'Marco Rubio viaja a Sudamérica: el funcionario de Trump visitará Colombia, Ecuador y Perú',
@@ -62,7 +60,7 @@ const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
       image: 'https://www.bloomberglinea.com/resizer/v2/KJTDLQO6DZGWDA4O3ALCN4X7XU.jpg?auth=f03c285d33b630d4addb1ab41a2d335330966f38794d0536a973e41c2eb3e292&smart=true&width=1200&height=675',
       region: 'colombia',
       source: 'Bloomberg Línea Colombia',
-      tag: 'GEOPOLÍTICA'
+      tag: 'GEOPOLÍTICA',
     },
     {
       title: 'Epson apuesta por tecnología sustentable y alianzas estratégicas para ganar terreno en Colombia',
@@ -73,7 +71,7 @@ const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
       image: 'https://www.bloomberglinea.com/resizer/v2/QW4LFJWEXJE63IOP6NQXDZ52XI.jpg?auth=fbd12ef98ec28bbbb19df56673c8a466a26eb8fbd7bd1a906b894a9d6cf3c347&smart=true&width=1200&height=675',
       region: 'colombia',
       source: 'Bloomberg Línea Colombia',
-      tag: 'EMPRESAS'
+      tag: 'EMPRESAS',
     },
     {
       title: 'Dólar en Colombia abre a la baja tras dato de nóminas no agrícolas en Estados Unidos',
@@ -84,8 +82,8 @@ const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
       image: 'https://www.bloomberglinea.com/resizer/v2/3VX7A35DFVBOFOGQSLGWKWEWU.jpg?auth=21061f2b13019b321bb29f0c641a6664ab0a740b08e04c447de45feead3b85db&smart=true&width=1200&height=675',
       region: 'colombia',
       source: 'Bloomberg Línea Colombia',
-      tag: 'DIVISAS / USD'
-    }
+      tag: 'DIVISAS / USD',
+    },
   ],
   global: [
     {
@@ -97,7 +95,7 @@ const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
       image: 'https://www.bloomberglinea.com/resizer/v2/YM33I42JPNGQ7AQAGIYB3YARHM.jpg?auth=6b73b1f6a59da66e07ab9f5c176c6882056a22ff9ddf625636d089505da700ba&smart=true&width=1200&height=675',
       region: 'global',
       source: 'Bloomberg Línea Mercados',
-      tag: 'WALL STREET & TECH'
+      tag: 'WALL STREET & TECH',
     },
     {
       title: 'Redata pone a Brasil en el radar de inversiones globales en centros de datos, dice AWS',
@@ -108,7 +106,7 @@ const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
       image: 'https://www.bloomberglinea.com/resizer/v2/QW4LFJWEXJE63IOP6NQXDZ52XI.jpg?auth=fbd12ef98ec28bbbb19df56673c8a466a26eb8fbd7bd1a906b894a9d6cf3c347&smart=true&width=1200&height=675',
       region: 'global',
       source: 'Bloomberg Línea LatAm',
-      tag: 'INFRAESTRUCTURA IA'
+      tag: 'INFRAESTRUCTURA IA',
     },
     {
       title: 'Wall Street evalúa la curva de rendimientos del Tesoro tras señales de la Fed',
@@ -119,7 +117,7 @@ const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
       image: 'https://www.bloomberglinea.com/resizer/v2/KJTDLQO6DZGWDA4O3ALCN4X7XU.jpg?auth=f03c285d33b630d4addb1ab41a2d335330966f38794d0536a973e41c2eb3e292&smart=true&width=1200&height=675',
       region: 'global',
       source: 'Bloomberg Línea EE.UU.',
-      tag: 'BONOS & FED'
+      tag: 'BONOS & FED',
     },
     {
       title: 'Nvidia y las mega-caps sostienen el rally del S&P 500 en máximos históricos',
@@ -130,59 +128,115 @@ const STATIC_BLOOMBERG_LINEA_ARTICLES: Record<string, NewsArticle[]> = {
       image: 'https://www.bloomberglinea.com/resizer/v2/F5625YQCXZH7ZH4OJ7RCEI5KGM.jpg?auth=d91b4ad74a2fc97bf87b9c9f697ca6f6345ec46894c2514c330f69a912bb0e18&smart=true&width=1200&height=675',
       region: 'global',
       source: 'Bloomberg Línea Global',
-      tag: 'RENTA VARIABLE'
-    }
-  ]
+      tag: 'RENTA VARIABLE',
+    },
+  ],
 }
 
-// Key Macro & FX Indicators of Colombia & LatAm
+/* Key macro & FX indicators of Colombia & LatAm */
 const BLOOMBERG_LINEA_INDICATORS = [
-  { label: 'Dólar TRM (USD/COP)', value: '$4,028.50', change: '-0.42%', positive: true, note: 'Tasa Representativa del Mercado' },
-  { label: 'Petróleo Brent (Barril)', value: '$72.80', change: '+0.65%', positive: true, note: 'Referencia Exportaciones Colombia' },
-  { label: 'Tasa BanRep (Colombia)', value: '11.75%', change: '0.00%', positive: true, note: 'Tasa de Interés de Política' },
-  { label: 'Inflación Anual IPC', value: '6.86%', change: '-0.12%', positive: true, note: 'Meta BanRep 3.0%' },
-  { label: 'Dólar México (USD/MXN)', value: '$19.85', change: '+0.18%', positive: false, note: 'Tipo de cambio interbancario' },
-  { label: 'Café Colombiano (C-Price)', value: '$2.48/lb', change: '+1.15%', positive: true, note: 'Contrato Nueva York' },
+  { label: 'Dólar TRM (USD/COP)', value: '$4,028.50', change: '-0.42%', positive: true },
+  { label: 'Petróleo Brent', value: '$72.80', change: '+0.65%', positive: true },
+  { label: 'Tasa BanRep', value: '11.75%', change: '0.00%', positive: true },
+  { label: 'Inflación anual IPC', value: '6.86%', change: '-0.12%', positive: true },
+  { label: 'Dólar México (USD/MXN)', value: '$19.85', change: '+0.18%', positive: false },
+  { label: 'Café C-Price', value: '$2.48/lb', change: '+1.15%', positive: true },
+]
+
+const PODCAST_MAP = {
+  colombia: {
+    code: 'CO',
+    title: 'La Estrategia del Día Colombia',
+    host: 'María C. Suárez',
+    spotifyId: '4LbFVsDKSmiivu5EcVQuw0',
+    url: 'https://open.spotify.com/show/4LbFVsDKSmiivu5EcVQuw0',
+    desc: 'El podcast diario insignia de Bloomberg Línea en Colombia. Análisis clave antes de la apertura del mercado.',
+  },
+  mexico: {
+    code: 'MX',
+    title: 'La Estrategia del Día México',
+    host: 'Jimena Tolama',
+    spotifyId: '0NXF3nHMLWO7qEdaUsp99b',
+    url: 'https://open.spotify.com/show/0NXF3nHMLWO7qEdaUsp99b',
+    desc: 'Coyuntura económica de Banxico, nearshoring, tipo de cambio y finanzas mexicanas.',
+  },
+  argentina: {
+    code: 'AR',
+    title: 'La Estrategia del Día Argentina',
+    host: 'Francisco Aldaya',
+    spotifyId: '2GlHSIiVaIUGHHfhGBCTcV',
+    url: 'https://open.spotify.com/show/2GlHSIiVaIUGHHfhGBCTcV',
+    desc: 'Análisis diario sobre política monetaria, bonos soberanos y variables macroeconómicas.',
+  },
+}
+
+const LIVE_PORTALS = [
+  { label: 'Bloomberg TV (US)', desc: 'Señal central Wall Street & NY', url: 'https://www.bloomberg.com/live/us' },
+  { label: 'Bloomberg TV (Europe)', desc: 'Londres, Fráncfort & BCE', url: 'https://www.bloomberg.com/live/europe' },
+  { label: 'Bloomberg Originals', desc: 'Documentales, IA & Quicktake', url: 'https://www.bloomberg.com/live/originals' },
+]
+
+const ECOSYSTEM_FEATURES = [
+  {
+    n: '01',
+    icon: DollarSign,
+    title: 'Cotizador de monedas en tiempo real',
+    desc: 'Seguimiento tick a tick de USD/COP, USD/MXN, USD/BRL y divisas de la región.',
+    link: 'https://www.bloomberglinea.com/quote/USDCOP:CUR/',
+    cta: 'Ver USD/COP',
+  },
+  {
+    n: '02',
+    icon: Mail,
+    title: 'Newsletters diarias gratuitas',
+    desc: '«Primera Hora», «Apertura de Mercados» y el análisis de cierre, directo al correo.',
+    link: 'https://www.bloomberglinea.com/tus-newsletters-bloomberg-linea/',
+    cta: 'Suscribirse',
+  },
+  {
+    n: '03',
+    icon: Play,
+    title: 'Videos & entrevistas exclusivas',
+    desc: 'Reportajes con ministros de hacienda, bancos centrales y fundadores de unicornios LatAm.',
+    link: 'https://www.bloomberglinea.com/videos/',
+    cta: 'Explorar videoteca',
+  },
+  {
+    n: '04',
+    icon: Award,
+    title: 'Los 500 de América Latina & rankings',
+    desc: 'La lista anual definitiva de líderes que mueven la economía de la región.',
+    link: 'https://www.bloomberglinea.com/especiales/',
+    cta: 'Ver especiales',
+  },
+  {
+    n: '05',
+    icon: Sparkles,
+    title: 'Línea Green (ESG & transición energética)',
+    desc: 'Finanzas sostenibles, bonos verdes y descarbonización en balances corporativos.',
+    link: 'https://www.bloomberglinea.com/esg/linea-green/',
+    cta: 'Leer Línea Green',
+  },
+  {
+    n: '06',
+    icon: TrendingUp,
+    title: 'Venture capital, fintech & cripto',
+    desc: 'Rondas de inversión, valuaciones de startups y adopción de activos digitales en la banca.',
+    link: 'https://www.bloomberglinea.com/cripto/',
+    cta: 'Ver cripto & innovación',
+  },
 ]
 
 export const BloombergNewsSection: React.FC = () => {
-  // Main view tab: 'tv' (Live Broadcast) | 'news' (Articles) | 'podcast' (Audio) | 'ecosystem' (More features)
-  const [activeTab, setActiveTab] = useState<'tv' | 'news' | 'podcast' | 'ecosystem'>('tv')
+  const [activeTab, setActiveTab] = useState<'tv' | 'podcast' | 'news' | 'ecosystem'>('tv')
   const [region, setRegion] = useState<'colombia' | 'global'>('colombia')
   const [podcastCountry, setPodcastCountry] = useState<'colombia' | 'mexico' | 'argentina'>('colombia')
   const [articles, setArticles] = useState<NewsArticle[]>(STATIC_BLOOMBERG_LINEA_ARTICLES.colombia)
   const [loading, setLoading] = useState(false)
   const [isLive, setIsLive] = useState(false)
-
-  // Verified active YouTube video ID for Bloomberg Television
   const [liveVideoId, setLiveVideoId] = useState<string>('QB5BNdBFujE')
 
-  // Spotify show IDs for "La Estrategia del Día"
-  const podcastMap = {
-    colombia: {
-      title: 'La Estrategia del Día Colombia',
-      host: 'María C. Suárez',
-      spotifyId: '4LbFVsDKSmiivu5EcVQuw0',
-      url: 'https://open.spotify.com/show/4LbFVsDKSmiivu5EcVQuw0',
-      desc: 'El podcast diario insignia de Bloomberg Línea en Colombia. Análisis clave antes de la apertura del mercado.'
-    },
-    mexico: {
-      title: 'La Estrategia del Día México',
-      host: 'Jimena Tolama',
-      spotifyId: '0NXF3nHMLWO7qEdaUsp99b',
-      url: 'https://open.spotify.com/show/0NXF3nHMLWO7qEdaUsp99b',
-      desc: 'Coyuntura económica de Banxico, nearshoring, tipo de cambio y finanzas mexicanas.'
-    },
-    argentina: {
-      title: 'La Estrategia del Día Argentina',
-      host: 'Francisco Aldaya',
-      spotifyId: '2GlHSIiVaIUGHHfhGBCTcV',
-      url: 'https://open.spotify.com/show/2GlHSIiVaIUGHHfhGBCTcV',
-      desc: 'Análisis diario sobre política monetaria, bonos soberanos y variables macroeconómicas.'
-    }
-  }
-
-  // Fetch live news updates from backend
+  /* Live RSS sync from backend (falls back to verified static articles) */
   useEffect(() => {
     let isMounted = true
     const fetchLiveNews = async () => {
@@ -196,7 +250,7 @@ export const BloombergNewsSection: React.FC = () => {
             setIsLive(true)
           }
         }
-      } catch (err) {
+      } catch {
         if (isMounted) {
           setArticles(STATIC_BLOOMBERG_LINEA_ARTICLES[region] || STATIC_BLOOMBERG_LINEA_ARTICLES.colombia)
           setIsLive(false)
@@ -214,12 +268,12 @@ export const BloombergNewsSection: React.FC = () => {
     }
   }, [region])
 
-  // Verified official Bloomberg Television Live Stream ID: QB5BNdBFujE (Channel: Bloomberg Television)
+  /* Verified official Bloomberg Television live stream ID */
   useEffect(() => {
     let isMounted = true
     fetch('/api/news/bloomberg/live')
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         if (isMounted && data?.tv?.video_id && data?.tv?.channel_name === 'Bloomberg Television') {
           setLiveVideoId(data.tv.video_id)
         }
@@ -230,286 +284,142 @@ export const BloombergNewsSection: React.FC = () => {
     }
   }, [])
 
-  const currentPodcast = podcastMap[podcastCountry]
+  const currentPodcast = PODCAST_MAP[podcastCountry]
+  const [lead, ...rest] = articles
 
   return (
-    <div className="w-full rounded-3xl bg-[#09090D] border border-white/[0.12] p-6 sm:p-8 lg:p-10 shadow-2xl relative overflow-hidden">
-      {/* Top amber accent line */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/50 via-white/25 to-amber-500/50" />
-
-      {/* Header bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/[0.08]">
+    <div className="w-full">
+      {/* Editorial head + media mode switcher */}
+      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
         <div>
-          <div className="flex items-center space-x-2.5 mb-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
-            <span className="text-xs font-mono font-bold tracking-widest text-amber-400 uppercase">
-              BLOOMBERG OFICIAL // RETRANSMISIÓN & MEDIOS EN VIVO
+          <Eyebrow>
+            <span className="flex items-center gap-2">
+              <StatusDot tone="neg" ping /> Bloomberg oficial · retransmisión & medios
+              {loading && <RefreshCw className="h-3 w-3 animate-spin text-white" />}
+              <span className="text-[#30D158]">{isLive ? '· RSS en vivo' : '· contenido verificado'}</span>
             </span>
-            <span className="h-3 w-[1px] bg-white/20" />
-            <span className="text-[11px] font-mono text-emerald-400 flex items-center space-x-1">
-              {loading && <RefreshCw className="w-3 h-3 animate-spin text-white" />}
-              <span>{isLive ? 'SINCRO EN VIVO RSS' : 'CONTENIDO VERIFICADO'}</span>
-            </span>
-          </div>
-
-          <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight">
-            Retransmisión Oficial de Bloomberg & Ecosistema Bloomberg Línea
-          </h3>
-          <p className="text-sm text-[#86868B] mt-1 max-w-3xl leading-relaxed">
-            Señal satelital en directo <strong className="text-white font-semibold">Bloomberg Television 24/7</strong>, podcast diario oficial <strong className="text-white font-semibold">"La Estrategia del Día"</strong>, cotizaciones de divisas y cobertura periodística de Colombia y Wall Street.
-          </p>
+          </Eyebrow>
+          <h2 className="mt-3 font-serif text-3xl leading-[1.06] text-white sm:text-4xl">
+            Televisión, podcast y wire <em className="italic text-[#6E6E73]">Bloomberg Línea.</em>
+          </h2>
         </div>
 
-        {/* Media Mode Tabs */}
-        <div className="flex flex-wrap items-center p-1 rounded-2xl bg-black/60 border border-white/[0.1] font-mono text-xs self-start lg:self-auto gap-1">
-          <button
-            onClick={() => setActiveTab('tv')}
-            className={`px-3.5 py-2 rounded-xl transition-all flex items-center space-x-2 ${
-              activeTab === 'tv'
-                ? 'bg-rose-500 text-white font-bold shadow-md'
-                : 'text-[#86868B] hover:text-white'
-            }`}
-          >
-            <Tv className="w-3.5 h-3.5" />
-            <span>TV en Directo (24/7)</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('podcast')}
-            className={`px-3.5 py-2 rounded-xl transition-all flex items-center space-x-2 ${
-              activeTab === 'podcast'
-                ? 'bg-emerald-500 text-white font-bold shadow-md'
-                : 'text-[#86868B] hover:text-white'
-            }`}
-          >
-            <Radio className="w-3.5 h-3.5" />
-            <span>Podcast Diario</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('news')}
-            className={`px-3.5 py-2 rounded-xl transition-all flex items-center space-x-2 ${
-              activeTab === 'news'
-                ? 'bg-white text-black font-bold shadow-md'
-                : 'text-[#86868B] hover:text-white'
-            }`}
-          >
-            <Newspaper className="w-3.5 h-3.5" />
-            <span>Noticias Escritas</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('ecosystem')}
-            className={`px-3.5 py-2 rounded-xl transition-all flex items-center space-x-2 ${
-              activeTab === 'ecosystem'
-                ? 'bg-amber-400 text-black font-bold shadow-md'
-                : 'text-[#86868B] hover:text-white'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Ecosistema Línea</span>
-          </button>
-        </div>
+        <Segmented
+          layoutId="bbMediaTabs"
+          value={activeTab}
+          onChange={(id) => setActiveTab(id as typeof activeTab)}
+          options={[
+            {
+              id: 'tv',
+              label: (
+                <span className="flex items-center gap-1.5">
+                  <StatusDot tone="neg" ping={activeTab === 'tv'} /> TV 24/7
+                </span>
+              ),
+            },
+            { id: 'podcast', label: 'Podcast diario' },
+            { id: 'news', label: 'Wire de noticias' },
+            { id: 'ecosystem', label: 'Ecosistema Línea' },
+          ]}
+        />
       </div>
 
-      {/* 1. TAB: BLOOMBERG TELEVISION 24/7 LIVE BROADCAST */}
+      {/* ─── TV: official live broadcast ─── */}
       {activeTab === 'tv' && (
-        <div className="pt-8 space-y-6">
-          {/* Direct Launchpad for Bloomberg.com/live Signals */}
-          <div className="p-5 rounded-2xl bg-[#0E0E14] border border-white/[0.1] shadow-xl">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/[0.08]">
-              <div>
-                <div className="flex items-center space-x-2 mb-1">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-                  <span className="text-xs font-mono font-bold text-amber-400 uppercase tracking-wider">
-                    PORTAL OFICIAL BLOOMBERG.COM/LIVE
-                  </span>
-                </div>
-                <h4 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                  Transmisión Oficial Directa en Bloomberg.com
-                </h4>
-                <p className="text-xs text-[#86868B] mt-0.5">
-                  Acceso directo a las tres señales de transmisión simultánea de la plataforma web de Bloomberg:
-                </p>
-              </div>
-
-              <a
-                href="https://www.bloomberg.com/live"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-xl bg-white text-black font-bold text-xs font-mono hover:bg-white/90 transition-all flex items-center space-x-2 self-start md:self-auto shadow-lg"
-              >
-                <span>Abrir Bloomberg.com/live</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-
-            {/* Quick Signal Buttons for Bloomberg.com/live channels */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4">
-              <a
-                href="https://www.bloomberg.com/live/us"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all flex items-center justify-between group"
-              >
-                <div>
-                  <div className="text-xs font-bold text-white font-mono group-hover:text-amber-300 transition-colors">
-                    🇺🇸 Bloomberg TV (US)
-                  </div>
-                  <div className="text-[11px] text-[#86868B]">Señal central Wall Street & NY</div>
-                </div>
-                <ExternalLink className="w-3.5 h-3.5 text-[#86868B] group-hover:text-white transition-colors" />
-              </a>
-
-              <a
-                href="https://www.bloomberg.com/live/europe"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all flex items-center justify-between group"
-              >
-                <div>
-                  <div className="text-xs font-bold text-white font-mono group-hover:text-amber-300 transition-colors">
-                    🇪🇺 Bloomberg TV (Europe)
-                  </div>
-                  <div className="text-[11px] text-[#86868B]">Londres, Fráncfort & BCE</div>
-                </div>
-                <ExternalLink className="w-3.5 h-3.5 text-[#86868B] group-hover:text-white transition-colors" />
-              </a>
-
-              <a
-                href="https://www.bloomberg.com/live/originals"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] transition-all flex items-center justify-between group"
-              >
-                <div>
-                  <div className="text-xs font-bold text-white font-mono group-hover:text-amber-300 transition-colors">
-                    🎬 Bloomberg Originals
-                  </div>
-                  <div className="text-[11px] text-[#86868B]">Documentales, IA & Quicktake</div>
-                </div>
-                <ExternalLink className="w-3.5 h-3.5 text-[#86868B] group-hover:text-white transition-colors" />
-              </a>
-            </div>
-          </div>
-
-          {/* Embedded 24/7 Global Satellite Player (Official Bloomberg Television) */}
-          <div className="rounded-2xl bg-black border border-white/[0.14] overflow-hidden shadow-2xl">
-            {/* Top broadcast status bar */}
-            <div className="px-5 py-3 bg-[#0E0E14] border-b border-white/[0.08] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-              <div className="flex items-center space-x-2.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
-                <span className="font-bold text-rose-400 tracking-wider">
-                  SEÑAL OFICIAL // BLOOMBERG BUSINESS NEWS LIVE (TELEVISION 24/7)
-                </span>
-                <span className="hidden sm:inline text-white/30">•</span>
-                <span className="hidden sm:inline text-[#86868B]">
-                  Canal Oficial: Bloomberg Television
-                </span>
-              </div>
-
-              <div className="flex items-center space-x-3">
+        <div className="mt-8 space-y-6">
+          <Panel
+            eyebrow="Señal satelital oficial · Bloomberg Television"
+            title="Bloomberg Business News Live (24/7)"
+            right={
+              <div className="flex items-center gap-2">
                 <a
                   href="https://www.youtube.com/@BloombergTelevision"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-3 py-1 rounded-lg bg-white/[0.06] hover:bg-white/[0.12] text-[#D2D2D7] hover:text-white transition-colors flex items-center space-x-1.5"
+                  className="apple-press glass-pill hidden items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[10px] text-[#A1A1A6] transition-colors hover:text-white sm:flex"
                 >
-                  <span>Canal Oficial de YouTube</span>
-                  <ExternalLink className="w-3 h-3" />
+                  Canal oficial <ExternalLink className="h-3 w-3" />
                 </a>
-
-                <a
-                  href="https://www.bloomberg.com/live"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-3 py-1 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors flex items-center space-x-1.5 font-bold"
-                >
-                  <Maximize2 className="w-3 h-3" />
-                  <span>Ver en Bloomberg.com</span>
+                <a href="https://www.bloomberg.com/live" target="_blank" rel="noopener noreferrer">
+                  <Btn variant="secondary" size="sm">
+                    Ver en bloomberg.com <ExternalLink className="h-3 w-3" />
+                  </Btn>
                 </a>
               </div>
+            }
+            bodyClass="p-0 sm:p-0"
+          >
+            <div className="flex items-center gap-2 border-b border-white/[0.06] px-5 py-2.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#FF453A]">
+              <StatusDot tone="neg" ping /> On air — transmisión continua desde NY & Londres
             </div>
-
-            {/* Official 24/7 Live Stream Player Embed (Locked to Bloomberg Television) */}
-            <div className="relative w-full aspect-video sm:h-[500px] lg:h-[560px] bg-black">
+            <div className="relative aspect-video w-full bg-black sm:h-[500px] lg:h-[560px]">
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${liveVideoId}?autoplay=1&mute=1&enablejsapi=1`}
                 title="Bloomberg Television Official Live Broadcast"
-                className="w-full h-full border-0"
+                className="h-full w-full border-0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
             </div>
-
-            {/* Bottom Stream Info & Transparency Note */}
-            <div className="p-4 sm:p-5 bg-[#0A0A0F] border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-xs font-mono text-[#86868B]">
-              <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                <span className="text-white font-medium">Retransmisión oficial y continua 24 horas</span>
-                <span>— Cobertura satelital en directo desde los estudios de Bloomberg Television en Nueva York y Londres.</span>
-              </div>
-              <div className="text-[11px] text-white/50">
-                Señal provista por Bloomberg Television (Bloomberg L.P.)
-              </div>
+            <div className="flex flex-col items-start justify-between gap-2 border-t border-white/[0.06] px-5 py-3 font-mono text-[10px] text-[#636366] sm:flex-row sm:items-center">
+              <span>Retransmisión oficial y continua · Bloomberg L.P.</span>
+              <span>Señal provista por Bloomberg Television</span>
             </div>
+          </Panel>
+
+          {/* Official live portals — hairline rows */}
+          <div className="border-t border-white/[0.07]">
+            {LIVE_PORTALS.map((p) => (
+              <a
+                key={p.url}
+                href={p.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between gap-4 border-b border-white/[0.07] px-3 py-4 transition-colors hover:bg-white/[0.025]"
+              >
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold tracking-tight text-white">{p.label}</div>
+                  <div className="mt-0.5 font-mono text-[11px] text-[#86868B]">{p.desc}</div>
+                </div>
+                <span className="flex shrink-0 items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#636366] transition-colors group-hover:text-white">
+                  bloomberg.com/live <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </a>
+            ))}
           </div>
         </div>
       )}
 
-      {/* 2. TAB: PODCAST OFICIAL "LA ESTRATEGIA DEL DÍA" (SPOTIFY EMBED) */}
+      {/* ─── Podcast: official Spotify embed ─── */}
       {activeTab === 'podcast' && (
-        <div className="pt-8 space-y-6">
-          {/* Sub-Country Selector */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.08]">
-            <div>
-              <span className="text-xs font-mono text-emerald-400 font-bold uppercase tracking-wider block mb-1">
-                🎙️ PODCAST OFICIAL DIARIO // BLOOMBERG LÍNEA
+        <div className="mt-8 space-y-6">
+          <div className="flex flex-col justify-between gap-4 border-y border-white/[0.07] py-5 sm:flex-row sm:items-center">
+            <div className="min-w-0">
+              <span className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#30D158]">
+                <Radio className="h-3.5 w-3.5" /> Podcast oficial diario · Bloomberg Línea
               </span>
-              <h4 className="text-lg font-bold text-white tracking-tight">
-                {currentPodcast.title}
-              </h4>
-              <p className="text-xs text-[#86868B] mt-0.5">
-                Conducido por <strong className="text-white">{currentPodcast.host}</strong>. {currentPodcast.desc}
+              <h3 className="mt-1.5 truncate font-serif text-2xl text-white">{currentPodcast.title}</h3>
+              <p className="mt-1 text-xs text-[#86868B]">
+                Conducido por <strong className="text-white">{currentPodcast.host}</strong> ·{' '}
+                {currentPodcast.desc}
               </p>
             </div>
 
-            <div className="flex items-center space-x-2 p-1 rounded-xl bg-black/60 border border-white/[0.1] font-mono text-xs">
-              <button
-                onClick={() => setPodcastCountry('colombia')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
-                  podcastCountry === 'colombia'
-                    ? 'bg-emerald-500 text-white font-bold'
-                    : 'text-[#86868B] hover:text-white'
-                }`}
-              >
-                🇨🇴 Colombia
-              </button>
-              <button
-                onClick={() => setPodcastCountry('mexico')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
-                  podcastCountry === 'mexico'
-                    ? 'bg-emerald-500 text-white font-bold'
-                    : 'text-[#86868B] hover:text-white'
-                }`}
-              >
-                🇲🇽 México
-              </button>
-              <button
-                onClick={() => setPodcastCountry('argentina')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
-                  podcastCountry === 'argentina'
-                    ? 'bg-emerald-500 text-white font-bold'
-                    : 'text-[#86868B] hover:text-white'
-                }`}
-              >
-                🇦🇷 Argentina
-              </button>
-            </div>
+            <Segmented
+              size="sm"
+              layoutId="bbPodcastCountry"
+              value={podcastCountry}
+              onChange={(id) => setPodcastCountry(id as typeof podcastCountry)}
+              options={[
+                { id: 'colombia', label: 'CO' },
+                { id: 'mexico', label: 'MX' },
+                { id: 'argentina', label: 'AR' },
+              ]}
+              className="shrink-0 self-start sm:self-auto"
+            />
           </div>
 
-          {/* Official Spotify Embed Player */}
-          <div className="rounded-2xl overflow-hidden border border-white/[0.12] bg-[#0E0E14] shadow-xl p-2">
+          <Panel bodyClass="p-2 sm:p-2">
             <iframe
               style={{ borderRadius: '12px' }}
               src={`https://open.spotify.com/embed/show/${currentPodcast.spotifyId}?utm_source=generator&theme=0`}
@@ -520,352 +430,221 @@ export const BloombergNewsSection: React.FC = () => {
               loading="lazy"
               title={currentPodcast.title}
             />
-          </div>
+          </Panel>
 
-          {/* Podcast Info Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-            <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono text-xs space-y-1">
-              <span className="text-[#86868B]">Frecuencia:</span>
-              <div className="text-white font-bold">Lunes a Viernes (6:00 AM)</div>
-              <p className="text-[11px] text-[#86868B] leading-relaxed">
-                El resumen matutino para empezar el día con la radiografía completa del mercado.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono text-xs space-y-1">
-              <span className="text-[#86868B]">Formato:</span>
-              <div className="text-white font-bold">Cápsulas de 10 a 15 minutos</div>
-              <p className="text-[11px] text-[#86868B] leading-relaxed">
-                Sin relleno: datos duros de inflación, decisiones de tasas, empresas y divisas.
-              </p>
-            </div>
-
-            <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono text-xs space-y-1">
-              <span className="text-[#86868B]">Enlace Oficial:</span>
-              <div>
-                <a
-                  href={currentPodcast.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-400 hover:underline flex items-center space-x-1 font-bold"
-                >
-                  <span>Abrir en Spotify App</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-              <p className="text-[11px] text-[#86868B] leading-relaxed">
-                También disponible en Apple Podcasts y YouTube.
-              </p>
-            </div>
-          </div>
+          <MetricRail
+            cols={3}
+            items={[
+              { label: 'Frecuencia', value: 'Lun–Vie 6:00 AM', sub: 'radiografía matutina del mercado' },
+              { label: 'Formato', value: '10–15 min', sub: 'datos duros: tasas, inflación, divisas' },
+              {
+                label: 'Enlace oficial',
+                value: (
+                  <a
+                    href={currentPodcast.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-base text-white underline decoration-white/25 underline-offset-4 transition-colors hover:decoration-white"
+                  >
+                    Abrir en Spotify <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                ),
+                sub: 'también en Apple Podcasts & YouTube',
+              },
+            ]}
+          />
         </div>
       )}
 
-      {/* 3. TAB: STATIC & REAL-TIME NEWS FEED (COLOMBIA VS GLOBAL) */}
+      {/* ─── News wire: editorial lead + dense rows ─── */}
       {activeTab === 'news' && (
-        <div className="pt-8 space-y-6">
-          {/* Region Switcher */}
-          <div className="flex items-center justify-between pb-2">
-            <span className="text-xs font-mono text-[#86868B]">
-              Mostrando {articles.length} artículos certificados de Bloomberg Línea
+        <div className="mt-8">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-y border-white/[0.07] py-4">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#636366]">
+              {loading ? 'sincronizando wire…' : `${articles.length} artículos · ${isLive ? 'RSS en vivo' : 'verificados'}`}
             </span>
-
-            <div className="flex items-center p-1 rounded-xl bg-black/60 border border-white/[0.1] font-mono text-xs">
-              <button
-                onClick={() => setRegion('colombia')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
-                  region === 'colombia'
-                    ? 'bg-white text-black font-bold'
-                    : 'text-[#86868B] hover:text-white'
-                }`}
-              >
-                🇨🇴 Colombia
-              </button>
-              <button
-                onClick={() => setRegion('global')}
-                className={`px-3 py-1.5 rounded-lg transition-all ${
-                  region === 'global'
-                    ? 'bg-white text-black font-bold'
-                    : 'text-[#86868B] hover:text-white'
-                }`}
-              >
-                🇺🇸 Mercados & EE.UU.
-              </button>
-            </div>
+            <Segmented
+              size="sm"
+              layoutId="bbNewsRegion"
+              value={region}
+              onChange={(id) => setRegion(id as typeof region)}
+              options={[
+                { id: 'colombia', label: 'CO · Colombia' },
+                { id: 'global', label: 'US · Mercados & EE. UU.' },
+              ]}
+            />
           </div>
 
-          {/* Articles Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.map((item, idx) => (
-              <article
-                key={item.link + idx}
-                className="rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-white/25 transition-all overflow-hidden flex flex-col justify-between group shadow-lg"
-              >
-                <div>
-                  {item.image ? (
-                    <div className="relative w-full h-48 overflow-hidden bg-black/40">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0E0E14] via-transparent to-transparent" />
-                      <span className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/80 border border-white/20 text-[10px] font-mono text-white font-bold backdrop-blur-md">
-                        {item.tag || (region === 'colombia' ? 'COLOMBIA' : 'WALL STREET')}
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="w-full h-24 bg-gradient-to-br from-white/[0.04] to-white/[0.01] p-4 flex items-center justify-between border-b border-white/[0.06]">
-                      <span className="text-[10px] font-mono font-bold text-amber-400">
-                        BLOOMBERG LÍNEA
-                      </span>
-                      <Radio className="w-4 h-4 text-white/40" />
-                    </div>
-                  )}
-
-                  <div className="p-5 space-y-3">
-                    <div className="flex items-center space-x-2 text-[11px] font-mono text-[#86868B]">
-                      <Clock className="w-3.5 h-3.5" />
-                      <span>{item.pub_date}</span>
-                      <span>•</span>
-                      <span className="truncate text-[#D2D2D7]">{item.author}</span>
-                    </div>
-
-                    <h4 className="text-base sm:text-lg font-bold text-white tracking-tight leading-snug group-hover:text-amber-200 transition-colors">
-                      {item.title}
-                    </h4>
-
-                    <p className="text-xs text-[#86868B] leading-relaxed line-clamp-3 font-sans">
-                      {item.description}
-                    </p>
+          {loading ? (
+            <div className="space-y-0">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="flex animate-pulse items-center gap-5 border-b border-white/[0.06] py-6">
+                  <div className="h-16 w-28 shrink-0 rounded-lg bg-white/[0.04]" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3.5 w-3/4 rounded bg-white/[0.05]" />
+                    <div className="h-2.5 w-1/2 rounded bg-white/[0.03]" />
                   </div>
                 </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Lead article — monumental editorial */}
+              {lead && (
+                <Reveal>
+                  <a
+                    href={lead.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group grid grid-cols-1 items-center gap-8 border-b border-white/[0.07] py-8 md:grid-cols-12"
+                  >
+                    {lead.image && (
+                      <div className="relative overflow-hidden rounded-xl md:col-span-5">
+                        <img
+                          src={lead.image}
+                          alt={lead.title}
+                          loading="lazy"
+                          className="aspect-video w-full object-cover opacity-85 transition-all duration-500 group-hover:scale-[1.02] group-hover:opacity-100"
+                        />
+                        <span className="absolute left-3 top-3 rounded-full border border-white/20 bg-black/75 px-2.5 py-1 font-mono text-[9px] font-bold tracking-widest text-white backdrop-blur-md">
+                          {lead.tag || (region === 'colombia' ? 'COLOMBIA' : 'WALL STREET')}
+                        </span>
+                      </div>
+                    )}
+                    <div className={lead.image ? 'md:col-span-7' : 'md:col-span-12'}>
+                      <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#636366]">
+                        <Clock className="h-3 w-3" /> {lead.pub_date} · {lead.author}
+                      </div>
+                      <h3 className="mt-3 font-serif text-2xl leading-[1.15] text-white transition-colors group-hover:text-[#D2D2D7] sm:text-3xl">
+                        {lead.title}
+                      </h3>
+                      <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#86868B]">
+                        {lead.description}
+                      </p>
+                      <span className="mt-4 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#A1A1A6] transition-colors group-hover:text-white">
+                        Leer en Bloomberg Línea <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      </span>
+                    </div>
+                  </a>
+                </Reveal>
+              )}
 
-                <div className="p-5 pt-0">
+              {/* Remaining articles — dense hairline rows */}
+              {rest.map((item, idx) => (
+                <Reveal key={item.link + idx} delay={idx * 0.05}>
                   <a
                     href={item.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-2.5 px-4 rounded-xl bg-white/[0.05] hover:bg-white/[0.12] border border-white/[0.1] text-xs font-mono text-white font-medium flex items-center justify-between transition-colors group/link"
+                    className="group flex items-center gap-5 border-b border-white/[0.07] py-5 transition-colors hover:bg-white/[0.02]"
                   >
-                    <span>Leer en Bloomberg Línea</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#86868B] group-hover/link:text-white transition-colors" />
+                    {item.image && (
+                      <img
+                        src={item.image}
+                        alt=""
+                        loading="lazy"
+                        className="hidden h-16 w-28 shrink-0 rounded-lg object-cover opacity-80 transition-opacity group-hover:opacity-100 sm:block"
+                      />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.16em] text-[#636366]">
+                        <span className="rounded border border-white/[0.1] px-1.5 py-px text-white/70">
+                          {item.tag || (region === 'colombia' ? 'COLOMBIA' : 'GLOBAL')}
+                        </span>
+                        {item.pub_date} · {item.author}
+                      </div>
+                      <h4 className="mt-1.5 truncate text-[15px] font-semibold tracking-tight text-white transition-colors group-hover:text-[#D2D2D7]">
+                        {item.title}
+                      </h4>
+                      <p className="mt-1 hidden text-xs leading-relaxed text-[#86868B] line-clamp-1 md:block">
+                        {item.description}
+                      </p>
+                    </div>
+                    <ArrowUpRight className="h-4 w-4 shrink-0 -translate-x-1 text-[#48484A] opacity-0 transition-all group-hover:translate-x-0 group-hover:text-white group-hover:opacity-100" />
                   </a>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* 4. TAB: FULL BLOOMBERG LÍNEA ECOSYSTEM (INDICATORS, NEWSLETTERS, SPECIALS) */}
-      {activeTab === 'ecosystem' && (
-        <div className="pt-8 space-y-8">
-          {/* Key Indicators Ribbon */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <h4 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-                Indicadores Macroeconómicos & Divisas de Bloomberg Línea
-              </h4>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              {BLOOMBERG_LINEA_INDICATORS.map((ind) => (
-                <div
-                  key={ind.label}
-                  className="p-3.5 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-white/20 transition-all font-mono"
-                >
-                  <div className="text-[10px] text-[#86868B] truncate mb-1">{ind.label}</div>
-                  <div className="text-sm font-bold text-white tracking-tight">{ind.value}</div>
-                  <div
-                    className={`text-[11px] font-semibold mt-0.5 ${
-                      ind.positive ? 'text-emerald-400' : 'text-rose-400'
-                    }`}
-                  >
-                    {ind.change}
-                  </div>
-                  <div className="text-[9px] text-[#636366] truncate mt-1">{ind.note}</div>
-                </div>
+                </Reveal>
               ))}
-            </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ─── Ecosystem: indicators + platform features ─── */}
+      {activeTab === 'ecosystem' && (
+        <div className="mt-8 space-y-10">
+          <div>
+            <Eyebrow className="mb-3">Indicadores macro & divisas · LatAm</Eyebrow>
+            <MetricRail
+              cols={6}
+              items={BLOOMBERG_LINEA_INDICATORS.map((ind) => ({
+                label: ind.label,
+                value: ind.value,
+                sub: (
+                  <span className={ind.positive ? 'text-[#30D158]' : 'text-[#FF453A]'}>
+                    {ind.change}
+                  </span>
+                ),
+              }))}
+            />
           </div>
 
-          {/* Everything Bloomberg Línea Offers */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <Globe className="w-4 h-4 text-amber-400" />
-              <h4 className="text-sm font-mono font-bold text-white uppercase tracking-wider">
-                Todo lo que ofrece Bloomberg Línea en su Plataforma Oficial
-              </h4>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Feature 1: Divisas en tiempo real */}
-              <div className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-amber-400/30 transition-all space-y-3 group">
-                <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400">
-                  <DollarSign className="w-5 h-5" />
-                </div>
-                <h5 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
-                  Cotizador de Monedas en Tiempo Real
-                </h5>
-                <p className="text-xs text-[#86868B] leading-relaxed">
-                  Seguimiento tick a tick de la tasa representativa del mercado en Colombia (USD/COP), peso mexicano (USD/MXN), real brasileño (USD/BRL) y divisas de la región.
-                </p>
-                <a
-                  href="https://www.bloomberglinea.com/quote/USDCOP:CUR/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-mono text-amber-400 hover:underline inline-flex items-center space-x-1 pt-1"
-                >
-                  <span>Ver cotización USD/COP en Bloomberg Línea</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-
-              {/* Feature 2: Newsletters Gratuitas */}
-              <div className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-emerald-400/30 transition-all space-y-3 group">
-                <div className="w-10 h-10 rounded-xl bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center text-emerald-400">
-                  <Mail className="w-5 h-5" />
-                </div>
-                <h5 className="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">
-                  Newsletters Diarias Gratuitas
-                </h5>
-                <p className="text-xs text-[#86868B] leading-relaxed">
-                  Boletines matutinos de <strong className="text-white">"Primera Hora"</strong> (resumen antes de abrir bolsa en Bogotá y Wall Street), <strong className="text-white">"Apertura de Mercados"</strong> y el análisis de cierre.
-                </p>
-                <a
-                  href="https://www.bloomberglinea.com/tus-newsletters-bloomberg-linea/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-mono text-emerald-400 hover:underline inline-flex items-center space-x-1 pt-1"
-                >
-                  <span>Suscribirse a las Newsletters</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-
-              {/* Feature 3: Videos & Entrevistas */}
-              <div className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-rose-400/30 transition-all space-y-3 group">
-                <div className="w-10 h-10 rounded-xl bg-rose-400/10 border border-rose-400/20 flex items-center justify-center text-rose-400">
-                  <Play className="w-5 h-5" />
-                </div>
-                <h5 className="text-base font-bold text-white group-hover:text-rose-300 transition-colors">
-                  Canal de Videos & Entrevistas Exclusivas
-                </h5>
-                <p className="text-xs text-[#86868B] leading-relaxed">
-                  Reportajes en video con ministros de hacienda, directores de bancos centrales, fundadores de unicornios latinoamericanos y presidentes corporativos.
-                </p>
-                <a
-                  href="https://www.bloomberglinea.com/videos/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-mono text-rose-400 hover:underline inline-flex items-center space-x-1 pt-1"
-                >
-                  <span>Explorar videoteca de Bloomberg Línea</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-
-              {/* Feature 4: Rankings y Especiales */}
-              <div className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-blue-400/30 transition-all space-y-3 group">
-                <div className="w-10 h-10 rounded-xl bg-blue-400/10 border border-blue-400/20 flex items-center justify-center text-blue-400">
-                  <Award className="w-5 h-5" />
-                </div>
-                <h5 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors">
-                  Los 500 de América Latina & Rankings
-                </h5>
-                <p className="text-xs text-[#86868B] leading-relaxed">
-                  La lista anual definitiva de personalidades, inversores y líderes que mueven la economía de América Latina, con biografías e impacto financiero.
-                </p>
-                <a
-                  href="https://www.bloomberglinea.com/especiales/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-mono text-blue-400 hover:underline inline-flex items-center space-x-1 pt-1"
-                >
-                  <span>Ver listas y ediciones especiales</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-
-              {/* Feature 5: Bloomberg Green (ESG) */}
-              <div className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-teal-400/30 transition-all space-y-3 group">
-                <div className="w-10 h-10 rounded-xl bg-teal-400/10 border border-teal-400/20 flex items-center justify-center text-teal-400">
-                  <Globe className="w-5 h-5" />
-                </div>
-                <h5 className="text-base font-bold text-white group-hover:text-teal-300 transition-colors">
-                  Línea Green (ESG & Transición Energética)
-                </h5>
-                <p className="text-xs text-[#86868B] leading-relaxed">
-                  Sección especializada en finanzas sostenibles, bonos verdes, matriz de descarbonización e impacto del cambio climático en los balances corporativos.
-                </p>
-                <a
-                  href="https://www.bloomberglinea.com/esg/linea-green/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-mono text-teal-400 hover:underline inline-flex items-center space-x-1 pt-1"
-                >
-                  <span>Leer Bloomberg Línea Green</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-
-              {/* Feature 6: Startups, Fintech & Cripto */}
-              <div className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-purple-400/30 transition-all space-y-3 group">
-                <div className="w-10 h-10 rounded-xl bg-purple-400/10 border border-purple-400/20 flex items-center justify-center text-purple-400">
-                  <Sparkles className="w-5 h-5" />
-                </div>
-                <h5 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
-                  Venture Capital, Fintech & Cripto
-                </h5>
-                <p className="text-xs text-[#86868B] leading-relaxed">
-                  Rondas de inversión de capital de riesgo, valuaciones de startups en Colombia, México y Brasil, y adopción de activos digitales en la banca tradicional.
-                </p>
-                <a
-                  href="https://www.bloomberglinea.com/cripto/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-mono text-purple-400 hover:underline inline-flex items-center space-x-1 pt-1"
-                >
-                  <span>Ver sección Cripto & Innovación</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
+            <Eyebrow className="mb-1">Plataforma oficial · bloomberglinea.com</Eyebrow>
+            <div className="border-t border-white/[0.07]">
+              {ECOSYSTEM_FEATURES.map((f) => {
+                const Icon = f.icon
+                return (
+                  <a
+                    key={f.n}
+                    href={f.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-5 border-b border-white/[0.07] px-2 py-5 transition-colors hover:bg-white/[0.02]"
+                  >
+                    <span className="w-6 shrink-0 font-mono text-[10px] text-[#48484A]">{f.n}</span>
+                    <Icon className="h-4 w-4 shrink-0 text-[#636366] transition-colors group-hover:text-white" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold tracking-tight text-white">
+                        {f.title}
+                      </span>
+                      <span className="mt-0.5 block text-xs leading-relaxed text-[#86868B]">
+                        {f.desc}
+                      </span>
+                    </span>
+                    <span className="hidden shrink-0 items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-[#636366] transition-colors group-hover:text-white sm:flex">
+                      {f.cta} <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </span>
+                  </a>
+                )
+              })}
             </div>
           </div>
         </div>
       )}
 
-      {/* Official Footer Attributions */}
-      <div className="mt-8 pt-6 border-t border-white/[0.08] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[#86868B]">
-        <div className="flex items-center space-x-2">
-          <span>Fuente Oficial:</span>
+      {/* Official attributions */}
+      <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-white/[0.07] pt-6 font-mono text-[10px] text-[#48484A] sm:flex-row sm:items-center">
+        <div className="flex items-center gap-2">
+          <span>Fuente oficial:</span>
           <a
             href="https://www.bloomberglinea.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:underline flex items-center space-x-1"
+            className="flex items-center gap-1 text-[#A1A1A6] transition-colors hover:text-white"
           >
-            <span>bloomberglinea.com</span>
-            <ExternalLink className="w-3 h-3" />
+            bloomberglinea.com <ExternalLink className="h-2.5 w-2.5" />
           </a>
           <span>&</span>
           <a
             href="https://www.bloomberg.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white hover:underline flex items-center space-x-1"
+            className="flex items-center gap-1 text-[#A1A1A6] transition-colors hover:text-white"
           >
-            <span>bloomberg.com</span>
-            <ExternalLink className="w-3 h-3" />
+            bloomberg.com <ExternalLink className="h-2.5 w-2.5" />
           </a>
         </div>
-
-        <div className="text-[11px] text-[#A1A1A6]">
-          Contenidos y transmisiones emitidos bajo la propiedad editorial de Bloomberg L.P. & Falic Media
-        </div>
+        <span>Contenidos emitidos bajo propiedad editorial de Bloomberg L.P. & Falic Media</span>
       </div>
     </div>
   )

@@ -1,7 +1,9 @@
 # Automatización de Despliegue Continuo (CI/CD con GitHub Actions)
 # Continuous Deployment (CI/CD) Architecture
 
-Este documento detalla el pipeline de despliegue continuo configurado para **QuantVibe**: cada vez que se hace `git push origin main`, GitHub Actions se conecta de forma segura por SSH al servidor de Alibaba Cloud ECS, descarga los cambios y reinicia el servicio web automáticamente.
+Este documento detalla el pipeline de despliegue continuo configurado para **QuantVibe**: cada vez que se hace `git push origin main`, GitHub Actions **compila el frontend desde el código fuente**, se conecta de forma segura por SSH al servidor de Alibaba Cloud ECS, sincroniza los cambios y reinicia el servicio web automáticamente.
+
+> **Importante:** ya NO es necesario ejecutar `pnpm build` manualmente ni commitear `web/static/`. El workflow de despliegue compila el frontend en cada push, garantizando que el sitio en vivo siempre refleje el código fuente de `web/frontend/`. (`web/static/` sigue en el repo como fallback para ejecutar el servidor sin Node.js.)
 
 ---
 
@@ -18,11 +20,14 @@ Este documento detalla el pipeline de despliegue continuo configurado para **Qua
        ▼
 [ GitHub Actions Runner ]
        │
+       ├─> pnpm install + pnpm build (frontend SIEMPRE fresco)
+       │
        │ 3. Conexión SSH cifrada con llave ED25519 (Puerto 22)
        ▼
 [ Servidor Alibaba Cloud ECS (47.85.111.6) ]
        │
-       ├─> git pull origin main
+       ├─> git fetch + git reset --hard origin/main (backend)
+       ├─> Sube web/static/ compilado por CI (atomic swap)
        ├─> source venv/bin/activate
        ├─> pip install -r requirements-web.txt
        ├─> Reinicia el proceso web (scripts/start_web.py --port 80)
@@ -31,6 +36,8 @@ Este documento detalla el pipeline de despliegue continuo configurado para **Qua
        ▼
 [ Sitio en Vivo Actualizado: https://quantvibeapp.com ]
 ```
+
+> Si el secret `SERVER_SSH_KEY` no está configurado, el workflow **falla visiblemente** (ya no se omite en silencio).
 
 ---
 
@@ -60,12 +67,13 @@ mkdir -p ~/.ssh && echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDn69L93ZBv6B/Ugxee
 ## 🚀 Cómo Trabajar de Ahora en Adelante
 
 Una vez guardado el secreto en GitHub:
-1. Programas y haces cambios en tu código local.
-2. Si modificas el frontend (`web/frontend/`), ejecutas `pnpm build` dentro de `web/frontend/`.
-3. Haces commit y push:
+1. Programas y haces cambios en tu código local (backend o frontend).
+2. Haces commit y push:
    ```bash
    git add .
    git commit -m "mi nueva función"
    git push origin main
    ```
-4. **¡Y te olvidas de todo!** A los 15-20 segundos, la página [https://quantvibeapp.com](https://quantvibeapp.com) ya tendrá tus cambios activos en vivo.
+3. **¡Y te olvidas de todo!** GitHub Actions compila el frontend automáticamente y a los ~2 minutos la página [https://quantvibeapp.com](https://quantvibeapp.com) ya tendrá tus cambios activos en vivo.
+
+> 💡 `pnpm build` local solo se necesita si quieres correr el servidor Python localmente con el frontend de producción (`python scripts/start_web.py`). Para desplegar, el CI lo hace por ti.

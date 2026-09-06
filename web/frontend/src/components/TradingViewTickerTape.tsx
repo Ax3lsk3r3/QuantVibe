@@ -51,7 +51,7 @@ export const TradingViewTickerTape: React.FC<TradingViewTickerTapeProps> = ({ cl
   }, [])
 
   return (
-    <div className={`w-full overflow-hidden border-y border-white/[0.08] bg-[#050507]/90 backdrop-blur-md relative z-10 ${className}`}>
+    <div className={`relative z-10 w-full overflow-hidden border-b border-white/[0.07] bg-[#030304]/90 backdrop-blur-md ${className}`}>
       <div ref={containerRef} className="tradingview-widget-container" />
     </div>
   )

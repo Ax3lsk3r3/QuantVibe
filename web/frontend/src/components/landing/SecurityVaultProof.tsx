@@ -1,13 +1,8 @@
 import React, { useState } from 'react'
-import { motion } from 'framer-motion'
-import { ShieldCheck, Lock, CheckCircle2, Copy, Check, Terminal, FileCode2 } from 'lucide-react'
+import { ShieldCheck, Lock, CheckCircle2, Check, Terminal, FileCode2 } from 'lucide-react'
+import { Btn, CopyChip, Eyebrow, Reveal, StatusDot } from '../ui'
 
-export const SecurityVaultProof: React.FC = () => {
-  const [copied, setCopied] = useState(false)
-  const [verifying, setVerifying] = useState(false)
-  const [verified, setVerified] = useState(true)
-
-  const samplePayload = `{
+const SAMPLE_PAYLOAD = `{
   "timestamp": "2026-09-04T16:40:00Z",
   "gate_metrics": {
     "ic": 0.0824,
@@ -22,132 +17,113 @@ export const SecurityVaultProof: React.FC = () => {
   "checksum": "a8f3b9c47e2119d8736e4f3a9e10283c749921bdfa8910e53a912c98d4389021"
 }`
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(samplePayload)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+export const SecurityVaultProof: React.FC = () => {
+  const [verifying, setVerifying] = useState(false)
+  const [verified, setVerified] = useState(true)
 
   const handleVerify = () => {
     setVerifying(true)
+    setVerified(false)
     setTimeout(() => {
       setVerifying(false)
       setVerified(true)
-    }, 600)
+    }, 900)
   }
 
   return (
-    <div className="w-full py-12">
-      <div className="rounded-3xl bg-[#0C0C10] border border-white/[0.08] p-6 sm:p-8 lg:p-10 backdrop-blur-2xl relative overflow-hidden">
-        {/* Subtle top light */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none" />
+    <div className="grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+      {/* Left — editorial explanation */}
+      <Reveal className="lg:col-span-5">
+        <Eyebrow>Bóveda criptográfica inmutable</Eyebrow>
+        <h2 className="mt-4 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
+          Aislamiento zero-import y <em className="italic text-[#6E6E73]">verificación por lote.</em>
+        </h2>
+        <p className="editorial-subhead mt-5 max-w-md text-sm leading-relaxed text-[#86868B]">
+          Para garantizar que el agente de ejecución jamás contamine el pipeline cuantitativo ni
+          genere órdenes con alpha degradado, QuantVibe implementa un{' '}
+          <strong className="font-medium text-white">puente de datos sellado</strong>.
+        </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Left: Architectural explanation (5 cols) */}
-          <div className="lg:col-span-5 space-y-5">
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-white/[0.05] border border-white/[0.12] text-[#A1A1A6] text-xs font-mono">
-              <ShieldCheck className="w-3.5 h-3.5 text-white" />
-              <span>BÓVEDA CRIPTOGRÁFICA INMUTABLE</span>
-            </div>
-
-            <h3 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-[-0.035em] leading-[1.1]">
-              Aislamiento Zero-Import y Verificación Criptográfica
-            </h3>
-
-            <p className="text-sm text-[#86868B] leading-relaxed">
-              Para garantizar que el agente de ejecución jamás contamine el pipeline cuantitativo ni genere
-              órdenes con alpha degradado, QuantVibe implementa un <strong className="text-white">puente de datos sellado</strong>.
-            </p>
-
-            <div className="space-y-3 pt-2 text-xs">
-              <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08] flex items-start space-x-3">
-                <Lock className="w-4 h-4 text-white shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-white block font-sans">Frontera de Código Estricta</strong>
-                  <span className="text-[#86868B] text-[11px]">
-                    <code>qlib_side</code> y <code>vibe_side</code> no comparten un solo import en memoria.
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-[#121216] border border-white/[0.08] flex items-start space-x-3">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <div>
-                  <strong className="text-white block font-sans">Auditoría Criptográfica por Lote</strong>
-                  <span className="text-[#86868B] text-[11px]">
-                    Cada lote de señales se firma con digest SHA-256 inmutable registrado en SQLite.
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.96 }}
-                onClick={handleVerify}
-                disabled={verifying}
-                className="px-5 py-2.5 rounded-full bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.14] text-white text-xs font-mono font-medium flex items-center space-x-2 transition-colors apple-press"
-              >
-                <ShieldCheck className={`w-4 h-4 ${verifying ? 'animate-spin' : ''}`} />
-                <span>{verifying ? 'Calculando Digest...' : 'Comprobar Integridad Hash en Vivo'}</span>
-              </motion.button>
+        <div className="mt-8 border-t border-white/[0.07]">
+          <div className="flex items-start gap-4 border-b border-white/[0.07] py-5">
+            <Lock className="mt-0.5 h-4 w-4 shrink-0 text-white" />
+            <div>
+              <strong className="block text-sm font-semibold tracking-tight text-white">
+                Frontera de código estricta
+              </strong>
+              <span className="mt-0.5 block text-xs leading-relaxed text-[#86868B]">
+                <code className="font-mono text-[#D2D2D7]">qlib_side</code> y{' '}
+                <code className="font-mono text-[#D2D2D7]">vibe_side</code> no comparten un solo
+                import en memoria.
+              </span>
             </div>
           </div>
-
-          {/* Right: Code contract preview (7 cols) */}
-          <div className="lg:col-span-7">
-            <div className="rounded-2xl bg-[#050507] border border-white/[0.1] shadow-2xl overflow-hidden font-mono text-xs">
-              {/* Terminal header */}
-              <div className="flex items-center justify-between px-4 py-3 bg-[#0E0E12] border-b border-white/[0.08]">
-                <div className="flex items-center space-x-2">
-                  <div className="flex space-x-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
-                    <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
-                  </div>
-                  <span className="text-[#86868B] text-[11px] ml-2 flex items-center space-x-1">
-                    <FileCode2 className="w-3.5 h-3.5 text-white" />
-                    <span>data/signals_envelope.json</span>
-                  </span>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  {verified && (
-                    <span className="text-[10px] text-white bg-white/[0.08] px-2.5 py-0.5 rounded-full border border-white/[0.15] flex items-center space-x-1">
-                      <Check className="w-3 h-3 text-emerald-400" />
-                      <span>SHA-256 Válido</span>
-                    </span>
-                  )}
-                  <button
-                    onClick={handleCopy}
-                    className="p-1 rounded-lg hover:bg-white/[0.08] text-[#86868B] hover:text-white transition-colors"
-                    title="Copiar Payload"
-                  >
-                    {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Code content */}
-              <div className="p-4 text-[#D2D2D7] overflow-x-auto leading-relaxed max-h-72">
-                <pre>
-                  <code>{samplePayload}</code>
-                </pre>
-              </div>
-
-              {/* Live Hash Status Bar */}
-              <div className="px-4 py-2.5 bg-[#0E0E12] border-t border-white/[0.08] flex items-center justify-between text-[11px] text-[#86868B]">
-                <span className="flex items-center space-x-1.5 text-white">
-                  <Terminal className="w-3.5 h-3.5 text-[#A1A1A6]" />
-                  <span>Digest Verification Engine</span>
-                </span>
-                <span className="text-emerald-400 font-medium">100% Inmutable</span>
-              </div>
+          <div className="flex items-start gap-4 border-b border-white/[0.07] py-5">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#30D158]" />
+            <div>
+              <strong className="block text-sm font-semibold tracking-tight text-white">
+                Auditoría criptográfica por lote
+              </strong>
+              <span className="mt-0.5 block text-xs leading-relaxed text-[#86868B]">
+                Cada lote de señales se firma con digest SHA-256 inmutable registrado en SQLite.
+              </span>
             </div>
           </div>
         </div>
-      </div>
+
+        <div className="mt-8">
+          <Btn variant="secondary" loading={verifying} onClick={handleVerify}>
+            {!verifying && <ShieldCheck className="h-4 w-4" />}
+            <span>{verifying ? 'Calculando digest…' : 'Comprobar integridad del hash'}</span>
+          </Btn>
+        </div>
+      </Reveal>
+
+      {/* Right — signed contract terminal */}
+      <Reveal delay={0.12} className="lg:col-span-7">
+        <div className="glass-panel specular-hairline overflow-hidden rounded-2xl font-mono text-xs">
+          <div className="flex items-center justify-between border-b border-white/[0.07] bg-[#0A0A0D]/80 px-4 py-3">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <FileCode2 className="h-3.5 w-3.5 shrink-0 text-white" />
+              <span className="truncate text-[11px] text-[#86868B]">
+                artifacts/signals.json · envelope firmado
+              </span>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <span
+                className={`flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest transition-colors ${
+                  verified
+                    ? 'border-[#30D158]/25 bg-[#30D158]/10 text-[#30D158]'
+                    : 'border-white/[0.1] bg-white/[0.04] text-[#636366]'
+                }`}
+              >
+                <StatusDot tone={verified ? 'pos' : 'muted'} ping={verified} />
+                {verifying ? 'Verificando' : verified ? 'SHA-256 válido' : 'En cola'}
+              </span>
+              <CopyChip text={SAMPLE_PAYLOAD} label="Payload" />
+            </div>
+          </div>
+
+          <div className="max-h-80 overflow-x-auto bg-[#030304] p-5 leading-relaxed text-[#D2D2D7]">
+            <pre>
+              <code>{SAMPLE_PAYLOAD}</code>
+            </pre>
+          </div>
+
+          <div className="flex items-center justify-between border-t border-white/[0.07] bg-[#0A0A0D]/80 px-4 py-2.5 text-[10px] text-[#636366]">
+            <span className="flex items-center gap-1.5 text-[#A1A1A6]">
+              <Terminal className="h-3.5 w-3.5" />
+              Digest verification engine
+            </span>
+            <span className="flex items-center gap-1.5">
+              {verified && <Check className="h-3 w-3 text-[#30D158]" />}
+              <span className={verified ? 'font-medium text-[#30D158]' : ''}>
+                {verified ? '100% inmutable' : '—'}
+              </span>
+            </span>
+          </div>
+        </div>
+      </Reveal>
     </div>
   )
 }

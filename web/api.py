@@ -24,7 +24,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from bridge.signal_store import checksum_of, load_signals, validate_payload
+from bridge.signal_store import checksum_of, load_signals
 
 app = FastAPI(
     title="QuantVibe Terminal API",
@@ -141,7 +141,7 @@ def get_signals() -> Dict[str, Any]:
     signals_path = ARTIFACTS_DIR / "signals.json"
     if not signals_path.is_file():
         ensure_artifacts()
-    
+
     if not signals_path.is_file():
         # Fallback structured response if disk write failed
         fallback_data = {
@@ -480,7 +480,7 @@ def execute_orders(req: OrderSubmitRequest) -> Dict[str, Any]:
             raise HTTPException(status_code=400, detail="El envío real exige order_cmd_template.")
         env["VIBE_ALLOW_ORDERS"] = "1"
         cmd.extend(["--submit", "--order-cmd-template", req.order_cmd_template])
-    
+
     result = subprocess.run(cmd, cwd=str(PROJECT_ROOT), env=env, capture_output=True, text=True)
     return {
         "return_code": result.returncode,
@@ -609,8 +609,20 @@ def get_bloomberg_live_broadcast() -> Dict[str, Any]:
 
 # Static Frontend mount (Vite build output in web/static)
 STATIC_DIR = PROJECT_ROOT / "web" / "static"
+
+
+class HashedAssetFiles(StaticFiles):
+    """Serves content-hashed build assets, which are safe to cache forever."""
+
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        if response.status_code == 200:
+            response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
+        return response
+
+
 if STATIC_DIR.is_dir():
-    app.mount("/assets", StaticFiles(directory=str(STATIC_DIR / "assets")), name="assets")
+    app.mount("/assets", HashedAssetFiles(directory=str(STATIC_DIR / "assets")), name="assets")
 
     @app.get("/{full_path:path}")
     async def serve_spa(full_path: str):
@@ -619,7 +631,8 @@ if STATIC_DIR.is_dir():
             raise HTTPException(status_code=404, detail="Endpoint no encontrado")
         target_file = STATIC_DIR / full_path
         if target_file.is_file() and full_path != "index.html" and not full_path.endswith(".html"):
-            return FileResponse(str(target_file))
+            # Unhashed files (favicon, icons): force revalidation so edits propagate
+            return FileResponse(str(target_file), headers={"Cache-Control": "no-cache"})
 
         # Always serve index.html with no-cache headers to prevent browser stale cache
         headers = {
