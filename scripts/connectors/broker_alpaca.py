@@ -18,19 +18,20 @@ import uuid
 def parse_args():
     parser = argparse.ArgumentParser(description="Alpaca Markets Order Dispatcher for QuantVibe")
     parser.add_argument("--action", default="BUY", choices=["BUY", "SELL"], help="Order action side")
-    parser.add_argument("--symbol", required=True, help="Stock ticker symbol (e.g. AAPL, TSLA)")
-    parser.add_argument("--qty", required=True, type=int, help="Number of shares")
+    parser.add_argument("--symbol", "--ticker", dest="symbol", required=True, help="Stock ticker symbol (e.g. AAPL, TSLA)")
+    parser.add_argument("--qty", "--volume", dest="qty", required=True, type=float, help="Number of shares")
     parser.add_argument("--price", type=float, default=None, help="Estimated reference price")
     parser.add_argument("--type", default="market", choices=["market", "limit"], help="Order type")
     parser.add_argument("--time-in-force", default="day", choices=["day", "gtc", "ioc"], help="Time in force")
-    parser.add_argument("--paper", action="store_true", default=True, help="Use Paper Trading environment")
+    parser.add_argument("--paper", action="store_true", default=False, help="Use Paper Trading environment")
     parser.add_argument("--live", action="store_true", help="Target Live Account (real capital)")
+    parser.add_argument("--env", default="paper", choices=["paper", "live"], help="Environment (paper or live)")
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
-    is_live = args.live and not args.paper
+    is_live = args.live or args.env == "live"
 
     api_key = os.environ.get("APCA_API_KEY_ID")
     secret_key = os.environ.get("APCA_API_SECRET_KEY")

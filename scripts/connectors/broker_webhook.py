@@ -17,8 +17,8 @@ from datetime import datetime, timezone
 def parse_args():
     parser = argparse.ArgumentParser(description="Universal Webhook / cTrader Dispatcher for QuantVibe")
     parser.add_argument("--action", default="BUY", choices=["BUY", "SELL"], help="Order side")
-    parser.add_argument("--symbol", required=True, help="Asset ticker (e.g. AAPL, EURUSD)")
-    parser.add_argument("--qty", required=True, type=float, help="Volume / Units")
+    parser.add_argument("--symbol", "--ticker", dest="symbol", required=True, help="Asset ticker (e.g. AAPL, EURUSD)")
+    parser.add_argument("--qty", "--volume", dest="qty", required=True, type=float, help="Volume / Units")
     parser.add_argument("--price", type=float, default=None, help="Estimated price")
     parser.add_argument("--url", default=None, help="Target webhook URL")
     parser.add_argument("--secret", default=None, help="Shared HMAC secret for signature")

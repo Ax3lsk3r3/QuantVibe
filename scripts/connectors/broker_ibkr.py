@@ -14,9 +14,10 @@ from datetime import datetime, timezone
 def parse_args():
     parser = argparse.ArgumentParser(description="Interactive Brokers Order Dispatcher for QuantVibe")
     parser.add_argument("--action", default="BUY", choices=["BUY", "SELL"], help="Order action side")
-    parser.add_argument("--symbol", required=True, help="Stock ticker symbol (e.g. AAPL, TSLA)")
-    parser.add_argument("--qty", required=True, type=int, help="Quantity of shares")
+    parser.add_argument("--symbol", "--ticker", "--conid", dest="symbol", required=True, help="Stock ticker symbol or ConID")
+    parser.add_argument("--qty", "--volume", dest="qty", required=True, type=float, help="Quantity of shares")
     parser.add_argument("--price", type=float, default=None, help="Reference price")
+    parser.add_argument("--order-type", "--type", dest="order_type", default="MKT", help="Order type")
     parser.add_argument("--account", default=None, help="IBKR Account ID (e.g. U1234567)")
     parser.add_argument("--exchange", default="SMART", help="Exchange routing (SMART, NASDAQ, NYSE)")
     return parser.parse_args()

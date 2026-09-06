@@ -32,7 +32,7 @@ def _price_at(raw_dir: Path, instrument: str, as_of: str) -> float | None:
     return price
 
 
-def build_plan(cfg_path: str, signals_path: Path) -> dict:
+def build_plan(cfg_path: str | None, signals_path: Path, is_live: bool = False) -> dict:
     from qlib_side.common import load_config
 
     cfg = load_config(cfg_path)
@@ -79,7 +79,7 @@ def build_plan(cfg_path: str, signals_path: Path) -> dict:
     plan = {
         "schema_version": 1,
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "dry_run": True,
+        "dry_run": not is_live,
         "currency": cfg["execution"].get("currency", "USD"),
         "total_notional_target": notional,
         "source_model": payload["source_model"],
@@ -103,24 +103,37 @@ def submit(plan_path: Path, order_cmd_template: str) -> int:
             "         Recomendado: mantén paper trading (cuenta sombra) hasta revisar el plan\n"
             "         a lo largo de varias sesiones.",
             file=sys.stderr,
+            flush=True,
         )
         return 2
     with open(plan_path, "r", encoding="utf-8") as fh:
         plan = json.load(fh)
     rc = 0
-    for order in plan["orders"]:
-        if order["status"] != "PLANNED":
-            continue
+    planned_orders = [o for o in plan.get("orders", []) if o.get("status") == "PLANNED"]
+    total = len(planned_orders)
+    print(f"\n[EXEC] Despachando {total} órdenes al conector de ejecución...", flush=True)
+
+    for idx, order in enumerate(planned_orders, start=1):
         argv = [
             tok.format(
                 symbol=order["instrument"], qty=order["qty"], est_price=order["est_price"]
             )
             for tok in shlex.split(order_cmd_template, posix=False)
         ]
-        print(f"[ORDEN] {' '.join(argv)}")
-        result = subprocess.run(argv)
+        cmd_str = " ".join(argv)
+        print(f"[ORDEN {idx}/{total}] {cmd_str}", flush=True)
+        result = subprocess.run(argv, capture_output=True, text=True)
+        if result.stdout.strip():
+            print(f"  -> {result.stdout.strip()}", flush=True)
+        if result.stderr.strip():
+            print(f"  -> [ERROR] {result.stderr.strip()}", file=sys.stderr, flush=True)
         if result.returncode != 0:
             rc = result.returncode
+
+    if rc == 0:
+        print(f"\n[OK] {total}/{total} ordenes transmitidas con exito al broker.", flush=True)
+    else:
+        print(f"\n[AVISO] Una o mas ordenes retornaron codigo distinto de cero (rc={rc}).", file=sys.stderr, flush=True)
     return rc
 
 
@@ -147,13 +160,15 @@ def main() -> None:
     if not signals_path.is_absolute():
         signals_path = PROJECT_ROOT / signals_path
 
+    is_live = args.submit and os.environ.get("VIBE_ALLOW_ORDERS", "").strip() == "1"
+
     try:
-        plan = build_plan(args.config, signals_path)
+        plan = build_plan(args.config, signals_path, is_live=is_live)
     except FileNotFoundError as exc:
-        print(f"[ERROR] {exc}\nEjecuta scripts/run_pipeline.py primero.", file=sys.stderr)
+        print(f"[ERROR] {exc}\nEjecuta scripts/run_pipeline.py primero.", file=sys.stderr, flush=True)
         raise SystemExit(1)
     except Exception as exc:
-        print(f"[ERROR] no se pudo construir el plan: {exc}", file=sys.stderr)
+        print(f"[ERROR] no se pudo construir el plan: {exc}", file=sys.stderr, flush=True)
         raise SystemExit(1)
 
     out_path = Path(args.out)
@@ -164,18 +179,20 @@ def main() -> None:
         json.dump(plan, fh, indent=2)
 
     print(f"Plan de órdenes ({plan['totals']['planned_orders']} planeadas / "
-          f"{plan['totals']['skipped_orders']} omitidas):")
+          f"{plan['totals']['skipped_orders']} omitidas):", flush=True)
     for o in plan["orders"]:
         if o["status"] == "PLANNED":
             print(f"  {o['action']:<4} {o['instrument']:<6} qty={o['qty']:>4} "
-                  f"@ ~{o['est_price']:.2f} (rank #{o['rank']})")
+                  f"@ ~{o['est_price']:.2f} (rank #{o['rank']})", flush=True)
         else:
-            print(f"  SKIP  {o['instrument']:<6} {o['reason']}")
-    print(f"\nPlan escrito: {out_path} (dry_run={plan['dry_run']})")
+            print(f"  SKIP  {o['instrument']:<6} {o['reason']}", flush=True)
+
+    mode_label = "LIVE EXECUTION (dry_run=False)" if is_live else "PAPER SIMULATION (dry_run=True)"
+    print(f"\nPlan escrito: {out_path} [{mode_label}]", flush=True)
 
     if args.submit:
         if not args.order_cmd_template:
-            print("[ERROR] --submit requiere --order-cmd-template", file=sys.stderr)
+            print("[ERROR] --submit requiere --order-cmd-template", file=sys.stderr, flush=True)
             raise SystemExit(2)
         raise SystemExit(submit(out_path, args.order_cmd_template))
 

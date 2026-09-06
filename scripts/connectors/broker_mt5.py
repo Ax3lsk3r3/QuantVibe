@@ -14,8 +14,8 @@ from datetime import datetime, timezone
 def parse_args():
     parser = argparse.ArgumentParser(description="MetaTrader 5 Order Dispatcher for QuantVibe")
     parser.add_argument("--action", default="BUY", choices=["BUY", "SELL"], help="Order action")
-    parser.add_argument("--symbol", required=True, help="Asset ticker symbol (e.g. AAPL, EURUSD)")
-    parser.add_argument("--qty", required=True, type=int, help="Volume / Shares / Lots")
+    parser.add_argument("--symbol", "--ticker", dest="symbol", required=True, help="Asset ticker symbol (e.g. AAPL, EURUSD)")
+    parser.add_argument("--qty", "--volume", dest="qty", required=True, type=float, help="Volume / Shares / Lots")
     parser.add_argument("--price", type=float, default=None, help="Reference price")
     parser.add_argument("--magic", type=int, default=202609, help="QuantVibe Magic Number for tracking")
     parser.add_argument("--slippage", type=int, default=10, help="Maximum allowed slippage in points")

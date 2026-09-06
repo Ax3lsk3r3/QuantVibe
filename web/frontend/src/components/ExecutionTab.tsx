@@ -383,12 +383,13 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
     try {
       const res = await executeOrders(allowLive, orderCmdTemplate)
       const ok = res.return_code === 0
+      const combinedOutput = [res.stdout, res.stderr].filter(Boolean).join('\n')
       setSubmitOutput({
         text:
-          res.stdout ||
+          combinedOutput ||
           (ok
             ? `Ejecución del plan completada con éxito en ${selectedBroker.name}.`
-            : res.stderr || 'Proceso finalizado con código distinto de cero.'),
+            : 'Proceso finalizado con código distinto de cero.'),
         ok,
       })
       if (ok) {
@@ -1125,7 +1126,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
               </div>
               <span className="text-[#86868B]">RetCode: {submitOutput.ok ? 0 : 1}</span>
             </div>
-            <pre className="max-h-64 overflow-y-auto px-6 py-5 font-mono text-xs leading-relaxed whitespace-pre-wrap text-[#A1A1A6]">
+            <pre className="max-h-[32rem] overflow-y-auto px-6 py-5 font-mono text-xs leading-relaxed whitespace-pre-wrap text-[#A1A1A6] selection:bg-[#30D158]/30">
               {submitOutput.text}
             </pre>
           </motion.div>

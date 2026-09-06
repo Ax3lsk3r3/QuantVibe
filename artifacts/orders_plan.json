@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-06T00:30:41+00:00",
-  "dry_run": true,
+  "generated_at": "2026-09-06T18:23:45+00:00",
+  "dry_run": false,
   "currency": "USD",
   "total_notional_target": 10000.0,
   "source_model": "DemoMomentum",

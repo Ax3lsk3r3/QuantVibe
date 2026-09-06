@@ -20,8 +20,8 @@ from datetime import datetime, timezone
 def parse_args():
     parser = argparse.ArgumentParser(description="Crypto 24/7 Order Dispatcher for QuantVibe")
     parser.add_argument("--action", default="BUY", choices=["BUY", "SELL"], help="Order side")
-    parser.add_argument("--symbol", required=True, help="Pair ticker (e.g. BTC-USD, BTCUSDT)")
-    parser.add_argument("--qty", required=True, type=float, help="Order quantity / contracts")
+    parser.add_argument("--symbol", "--ticker", "--pair", dest="symbol", required=True, help="Pair ticker (e.g. BTC-USD, BTCUSDT)")
+    parser.add_argument("--qty", "--volume", "--amount", dest="qty", required=True, type=float, help="Order quantity / contracts")
     parser.add_argument("--price", type=float, default=None, help="Reference price")
     parser.add_argument("--exchange", default="binance", choices=["binance", "bybit", "coinbase"], help="Target exchange")
     return parser.parse_args()
