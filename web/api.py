@@ -356,6 +356,7 @@ def _run_pipeline_worker(mode: str, steps: Optional[List[str]], config_path: Opt
     env["PYTHONPATH"] = str(PROJECT_ROOT)
     if mode == "demo":
         env["QVB_FORCE_DEMO"] = "1"
+        env["QVB_FORCE"] = "1"
 
     proc = subprocess.Popen(
         cmd,

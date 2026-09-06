@@ -49,7 +49,7 @@ export const ComparisonMatrix: React.FC = () => {
           <span>PARADIGMA COMPARATIVO INSTITUCIONAL</span>
         </div>
         <h2 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-[-0.035em] leading-[1.05]">
-          Por qué los Modelos Tradicionales se Quedan Atrás y la IA Sin Rigor <span className="text-[#86868B]">Fracasa</span>
+          Por qué los Modelos Tradicionales se Quedan Atrás y la IA Sin Rigor Colapsa
         </h2>
         <p className="text-[#86868B] text-sm sm:text-base mt-4 leading-relaxed font-sans">
           Los fondos cuantitativos tradicionales sufren de modelos rígidos e incapaces de razonar.

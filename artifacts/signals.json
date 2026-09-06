@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-05T03:38:49+00:00",
+  "generated_at": "2026-09-06T00:30:41+00:00",
   "source_model": "DemoMomentum",
   "universe": [
     "AAPL",
@@ -53,5 +53,5 @@
       "2026-08-21"
     ]
   },
-  "checksum": "b5dfe3969aca6a7cbe3afdb247ab6e74ef9378a34c9308f6e06100357fcc75cc"
+  "checksum": "5e68be9df4cd21d433de5e5e037904502803192017d0992863341172462a283b"
 }

@@ -12,8 +12,16 @@ from concurrent.futures import ThreadPoolExecutor, as_completed, ProcessPoolExec
 import fire
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
-from loguru import logger
+try:
+    from tqdm import tqdm
+except ImportError:
+    def tqdm(iterable=None, *args, **kwargs):
+        return iterable if iterable is not None else []
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger("dump_bin")
 from qlib.utils import fname_to_code, code_to_fname
 
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -16,6 +17,8 @@ SIGNALS_OUT = ARTIFACTS / "signals.json"
 
 
 def export(config_path: str | None = None, as_of: str | None = None, force: bool = False) -> int:
+    if os.environ.get("QVB_FORCE_DEMO") == "1" or os.environ.get("QVB_FORCE") == "1":
+        force = True
     cfg = load_config(config_path)
     pred_csv = ARTIFACTS / "predictions.csv"
     meta_json = ARTIFACTS / "predictions.meta.json"

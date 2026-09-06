@@ -51,7 +51,7 @@ export const SecurityVaultProof: React.FC = () => {
             </div>
 
             <h3 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-[-0.035em] leading-[1.1]">
-              Aislamiento Zero-Import y <span className="text-[#86868B]">Firma SHA-256</span>
+              Aislamiento Zero-Import y Verificación Criptográfica
             </h3>
 
             <p className="text-sm text-[#86868B] leading-relaxed">
