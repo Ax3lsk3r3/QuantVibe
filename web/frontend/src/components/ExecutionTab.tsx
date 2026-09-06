@@ -193,6 +193,127 @@ const FALLBACK_BROKERS: BrokerInfo[] = [
   },
 ]
 
+const BROKER_GUIDES: Record<
+  string,
+  {
+    title: string
+    badge: string
+    badgeColor: string
+    steps: Array<{ n: string; title: string; desc: string }>
+  }
+> = {
+  mt5: {
+    title: 'Conexión MetaTrader 5 (MT5) sin API Keys',
+    badge: 'Nativo IPC / MQL5 Bridge',
+    badgeColor: 'text-blue-300 border-blue-500/30 bg-blue-500/10',
+    steps: [
+      {
+        n: '01',
+        title: 'En MT5 no existen API Keys',
+        desc: 'Los brokers (IC Markets, FTMO, Darwinex, Exness) solo entregan tu Número de Cuenta (Login ID), Contraseña de Trading y Servidor comercial.',
+      },
+      {
+        n: '02',
+        title: '¿Dónde ver tus datos en MT5?',
+        desc: 'En tu terminal MT5 ve al menú superior: Archivo → Conectarse a la cuenta comercial. Allí verás tu Login y Servidor exactos (o en el email de tu broker).',
+      },
+      {
+        n: '03',
+        title: 'Detección Automática 1-Clic',
+        desc: 'Si tienes MT5 abierto en este PC con Windows, el conector se enlaza directamente a terminal64.exe sin pedir contraseñas. Verifica que "Algo Trading" esté verde.',
+      },
+    ],
+  },
+  alpaca: {
+    title: 'Cómo obtener tus API Keys en Alpaca Markets',
+    badge: 'REST API v2 · FINRA / SIPC',
+    badgeColor: 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10',
+    steps: [
+      {
+        n: '01',
+        title: 'Inicia sesión en Alpaca',
+        desc: 'Entra a alpaca.markets. Puedes usar tu cuenta Paper gratuita (simulación) o tu cuenta individual con fondos reales.',
+      },
+      {
+        n: '02',
+        title: 'Genera tus claves de API',
+        desc: 'En el panel principal a la derecha, busca la sección "Your API Keys" y haz clic en "Generate API Key" o "View Keys".',
+      },
+      {
+        n: '03',
+        title: 'Pega tu API Key ID y Secret Key',
+        desc: 'Copia el API Key ID (empieza con PK...) y tu Secret Key. En modo simulación usa el endpoint paper; en real usa api.alpaca.markets.',
+      },
+    ],
+  },
+  ibkr: {
+    title: 'Cómo conectar Interactive Brokers (IBKR)',
+    badge: 'Institutional Gateway · TWS API',
+    badgeColor: 'text-amber-300 border-amber-500/30 bg-amber-500/10',
+    steps: [
+      {
+        n: '01',
+        title: 'Descarga TWS o IB Gateway',
+        desc: 'Instala Trader Workstation (TWS) o IB Gateway desde interactivebrokers.com en tu equipo para habilitar el socket local.',
+      },
+      {
+        n: '02',
+        title: 'Habilita la API de Socket',
+        desc: 'En TWS ve a Configuración Global → API → Settings. Marca "Enable ActiveX and Socket Clients". Puerto: 7497 (Paper) o 7496 (Live).',
+      },
+      {
+        n: '03',
+        title: 'Coloca tu Account ID',
+        desc: 'Ingresa tu identificador de cuenta (ej: U12345678). QuantVibe ejecuta órdenes directas con el algoritmo SmartRouting de IBKR.',
+      },
+    ],
+  },
+  crypto: {
+    title: 'Cómo generar tu API Key en Binance, Bybit o Coinbase',
+    badge: 'HMAC-SHA256 · Non-Custodial',
+    badgeColor: 'text-yellow-300 border-yellow-500/30 bg-yellow-500/10',
+    steps: [
+      {
+        n: '01',
+        title: 'Ve a Gestión de API (API Management)',
+        desc: 'Inicia sesión en tu exchange (Binance, Bybit o Coinbase), abre tu menú de perfil y haz clic en "API Management".',
+      },
+      {
+        n: '02',
+        title: 'Crea una nueva API Key',
+        desc: 'Selecciona "Create API" (generada por el sistema) y aprueba la autenticación de dos factores (2FA / Google Authenticator).',
+      },
+      {
+        n: '03',
+        title: 'SEGURIDAD CRÍTICA: Desactiva Retiros',
+        desc: 'Marca SOLO el permiso "Enable Spot & Margin Trading" y ASEGÚRATE de dejar DESMARCADO "Enable Withdrawals". Nadie podrá extraer tus fondos.',
+      },
+    ],
+  },
+  webhook: {
+    title: 'Cómo conectar cTrader, TradingView o Webhooks',
+    badge: 'Open Protocol · HMAC Signature',
+    badgeColor: 'text-purple-300 border-purple-500/30 bg-purple-500/10',
+    steps: [
+      {
+        n: '01',
+        title: 'Alertas de TradingView',
+        desc: 'En cualquier gráfico de TradingView, crea una Alerta. En la pestaña "Notificaciones", marca "URL de Webhook" y pega el endpoint de QuantVibe.',
+      },
+      {
+        n: '02',
+        title: 'cTrader Open API',
+        desc: 'En spotware.com accede a tu portal de desarrollador Open API, crea una aplicación de trading y copia tu Client ID y Access Token.',
+      },
+      {
+        n: '03',
+        title: 'Firma y Token de Autorización',
+        desc: 'Pega tu Token Bearer secreto. Cada orden se despacha con firma criptográfica HMAC-SHA256 para validación instantánea en destino.',
+      },
+    ],
+  },
+}
+
 export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh }) => {
   const [allowLive, setAllowLive] = useState(false)
   const [brokers, setBrokers] = useState<BrokerInfo[]>(FALLBACK_BROKERS)
@@ -207,7 +328,7 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitOutput, setSubmitOutput] = useState<{ text: string; ok: boolean } | null>(null)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-  const [showMt5Guide, setShowMt5Guide] = useState(false)
+  const [showGuide, setShowGuide] = useState(false)
 
   // Intelligence drawer: Qlib Factor Attribution vs Vibe-Trading Reasoning
   const [activeIntelTab, setActiveIntelTab] = useState<'qlib' | 'vibe'>('qlib')
@@ -448,47 +569,63 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
                 </div>
               </div>
 
-              {selectedBroker.id === 'mt5' && (
-                <button
-                  type="button"
-                  onClick={() => setShowMt5Guide(!showMt5Guide)}
-                  className="flex items-center gap-1.5 text-xs text-[#A1A1A6] hover:text-white font-mono uppercase tracking-wider transition-colors"
-                >
-                  <HelpCircle className="h-3.5 w-3.5" />
-                  <span>{showMt5Guide ? 'Ocultar guía' : '¿De dónde saco mis datos?'}</span>
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => setShowGuide(!showGuide)}
+                className="flex items-center gap-1.5 text-xs text-[#A1A1A6] hover:text-white font-mono uppercase tracking-wider transition-colors"
+              >
+                <HelpCircle className="h-3.5 w-3.5" />
+                <span>
+                  {showGuide
+                    ? 'Ocultar guía'
+                    : `¿Cómo conectar ${selectedBroker.name.split(' ')[0]}?`}
+                </span>
+              </button>
             </div>
 
             <p className="text-xs text-[#86868B] leading-relaxed">
               {selectedBroker.description}
             </p>
 
-            {/* Special MT5 Guide (collapsible) */}
+            {/* Universal Broker Connection Guide (collapsible for all 5 platforms) */}
             <AnimatePresence>
-              {selectedBroker.id === 'mt5' && showMt5Guide && (
+              {showGuide && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="rounded-2xl border border-blue-500/20 bg-blue-500/[0.05] p-5 space-y-3 text-xs">
-                    <div className="font-mono text-[10px] uppercase tracking-widest text-blue-300 font-bold flex items-center gap-1.5">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      <span>Cómo conectar MetaTrader 5 sin complicaciones de API Keys</span>
+                  <div className="rounded-2xl border border-white/[0.1] bg-white/[0.03] p-5 space-y-3.5 text-xs">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.07] pb-3">
+                      <div className="font-mono text-[10px] uppercase tracking-widest text-white font-bold flex items-center gap-1.5">
+                        <Sparkles className="h-3.5 w-3.5 text-[#30D158]" />
+                        <span>
+                          {(BROKER_GUIDES[selectedBroker.id] || BROKER_GUIDES.mt5).title}
+                        </span>
+                      </div>
+                      <span
+                        className={cn(
+                          'px-2.5 py-0.5 rounded-full font-mono text-[9px] font-bold uppercase border self-start sm:self-auto',
+                          (BROKER_GUIDES[selectedBroker.id] || BROKER_GUIDES.mt5).badgeColor
+                        )}
+                      >
+                        {(BROKER_GUIDES[selectedBroker.id] || BROKER_GUIDES.mt5).badge}
+                      </span>
                     </div>
-                    <ul className="space-y-2 text-[#D1D1D6] leading-relaxed">
-                      <li>
-                        <strong className="text-white">1. En MT5 no existen API Keys:</strong> Los brokers (IC Markets, FTMO, Darwinex) te entregan únicamente tu <span className="text-white font-mono">Número de Cuenta (Login ID)</span>, <span className="text-white font-mono">Contraseña</span> y <span className="text-white font-mono">Servidor</span>.
-                      </li>
-                      <li>
-                        <strong className="text-white">2. ¿Dónde los encuentras?</strong> En tu MT5 de escritorio, ve al menú superior: <span className="text-white font-mono">Archivo → Conectarse a la cuenta comercial</span>. Allí aparecen exactamente estos 3 campos.
-                      </li>
-                      <li>
-                        <strong className="text-white">3. Detección Automática 1-Clic:</strong> Si ya tienes tu MT5 abierto en este equipo Windows, el conector nativo en Python se engancha directamente al proceso <span className="text-white font-mono">terminal64.exe</span> sin pedir contraseñas.
-                      </li>
-                    </ul>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                      {(BROKER_GUIDES[selectedBroker.id] || BROKER_GUIDES.mt5).steps.map((st) => (
+                        <div
+                          key={st.n}
+                          className="p-3.5 rounded-xl border border-white/[0.06] bg-black/40 space-y-1.5"
+                        >
+                          <div className="font-mono text-[10px] text-[#86868B] font-bold">{st.n}</div>
+                          <div className="font-bold text-white text-[11px]">{st.title}</div>
+                          <p className="text-[11px] text-[#A1A1A6] leading-relaxed">{st.desc}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </motion.div>
               )}
