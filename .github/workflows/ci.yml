@@ -32,7 +32,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Instalar dependencias mínimas
-        run: pip install pandas numpy coverage
+        run: pip install pandas numpy coverage fastapi httpx
       - name: Compilar todos los módulos (chequeo de sintaxis)
         run: python -m compileall -q bridge qlib_side vibe_side scripts tests
       - name: Tests unitarios con cobertura
