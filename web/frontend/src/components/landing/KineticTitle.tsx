@@ -5,7 +5,6 @@ interface KineticTitleProps {
   text: string
   highlightWord?: string
   italicWord?: string
-  serif?: boolean
   className?: string
 }
 
@@ -13,7 +12,6 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
   text,
   highlightWord,
   italicWord,
-  serif = false,
   className = '',
 }) => {
   const words = text.split(' ')
@@ -53,11 +51,7 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
       variants={container}
       initial="hidden"
       animate="visible"
-      className={
-        serif
-          ? `font-serif font-normal leading-[1.03] tracking-[-0.015em] text-white ${className}`
-          : `editorial-display font-sans font-extrabold text-white ${className}`
-      }
+      className={`font-sans font-extrabold tracking-[-0.04em] text-white ${className}`}
     >
       {words.map((word, index) => {
         const isHighlight = highlightWord && word.toLowerCase().includes(highlightWord.toLowerCase())

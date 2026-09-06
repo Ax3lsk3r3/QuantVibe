@@ -112,92 +112,106 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
   return (
     <div className="relative w-full">
-      {/* ═══════════════ 1. HERO — Asymmetric editorial + live console (Z-depth) ═══════════════ */}
-      <section className="relative grid grid-cols-1 items-center gap-12 pb-20 pt-10 lg:grid-cols-12 lg:gap-8 lg:pb-28 lg:pt-16">
-        {/* Hero rim light */}
+      {/* ═══════════════ 1. HERO — Flagship Centered Layout ═══════════════ */}
+      <section className="relative flex flex-col items-center text-center pb-20 pt-8 sm:pt-12 lg:pb-28 overflow-hidden">
+        {/* Apple Atmospheric White Rim Halo */}
         <div
-          className="pointer-events-none absolute -top-24 left-1/4 h-[480px] w-[720px] rounded-full bg-white/[0.04] blur-[150px]"
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[950px] h-[550px] bg-gradient-to-b from-white/[0.045] via-white/[0.015] to-transparent blur-[160px] -z-10"
           aria-hidden
         />
 
-        {/* Left — monumental editorial column */}
-        <div className="relative lg:col-span-7 lg:pr-8">
-          <motion.div
-            initial={{ opacity: 0, y: -12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <Eyebrow>Quantitative Brain × Autonomous Hands</Eyebrow>
-          </motion.div>
+        {/* Asymmetric Luxury Pill Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="inline-flex items-center space-x-3 px-4 py-1.5 rounded-full bg-[#0E0E12]/90 border border-white/[0.12] backdrop-blur-2xl shadow-xl mb-6 group hover:border-white/30 transition-colors"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+          </span>
+          <span className="text-[11px] font-mono uppercase tracking-widest text-[#A1A1A6] font-medium">
+            QUANTITATIVE BRAIN × AUTONOMOUS HANDS
+          </span>
+          <span className="h-3 w-[1px] bg-white/[0.15]" />
+          <span className="text-[11px] font-mono text-white/90 font-semibold flex items-center gap-1">
+            <span>PRO</span>
+            <span className="text-[#86868B]">v1.0.1</span>
+          </span>
+        </motion.div>
 
-          <div className="mt-6">
-            <TextSwap phrases={dynamicPhrases} intervalMs={3400} />
-          </div>
-
-          <div className="mt-5">
-            <KineticTitle
-              serif
-              text="El rigor cuantitativo institucional, con manos autónomas"
-              italicWord="autónomas"
-              className="text-[2.6rem] sm:text-6xl lg:text-7xl xl:text-[5.2rem]"
-            />
-          </div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="editorial-subhead mt-7 max-w-xl text-[15px] leading-relaxed text-[#86868B]"
-          >
-            QuantVibe orquesta el pipeline completo de finanzas computacionales: minado de 158
-            factores con <strong className="font-medium text-[#F5F5F7]">Microsoft Qlib</strong>,
-            validación con firewall matemático ineludible y ejecución autónoma mediante agentes LLM
-            protegidos bajo digest criptográfico{' '}
-            <span className="font-mono text-[13px] font-semibold text-white">SHA-256</span>.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.42, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
-          >
-            <Btn size="lg" onClick={() => onNavigateToTab('overview')}>
-              <span>Entrar a Alpha Studio</span>
-              <ArrowRight className="h-4 w-4" />
-            </Btn>
-            <Btn variant="secondary" size="lg" onClick={() => onNavigateToTab('bloomberg')}>
-              <StatusDot tone="neg" ping />
-              <span>Terminal Bloomberg en vivo</span>
-            </Btn>
-          </motion.div>
-
-          {/* Trust rail — hairline matrix, real data */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 0.6 }}
-            className="mt-12 grid max-w-2xl grid-cols-2 border-l border-t border-white/[0.07] sm:grid-cols-4"
-          >
-            {trustRail.map((t) => (
-              <div key={t.label} className="border-b border-r border-white/[0.07] px-4 py-3">
-                <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#636366]">
-                  {t.label}
-                </div>
-                <div className="tnum mt-1 truncate font-mono text-[13px] font-bold text-white">
-                  {t.value}
-                </div>
-              </div>
-            ))}
-          </motion.div>
+        {/* Dynamic Tagline Swap */}
+        <div className="mb-6">
+          <TextSwap phrases={dynamicPhrases} intervalMs={3400} />
         </div>
 
-        {/* Right — floating live console (glass, overlapping depth) */}
+        {/* Monumental Headline Centered */}
+        <div className="max-w-6xl mx-auto px-4">
+          <KineticTitle
+            text="El rigor cuantitativo institucional, con manos autónomas"
+            highlightWord="cuantitativo"
+            italicWord="autónomas"
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-[1.0] tracking-[-0.04em]"
+          />
+        </div>
+
+        {/* Editorial Subtitle Centered */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-3xl mx-auto mt-7 text-base sm:text-lg text-[#86868B] font-sans leading-relaxed px-4 tracking-[-0.015em] font-normal"
+        >
+          QuantVibe orquesta el pipeline completo de finanzas computacionales: minado de 158
+          factores con <strong className="font-medium text-[#F5F5F7]">Microsoft Qlib</strong>,
+          validación con firewall matemático ineludible (<span className="text-white font-mono text-sm font-semibold">IC ≥ 0.00</span>),
+          y ejecución autónoma mediante agentes LLM protegidos bajo digest criptográfico{' '}
+          <span className="font-mono text-sm font-semibold text-white">SHA-256</span>.
+        </motion.p>
+
+        {/* Primary CTA Action System */}
         <motion.div
-          initial={{ opacity: 0, y: 40, scale: 0.97 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-9 px-4 w-full sm:w-auto"
+        >
+          <Btn size="lg" onClick={() => onNavigateToTab('overview')}>
+            <span>Entrar a Alpha Studio</span>
+            <ArrowRight className="h-4 w-4" />
+          </Btn>
+          <Btn variant="secondary" size="lg" onClick={() => onNavigateToTab('bloomberg')}>
+            <StatusDot tone="neg" ping />
+            <span>Terminal Bloomberg en vivo</span>
+          </Btn>
+        </motion.div>
+
+        {/* Trust rail — hairline matrix, real data, centered */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="mt-12 grid w-full max-w-2xl grid-cols-2 border-l border-t border-white/[0.07] sm:grid-cols-4 mx-auto text-left"
+        >
+          {trustRail.map((t) => (
+            <div key={t.label} className="border-b border-r border-white/[0.07] px-4 py-3">
+              <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#636366]">
+                {t.label}
+              </div>
+              <div className="tnum mt-1 truncate font-mono text-[13px] font-bold text-white">
+                {t.value}
+              </div>
+            </div>
+          ))}
+        </motion.div>
+
+        {/* Live console (real telemetry data) — centered */}
+        <motion.div
+          initial={{ opacity: 0, y: 40, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ duration: 1, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="relative lg:col-span-5"
+          transition={{ duration: 1, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full max-w-4xl mt-12 text-left"
         >
           <div className="pointer-events-none absolute -inset-8 rounded-full bg-white/[0.025] blur-[90px]" aria-hidden />
           <Panel
@@ -468,8 +482,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <StatusDot tone="neg" ping /> Bloomberg Pulse · 24/7
               </span>
             </Eyebrow>
-            <h2 className="mt-4 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
-              La pulsación macro global, <em className="italic text-[#6E6E73]">en tu terminal.</em>
+            <h2 className="mt-4 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
+              La pulsación macro global, <span className="text-[#86868B] font-semibold">en tu terminal.</span>
             </h2>
             <p className="editorial-subhead mt-5 max-w-md text-sm leading-relaxed text-[#86868B]">
               Televisión oficial en directo, podcast diario de Bloomberg Línea, wire RSS certificado
@@ -537,8 +551,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <Eyebrow className="justify-center" rule={false}>
               <Lock className="h-3 w-3" /> Soberanía de código · Alibaba ECS + local
             </Eyebrow>
-            <h2 className="font-serif text-4xl leading-[1.05] text-white sm:text-6xl">
-              Despliega tu mesa cuantitativa <em className="italic text-[#6E6E73]">institucional.</em>
+            <h2 className="font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-6xl">
+              Despliega tu mesa cuantitativa <span className="text-[#86868B] font-semibold">institucional.</span>
             </h2>
             <p className="editorial-subhead mx-auto max-w-xl text-sm leading-relaxed text-[#86868B]">
               Sin suscripciones opacas. Servidor FastAPI nativo con trazabilidad total: cada señal,

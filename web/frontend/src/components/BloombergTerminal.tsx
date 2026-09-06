@@ -162,8 +162,8 @@ export const BloombergTerminal: React.FC = () => {
               <StatusDot tone="warn" ping /> Terminal Bloomberg · macro desk en vivo
             </span>
           </Eyebrow>
-          <h1 className="mt-3 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
-            Mesa macro & feed <em className="italic text-[#6E6E73]">global.</em>
+          <h1 className="mt-3 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
+            Mesa macro & feed <span className="text-[#86868B] font-semibold">global.</span>
           </h1>
           <p className="editorial-subhead mt-3 max-w-2xl text-sm leading-relaxed text-[#86868B]">
             Liquidez mundial en tiempo real, índices interbancarios, curva de rendimientos,

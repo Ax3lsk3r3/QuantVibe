@@ -35,8 +35,8 @@ export const SecurityVaultProof: React.FC = () => {
       {/* Left — editorial explanation */}
       <Reveal className="lg:col-span-5">
         <Eyebrow>Bóveda criptográfica inmutable</Eyebrow>
-        <h2 className="mt-4 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
-          Aislamiento zero-import y <em className="italic text-[#6E6E73]">verificación por lote.</em>
+        <h2 className="mt-4 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
+          Aislamiento zero-import y <span className="text-[#86868B] font-semibold">verificación por lote.</span>
         </h2>
         <p className="editorial-subhead mt-5 max-w-md text-sm leading-relaxed text-[#86868B]">
           Para garantizar que el agente de ejecución jamás contamine el pipeline cuantitativo ni

@@ -9,6 +9,7 @@ import { ArchitectureTab } from './components/ArchitectureTab'
 import { LandingPage } from './components/LandingPage'
 import { TradingViewTickerTape } from './components/TradingViewTickerTape'
 import { BloombergTerminal } from './components/BloombergTerminal'
+import { FloatingCollapsibleNav } from './components/FloatingCollapsibleNav'
 import {
   fetchStatus,
   fetchSignals,
@@ -128,12 +129,17 @@ export const App: React.FC = () => {
         </AnimatePresence>
       </main>
 
+      {/* Floating collapsible scroll navigation */}
+      <FloatingCollapsibleNav activeTab={activeTab} setActiveTab={navigate} />
+
       {/* Editorial hairline footer */}
       <footer className="relative z-10 border-t border-white/[0.07] bg-black/70 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-[1720px] flex-col gap-8 px-4 py-10 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8 xl:px-10">
           <div className="space-y-2">
             <div className="flex items-center gap-2.5">
-              <span className="font-serif text-2xl italic text-white">QuantVibe</span>
+              <span className="font-sans text-xl font-bold tracking-tight text-white">
+                Quant<span className="text-[#86868B]">Vibe</span>
+              </span>
               <StatusDot tone="pos" ping={!loading} />
             </div>
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#636366]">
@@ -147,7 +153,7 @@ export const App: React.FC = () => {
               { id: 'bloomberg', label: 'Terminal Bloomberg' },
               { id: 'pipeline', label: 'Pipeline' },
               { id: 'execution', label: 'Mesa de Órdenes' },
-              { id: 'trackrecord', label: 'Auditoría' },
+              { id: 'trackrecord', label: 'Track Record' },
               { id: 'architecture', label: 'Arquitectura' },
             ].map((l) => (
               <button

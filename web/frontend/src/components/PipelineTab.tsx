@@ -202,8 +202,8 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
               Consola de factores · ciclo cerrado
             </span>
           </Eyebrow>
-          <h1 className="mt-3 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
-            Centro de mando del <em className="italic text-[#6E6E73]">pipeline.</em>
+          <h1 className="mt-3 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
+            Centro de mando del <span className="text-[#86868B] font-semibold">pipeline.</span>
           </h1>
           <p className="editorial-subhead mt-3 max-w-xl text-sm leading-relaxed text-[#86868B]">
             Ingesta → modelado ML → evaluación y firma criptográfica. La telemetría fluye en tiempo

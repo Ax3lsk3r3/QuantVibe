@@ -60,8 +60,8 @@ export const ArchitectureTab: React.FC = () => {
       {/* 1. Editorial head */}
       <div>
         <Eyebrow>Topología dual-brain · zero-import IPC</Eyebrow>
-        <h1 className="mt-3 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
-          Dos cerebros aislados, <em className="italic text-[#6E6E73]">un contrato sellado.</em>
+        <h1 className="mt-3 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
+          Dos cerebros aislados, <span className="text-[#86868B] font-semibold">un contrato sellado.</span>
         </h1>
         <p className="editorial-subhead mt-3 max-w-2xl text-sm leading-relaxed text-[#86868B]">
           Qlib y Vibe-Trading operan en procesos independientes que jamás importan código mutuo.
@@ -93,7 +93,7 @@ export const ArchitectureTab: React.FC = () => {
                 </span>
               </div>
 
-              <h3 className="mt-5 font-serif text-2xl text-white">{zone.title}</h3>
+              <h3 className="mt-5 font-sans text-2xl font-bold tracking-tight text-white">{zone.title}</h3>
               <p className="mt-2.5 text-xs leading-relaxed text-[#86868B]">{zone.desc}</p>
 
               <ul className="mt-6 space-y-2 border-t border-white/[0.06] pt-4">
@@ -114,7 +114,7 @@ export const ArchitectureTab: React.FC = () => {
         <Reveal>
           <div>
             <Eyebrow>FastMCP · stdio + SSE · read-only</Eyebrow>
-            <h2 className="mt-3 font-serif text-2xl text-white sm:text-3xl">
+            <h2 className="mt-3 font-sans text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Herramientas expuestas al agente
             </h2>
             <div className="mt-6 border-t border-white/[0.07]">
@@ -136,7 +136,7 @@ export const ArchitectureTab: React.FC = () => {
         <Reveal delay={0.1}>
           <div>
             <Eyebrow>Trazabilidad · grafos de código indexados</Eyebrow>
-            <h2 className="mt-3 font-serif text-2xl text-white sm:text-3xl">
+            <h2 className="mt-3 font-sans text-2xl font-bold tracking-tight text-white sm:text-3xl">
               Motores de conocimiento estructural
             </h2>
             <div className="mt-6 border-t border-white/[0.07]">

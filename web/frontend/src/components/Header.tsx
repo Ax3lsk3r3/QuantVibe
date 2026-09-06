@@ -19,7 +19,7 @@ const TABS = [
   { id: 'bloomberg', label: 'Bloomberg', full: 'Terminal Bloomberg — Macro Desk' },
   { id: 'pipeline', label: 'Pipeline', full: 'Pipeline de Factores — Consola' },
   { id: 'execution', label: 'Mesa de Órdenes', full: 'Mesa de Órdenes — Agente Autónomo' },
-  { id: 'trackrecord', label: 'Auditoría', full: 'Auditoría Histórica — Ledger' },
+  { id: 'trackrecord', label: 'Track Record', full: 'Track Record — Ledger Auditado' },
   { id: 'architecture', label: 'Arquitectura', full: 'Arquitectura & MCP' },
 ]
 
@@ -38,14 +38,14 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-50 w-full border-b border-white/[0.07] bg-black/75 backdrop-blur-3xl">
       <div className="mx-auto max-w-[1780px] px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="flex h-16 items-center justify-between gap-6">
-          {/* Brand — editorial serif wordmark */}
+          {/* Brand — modern geometric sans wordmark */}
           <button
             onClick={() => setActiveTab('landing')}
             className="apple-press group flex shrink-0 items-baseline gap-2 select-none"
             title="Volver al Showcase Institucional"
           >
-            <span className="font-serif text-[22px] leading-none text-white">
-              Quant<span className="italic text-[#86868B] transition-colors group-hover:text-white">Vibe</span>
+            <span className="font-sans text-xl font-extrabold tracking-tight text-white">
+              Quant<span className="text-[#86868B] transition-colors group-hover:text-white">Vibe</span>
             </span>
             <span className="hidden rounded-full border border-white/[0.12] bg-white/[0.05] px-2 py-px font-mono text-[8px] font-bold uppercase tracking-[0.2em] text-[#A1A1A6] sm:inline">
               Pro

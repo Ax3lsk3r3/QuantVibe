@@ -64,8 +64,8 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
               Mesa de órdenes · agente vibe-trading
             </span>
           </Eyebrow>
-          <h1 className="mt-3 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
-            Ejecución con <em className="italic text-[#6E6E73]">doble candado.</em>
+          <h1 className="mt-3 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
+            Ejecución con <span className="text-[#86868B] font-semibold">doble candado.</span>
           </h1>
           <p className="editorial-subhead mt-3 max-w-2xl text-sm leading-relaxed text-[#86868B]">
             El agente LLM lee las señales firmadas vía MCP stdio y dimensiona un plan equilibrado.

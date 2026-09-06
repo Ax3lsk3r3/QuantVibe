@@ -299,8 +299,8 @@ export const BloombergNewsSection: React.FC = () => {
               <span className="text-[#30D158]">{isLive ? '· RSS en vivo' : '· contenido verificado'}</span>
             </span>
           </Eyebrow>
-          <h2 className="mt-3 font-serif text-3xl leading-[1.06] text-white sm:text-4xl">
-            Televisión, podcast y wire <em className="italic text-[#6E6E73]">Bloomberg Línea.</em>
+          <h2 className="mt-3 font-sans text-3xl font-extrabold tracking-[-0.035em] text-white sm:text-4xl">
+            Televisión, podcast y wire <span className="text-[#86868B] font-semibold">Bloomberg Línea.</span>
           </h2>
         </div>
 
@@ -398,7 +398,7 @@ export const BloombergNewsSection: React.FC = () => {
               <span className="flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#30D158]">
                 <Radio className="h-3.5 w-3.5" /> Podcast oficial diario · Bloomberg Línea
               </span>
-              <h3 className="mt-1.5 truncate font-serif text-2xl text-white">{currentPodcast.title}</h3>
+              <h3 className="mt-1.5 truncate font-sans text-2xl font-bold tracking-tight text-white">{currentPodcast.title}</h3>
               <p className="mt-1 text-xs text-[#86868B]">
                 Conducido por <strong className="text-white">{currentPodcast.host}</strong> ·{' '}
                 {currentPodcast.desc}
@@ -515,7 +515,7 @@ export const BloombergNewsSection: React.FC = () => {
                       <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-[#636366]">
                         <Clock className="h-3 w-3" /> {lead.pub_date} · {lead.author}
                       </div>
-                      <h3 className="mt-3 font-serif text-2xl leading-[1.15] text-white transition-colors group-hover:text-[#D2D2D7] sm:text-3xl">
+                      <h3 className="mt-3 font-sans text-2xl font-bold tracking-tight leading-[1.15] text-white transition-colors group-hover:text-[#D2D2D7] sm:text-3xl">
                         {lead.title}
                       </h3>
                       <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#86868B]">

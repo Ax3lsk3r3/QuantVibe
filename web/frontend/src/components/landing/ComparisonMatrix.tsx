@@ -63,7 +63,7 @@ export const ComparisonMatrix: React.FC = () => {
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#636366]">
                 Modelos estadísticos clásicos
               </span>
-              <h3 className="mt-2 font-serif text-2xl text-white">Quants tradicionales</h3>
+              <h3 className="mt-2 font-sans text-2xl font-bold tracking-tight text-white">Quants tradicionales</h3>
               <p className="mt-3 text-xs leading-relaxed text-[#86868B]">
                 Dependientes de scripts manuales y supuestos de distribución normal que fallan en
                 colapsos de liquidez.
@@ -96,7 +96,7 @@ export const ComparisonMatrix: React.FC = () => {
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#636366]">
                 LLMs operando directamente
               </span>
-              <h3 className="mt-2 font-serif text-2xl text-white">Bots GenAI puros</h3>
+              <h3 className="mt-2 font-sans text-2xl font-bold tracking-tight text-white">Bots GenAI puros</h3>
               <p className="mt-3 text-xs leading-relaxed text-[#86868B]">
                 Agentes que leen noticias y compran tickers sin validación econométrica ni barreras
                 matemáticas de riesgo.
@@ -128,7 +128,7 @@ export const ComparisonMatrix: React.FC = () => {
               <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#A1A1A6]">
                 Síntesis dual-brain aislada
               </span>
-              <h3 className="mt-2 font-serif text-2xl text-white">QuantVibe</h3>
+              <h3 className="mt-2 font-sans text-2xl font-bold tracking-tight text-white">QuantVibe</h3>
               <p className="mt-3 text-xs leading-relaxed text-[#D2D2D7]">
                 Separación total: Qlib produce y valida señales contra el gate IC/ICIR. El agente
                 Vibe sólo construye órdenes con invariantes estrictos sellados bajo SHA-256.

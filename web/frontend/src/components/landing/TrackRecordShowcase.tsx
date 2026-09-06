@@ -57,8 +57,8 @@ export const TrackRecordShowcase: React.FC = () => {
       <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
         <div>
           <Eyebrow>Desempeño histórico · backtest walk-forward</Eyebrow>
-          <h2 className="mt-4 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
-            Curva de equity vs <em className="italic text-[#6E6E73]">benchmark S&P 500.</em>
+          <h2 className="mt-4 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
+            Curva de equity vs <span className="text-[#86868B] font-semibold">benchmark S&P 500.</span>
           </h2>
           <p className="editorial-subhead mt-4 max-w-xl text-sm leading-relaxed text-[#86868B]">
             Backtest continuo rolling walk-forward (Alpha158 + LightGBM) con costos de transacción

@@ -105,8 +105,8 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               Alpha Studio · lote {payload?.as_of ?? '—'}
             </span>
           </Eyebrow>
-          <h1 className="mt-3 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
-            Cartera validada por el <em className="italic text-[#6E6E73]">firewall estadístico.</em>
+          <h1 className="mt-3 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
+            Cartera validada por el <span className="text-[#86868B] font-semibold">firewall estadístico.</span>
           </h1>
         </div>
         <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.16em] text-[#636366]">

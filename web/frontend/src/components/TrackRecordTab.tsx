@@ -52,11 +52,11 @@ export const TrackRecordTab: React.FC<TrackRecordTabProps> = ({ trackRecord }) =
           <Eyebrow>
             <span className="flex items-center gap-2">
               <StatusDot tone={trackRecord?.has_db ? 'pos' : 'muted'} ping={trackRecord?.has_db} />
-              Auditoría histórica · ledger SQLite
+              Track Record histórico · ledger SQLite
             </span>
           </Eyebrow>
-          <h1 className="mt-3 font-serif text-4xl leading-[1.05] text-white sm:text-5xl">
-            Cada retorno, <em className="italic text-[#6E6E73]">liquidado y sellado.</em>
+          <h1 className="mt-3 font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl">
+            Cada retorno, <span className="text-[#86868B] font-semibold">liquidado y sellado.</span>
           </h1>
           <p className="editorial-subhead mt-3 max-w-2xl text-sm leading-relaxed text-[#86868B]">
             Libro mayor inmutable en{' '}

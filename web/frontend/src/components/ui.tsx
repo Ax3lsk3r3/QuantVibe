@@ -65,7 +65,7 @@ export const Eyebrow = ({
   </div>
 )
 
-/* Monumental section heading — Instrument Serif display with optional italic-gray accent */
+/* Monumental section heading — clean geometric sans display with optional subtle accent */
 export const SectionHead = ({
   eyebrow,
   title,
@@ -87,12 +87,12 @@ export const SectionHead = ({
         {eyebrow}
       </Eyebrow>
     )}
-    <h2 className="font-serif text-4xl leading-[1.04] text-white sm:text-5xl lg:text-6xl">
+    <h2 className="font-sans text-4xl font-extrabold tracking-[-0.035em] text-white sm:text-5xl lg:text-6xl">
       {title}
       {accent && (
         <>
           {' '}
-          <em className="italic text-[#6E6E73]">{accent}</em>
+          <span className="text-[#86868B] font-semibold">{accent}</span>
         </>
       )}
     </h2>
