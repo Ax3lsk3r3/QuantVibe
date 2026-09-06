@@ -40,6 +40,7 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
   const [autoScroll, setAutoScroll] = useState(true)
   const [copied, setCopied] = useState(false)
   const [searchLog, setSearchLog] = useState('')
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const terminalEndRef = useRef<HTMLDivElement>(null)
   const eventSourceRef = useRef<EventSource | null>(null)
 
@@ -161,9 +162,11 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
 
   const handleRunPipeline = async () => {
     if (selectedSteps.length === 0) {
-      alert('Por favor selecciona al menos una fase del pipeline.')
+      setErrorMsg('Debes seleccionar al menos una fase activa del pipeline para iniciar el cómputo.')
+      setTimeout(() => setErrorMsg(null), 5000)
       return
     }
+    setErrorMsg(null)
 
     setIsRunning(true)
     setLogs((prev) => [
@@ -287,6 +290,22 @@ export const PipelineTab: React.FC<PipelineTabProps> = ({
             })}
           </div>
         </div>
+
+        {/* Validation Error Banner */}
+        {errorMsg && (
+          <div className="mt-4 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-xs font-mono text-rose-300 flex items-center justify-between animate-in fade-in duration-200">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-rose-500" />
+              <span>{errorMsg}</span>
+            </div>
+            <button
+              onClick={() => setErrorMsg(null)}
+              className="px-2 py-0.5 rounded hover:bg-rose-500/20 text-rose-300 transition-colors"
+            >
+              Descartar
+            </button>
+          </div>
+        )}
 
         {/* Launch Button Strip */}
         <div className="mt-8 pt-5 border-t border-white/[0.08] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">

@@ -49,12 +49,12 @@ export const FloatingCollapsibleNav: React.FC<FloatingCollapsibleNavProps> = ({
   }, [])
 
   const tabs = [
-    { id: 'landing', label: 'SaaS Showcase', sub: 'Visión General & Invariantes', icon: Sparkles },
+    { id: 'landing', label: 'Showcase Institucional', sub: 'Visión General & Invariantes', icon: Sparkles },
     { id: 'overview', label: 'Alpha Studio', sub: 'Señales Activas & Gate IC', icon: Activity },
-    { id: 'bloomberg', label: 'Bloomberg Terminal', sub: 'Macro Desk & News Wire en Vivo', icon: Monitor },
-    { id: 'pipeline', label: 'Pipeline Control', sub: 'Consola de Minado en Vivo', icon: Terminal },
+    { id: 'bloomberg', label: 'Terminal Bloomberg', sub: 'Macro Desk & News Wire en Vivo', icon: Monitor },
+    { id: 'pipeline', label: 'Pipeline de Factores', sub: 'Consola de Minado en Vivo', icon: Terminal },
     { id: 'execution', label: 'Mesa de Órdenes', sub: 'Agente Autónomo & Invariantes', icon: Layers },
-    { id: 'trackrecord', label: 'Track Record', sub: 'Equity Histórica Auditada', icon: TrendingUp },
+    { id: 'trackrecord', label: 'Auditoría Histórica', sub: 'Equity Histórica Auditada', icon: TrendingUp },
     { id: 'architecture', label: 'Arquitectura & MCP', sub: 'Topología Dual-Brain Aislada', icon: Cpu },
   ]
 

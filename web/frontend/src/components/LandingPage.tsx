@@ -17,7 +17,6 @@ import { InteractiveSimulator } from './landing/InteractiveSimulator'
 import { ComparisonMatrix } from './landing/ComparisonMatrix'
 import { SecurityVaultProof } from './landing/SecurityVaultProof'
 import { TrackRecordShowcase } from './landing/TrackRecordShowcase'
-import { BloombergNewsSection } from './BloombergNewsSection'
 
 interface LandingPageProps {
   onNavigateToTab: (tab: string) => void
@@ -458,9 +457,128 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToTab }) => 
         <InteractiveSimulator onNavigateToTab={onNavigateToTab} />
       </section>
 
-      {/* 4. BLOOMBERG LÍNEA NEWS WIRE (STATIC + REAL-TIME RSS) */}
-      <section className="w-full">
-        <BloombergNewsSection />
+      {/* 4. BLOOMBERG MACRO PULSE & NEWS WIRE SHOWCASE (Dedicated Teaser linking to full Bloomberg Terminal) */}
+      <section className="w-full rounded-3xl bg-[#09090D] border border-white/[0.12] p-8 sm:p-12 relative overflow-hidden shadow-2xl">
+        {/* Specular Amber Hairline */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-amber-500/40 via-white/30 to-amber-500/40" />
+
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 pb-8 border-b border-white/[0.08]">
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
+              <span className="text-xs font-mono font-bold tracking-widest text-amber-400 uppercase">
+                BLOOMBERG PULSE // COBERTURA MACRO & WALL STREET
+              </span>
+              <span className="h-3 w-[1px] bg-white/20" />
+              <span className="text-[11px] font-mono text-emerald-400">EN VIVO 24/7</span>
+            </div>
+
+            <h3 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-[-0.035em] leading-[1.08]">
+              Inteligencia Macro Bloomberg <span className="text-[#86868B]">& Teletipo Global</span>
+            </h3>
+
+            <p className="text-sm sm:text-base text-[#86868B] max-w-3xl leading-relaxed font-sans font-normal">
+              Supervisión continua de liquidez interbancaria, tasas de bancos centrales, tipos de cambio en tiempo real (USD/COP, USD/MXN), y la señal oficial satelital de Bloomberg Television sin costo de suscripción.
+            </p>
+          </div>
+
+          <motion.button
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={() => onNavigateToTab('bloomberg')}
+            className="self-start lg:self-center px-8 py-4 rounded-full bg-white text-black font-semibold text-sm tracking-tight shadow-xl hover:bg-[#EAEAEA] flex items-center space-x-2.5 transition-all group shrink-0"
+          >
+            <span>Abrir Terminal Bloomberg Completo</span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </motion.button>
+        </div>
+
+        {/* 4 Key Macro Telemetry Pills */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 py-8 border-b border-white/[0.08]">
+          <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono">
+            <div className="text-[11px] text-[#86868B] mb-1">DÓLAR TRM COLOMBIA</div>
+            <div className="text-xl font-bold text-white tracking-tight">$4,028.50 COP</div>
+            <div className="text-xs text-emerald-400 mt-0.5">-0.42% (Apreciación)</div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono">
+            <div className="text-[11px] text-[#86868B] mb-1">S&P 500 FUTURES</div>
+            <div className="text-xl font-bold text-white tracking-tight">5,842.10 PTS</div>
+            <div className="text-xs text-emerald-400 mt-0.5">+0.45% (Rally)</div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono">
+            <div className="text-[11px] text-[#86868B] mb-1">US 10-YR YIELD</div>
+            <div className="text-xl font-bold text-white tracking-tight">4.182%</div>
+            <div className="text-xs text-rose-400 mt-0.5">+1.2 bps</div>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-[#0E0E14] border border-white/[0.06] font-mono">
+            <div className="text-[11px] text-[#86868B] mb-1">TASA BANREP COLOMBIA</div>
+            <div className="text-xl font-bold text-white tracking-tight">11.75%</div>
+            <div className="text-xs text-[#A1A1A6] mt-0.5">Política Monetaria</div>
+          </div>
+        </div>
+
+        {/* 3 Interactive Feature Preview Pillars */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
+          <div
+            onClick={() => onNavigateToTab('bloomberg')}
+            className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-mono text-rose-400 font-bold uppercase flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+                TELEVISIÓN 24/7
+              </span>
+              <ChevronRight className="w-4 h-4 text-[#86868B] group-hover:text-white transition-colors" />
+            </div>
+            <h4 className="text-base font-bold text-white mb-1.5 group-hover:text-amber-300 transition-colors">
+              Bloomberg TV Oficial en Vivo
+            </h4>
+            <p className="text-xs text-[#86868B] leading-relaxed">
+              Transmisión satelital continua de Wall Street, análisis de apertura y debates geopolíticos en tiempo real.
+            </p>
+          </div>
+
+          <div
+            onClick={() => onNavigateToTab('bloomberg')}
+            className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-mono text-emerald-400 font-bold uppercase flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                PODCAST DIARIO SPOTIFY
+              </span>
+              <ChevronRight className="w-4 h-4 text-[#86868B] group-hover:text-white transition-colors" />
+            </div>
+            <h4 className="text-base font-bold text-white mb-1.5 group-hover:text-emerald-300 transition-colors">
+              La Estrategia del Día
+            </h4>
+            <p className="text-xs text-[#86868B] leading-relaxed">
+              Cápsulas matutinas oficiales con conductores en Colombia, México y Argentina sobre banca central y divisas.
+            </p>
+          </div>
+
+          <div
+            onClick={() => onNavigateToTab('bloomberg')}
+            className="p-6 rounded-2xl bg-[#0E0E14] border border-white/[0.08] hover:border-white/20 transition-all cursor-pointer group"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-mono text-amber-400 font-bold uppercase flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                RSS WIRE CERTIFICADO
+              </span>
+              <ChevronRight className="w-4 h-4 text-[#86868B] group-hover:text-white transition-colors" />
+            </div>
+            <h4 className="text-base font-bold text-white mb-1.5 group-hover:text-amber-200 transition-colors">
+              Noticias Bloomberg Línea
+            </h4>
+            <p className="text-xs text-[#86868B] leading-relaxed">
+              Artículos completos de Colombia y EE.UU. con imágenes, autores, fechas e impacto en mercados financieros.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* 5. INSTITUTIONAL COMPARISON MATRIX */}
@@ -468,18 +586,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigateToTab }) => 
         <ComparisonMatrix />
       </section>
 
-      {/* 5. AUDITED HISTORICAL TRACK RECORD */}
+      {/* 6. AUDITED HISTORICAL TRACK RECORD */}
       <section className="w-full">
         <TrackRecordShowcase />
       </section>
 
-      {/* 6. CRYPTOGRAPHIC VAULT & ZERO-IMPORT PROOF */}
+      {/* 7. CRYPTOGRAPHIC VAULT & ZERO-IMPORT PROOF */}
       <section className="w-full">
         <SecurityVaultProof />
       </section>
 
       {/* ========================================================================= */}
-      {/* 7. MONUMENTAL PRODUCTION DEPLOYMENT CALLOUT                               */}
+      {/* 8. MONUMENTAL PRODUCTION DEPLOYMENT CALLOUT                               */}
       {/* ========================================================================= */}
       <section className="w-full rounded-3xl bg-[#08080C] border border-white/[0.1] p-10 sm:p-16 relative overflow-hidden text-center shadow-2xl">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent pointer-events-none" />

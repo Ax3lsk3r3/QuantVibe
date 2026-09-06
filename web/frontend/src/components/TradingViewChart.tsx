@@ -12,8 +12,10 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   availableSymbols = ['TSLA', 'NVDA', 'AAPL', 'META', 'XOM', 'BTCUSDT'],
   className = '',
 }) => {
-  const [activeSymbol, setActiveSymbol] = useState(initialSymbol)
+  const [selectedSymbolOverride, setSelectedSymbolOverride] = useState<string | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const activeSymbol = selectedSymbolOverride || initialSymbol
 
   const normalizeSymbol = (sym: string) => {
     if (sym.includes(':')) return sym
@@ -23,15 +25,16 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
   }
 
   useEffect(() => {
-    if (!containerRef.current) return
+    const container = containerRef.current
+    if (!container) return
 
-    containerRef.current.innerHTML = ''
+    container.innerHTML = ''
 
     const widgetContainer = document.createElement('div')
     widgetContainer.className = 'tradingview-widget-container__widget'
     widgetContainer.style.height = '100%'
     widgetContainer.style.width = '100%'
-    containerRef.current.appendChild(widgetContainer)
+    container.appendChild(widgetContainer)
 
     const script = document.createElement('script')
     script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js'
@@ -55,11 +58,11 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
       studies: ['STD;SMA', 'STD;RSI'],
     })
 
-    containerRef.current.appendChild(script)
+    container.appendChild(script)
 
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = ''
+      if (container) {
+        container.innerHTML = ''
       }
     }
   }, [activeSymbol])
@@ -98,7 +101,7 @@ export const TradingViewChart: React.FC<TradingViewChartProps> = ({
             return (
               <button
                 key={sym}
-                onClick={() => setActiveSymbol(sym)}
+                onClick={() => setSelectedSymbolOverride(sym)}
                 className={`px-3 py-1 rounded-xl text-xs font-mono font-bold transition-all ${
                   isCurrent
                     ? 'bg-white text-black shadow-md'

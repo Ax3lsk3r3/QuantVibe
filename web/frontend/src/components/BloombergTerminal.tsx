@@ -12,9 +12,18 @@ export const BloombergTerminal: React.FC = () => {
   const [activeUniverse, setActiveUniverse] = useState<string>('sp10')
   const [customTickers, setCustomTickers] = useState<string>('PLTR, SMCI, ARM, COIN, MSTR')
   const [showBloombergTV, setShowBloombergTV] = useState<boolean>(true)
+  const [customUniverseNotice, setCustomUniverseNotice] = useState<string | null>(null)
 
   const marketQuotesContainerRef = useRef<HTMLDivElement>(null)
   const screenerContainerRef = useRef<HTMLDivElement>(null)
+
+  const handleApplyCustomTickers = () => {
+    if (!customTickers.trim()) return
+    setCustomUniverseNotice(`Universo personalizado activado: ${customTickers}. El motor Qlib minará factores Alpha158 sobre este nuevo conjunto de activos.`)
+    setTimeout(() => {
+      setCustomUniverseNotice(null)
+    }, 6000)
+  }
 
   // Universe configurations proving QuantVibe is not limited to 10 tickers
   const universes = [
@@ -351,7 +360,7 @@ export const BloombergTerminal: React.FC = () => {
             </div>
           </div>
 
-          {/* Custom Asset Input Demo */}
+          {/* Custom Asset Input Demo with Luxury Feedback */}
           <div className="w-full lg:w-auto flex flex-col sm:flex-row items-center gap-2">
             <div className="relative w-full sm:w-80">
               <input
@@ -359,17 +368,33 @@ export const BloombergTerminal: React.FC = () => {
                 value={customTickers}
                 onChange={(e) => setCustomTickers(e.target.value)}
                 placeholder="Ej: PLTR, ARM, COIN, BTC-USD..."
-                className="w-full px-4 py-2 rounded-xl bg-black/60 border border-white/[0.14] text-xs font-mono text-white placeholder-[#86868B] focus:outline-none focus:border-white/40"
+                className="w-full px-4 py-2.5 rounded-xl bg-black/60 border border-white/[0.14] text-xs font-mono text-white placeholder-[#86868B] focus:outline-none focus:border-white/50 transition-colors"
               />
             </div>
             <button
-              onClick={() => alert(`Universo personalizado configurado con: ${customTickers}. El pipeline ejecutará factor mining sobre estos activos.`)}
-              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-white text-black font-semibold text-xs font-mono hover:bg-[#EAEAEA] transition-colors whitespace-nowrap"
+              onClick={handleApplyCustomTickers}
+              className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-white text-black font-semibold text-xs font-mono hover:bg-[#EAEAEA] transition-all apple-press whitespace-nowrap shadow-sm"
             >
               Aplicar a Pipeline
             </button>
           </div>
         </div>
+
+        {/* Custom Universe Feedback Notification Banner */}
+        {customUniverseNotice && (
+          <div className="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-between text-xs font-mono text-emerald-300 animate-in fade-in duration-200">
+            <div className="flex items-center space-x-2.5">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>{customUniverseNotice}</span>
+            </div>
+            <button
+              onClick={() => setCustomUniverseNotice(null)}
+              className="px-2 py-0.5 rounded-md hover:bg-emerald-500/20 text-emerald-400 transition-colors"
+            >
+              Descartar
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 3. Terminal Live Market Overview Stage */}

@@ -58,23 +58,23 @@
 }
 
 @layer components {
-  /* Apple Pro Translucent Materials & Depth Surfaces */
+  /* Apple Pro & ElevenLabs Translucent Materials & Depth Surfaces */
   .glass-panel,
   .apple-panel {
-    background: rgba(18, 18, 22, 0.65);
-    backdrop-filter: blur(28px) saturate(190%);
-    -webkit-backdrop-filter: blur(28px) saturate(190%);
+    background: rgba(12, 12, 16, 0.72);
+    backdrop-filter: blur(32px) saturate(190%);
+    -webkit-backdrop-filter: blur(32px) saturate(190%);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.1) inset, 0 20px 48px -12px rgba(0, 0, 0, 0.85);
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.14) inset, 0 24px 60px -12px rgba(0, 0, 0, 0.9);
   }
 
   .glass-card,
   .apple-card {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08) inset, 0 10px 30px -6px rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.1) inset, 0 12px 36px -6px rgba(0, 0, 0, 0.75);
   }
 
   .glass-card-interactive,
@@ -83,15 +83,30 @@
     backdrop-filter: blur(24px) saturate(160%);
     -webkit-backdrop-filter: blur(24px) saturate(160%);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08) inset, 0 12px 32px -8px rgba(0, 0, 0, 0.75);
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.1) inset, 0 14px 36px -8px rgba(0, 0, 0, 0.8);
     transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.22s ease, box-shadow 0.22s ease;
   }
 
   .glass-card-interactive:hover,
   .apple-card-interactive:hover {
     transform: translateY(-2.5px);
-    border-color: rgba(255, 255, 255, 0.22);
-    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.18) inset, 0 24px 50px -10px rgba(0, 0, 0, 0.95);
+    border-color: rgba(255, 255, 255, 0.24);
+    box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.22) inset, 0 28px 60px -10px rgba(0, 0, 0, 0.95);
+  }
+
+  /* Specular Top Light Hairline */
+  .specular-hairline {
+    position: relative;
+  }
+  .specular-hairline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+    pointer-events: none;
   }
 
   /* Tactile feedback on press (Apple WWDC 2018 spring feel) */
@@ -125,7 +140,6 @@
     -webkit-text-fill-color: transparent;
   }
 
-  /* Apple Pro Titanium Accent Gradients (Replacing generic neon) */
   .gradient-text-cyan,
   .gradient-text-aurora {
     background: linear-gradient(180deg, #FFFFFF 0%, #D2D2D7 60%, #86868B 100%);
@@ -133,20 +147,28 @@
     -webkit-text-fill-color: transparent;
   }
 
-  /* Apple Buttons */
+  /* Apple & ElevenLabs Luxury Buttons with Explicit States */
   .apple-btn-primary {
     background: #FFFFFF;
     color: #000000;
     font-weight: 600;
     border-radius: 9999px;
-    box-shadow: 0 4px 14px 0 rgba(255, 255, 255, 0.2);
-    transition: background-color 0.15s ease, transform 0.15s cubic-bezier(0.2, 0, 0, 1);
+    box-shadow: 0 4px 20px 0 rgba(255, 255, 255, 0.25);
+    transition: background-color 0.15s ease, transform 0.15s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.15s ease;
   }
   .apple-btn-primary:hover {
     background: #E8E8ED;
+    box-shadow: 0 6px 28px 0 rgba(255, 255, 255, 0.35);
   }
   .apple-btn-primary:active {
     transform: scale(0.97);
+  }
+  .apple-btn-primary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+    background: #48484A;
+    color: #8E8E93;
   }
 
   .apple-btn-secondary {
@@ -154,17 +176,50 @@
     color: #F5F5F7;
     font-weight: 500;
     border-radius: 9999px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.14);
     backdrop-filter: blur(12px);
     transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s cubic-bezier(0.2, 0, 0, 1);
   }
   .apple-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.12);
-    border-color: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.28);
   }
   .apple-btn-secondary:active {
     transform: scale(0.97);
   }
+  .apple-btn-secondary:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  /* Financial Terminal Badges */
+  .badge-terminal-green {
+    background: rgba(48, 209, 88, 0.12);
+    color: #30D158;
+    border: 1px solid rgba(48, 209, 88, 0.28);
+  }
+  .badge-terminal-red {
+    background: rgba(255, 69, 58, 0.12);
+    color: #FF453A;
+    border: 1px solid rgba(255, 69, 58, 0.28);
+  }
+  .badge-terminal-amber {
+    background: rgba(255, 159, 10, 0.12);
+    color: #FF9F0A;
+    border: 1px solid rgba(255, 159, 10, 0.28);
+  }
+  .badge-terminal-neutral {
+    background: rgba(255, 255, 255, 0.06);
+    color: #D2D2D7;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* Accessible Focus States */
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
 }
 
 /* Minimalist Apple Scrollbar */
@@ -181,4 +236,14 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.28);
+}
+
+/* Reduced Motion Compliance */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

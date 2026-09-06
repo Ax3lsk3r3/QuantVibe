@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import {
   Percent,
@@ -28,16 +28,21 @@ export const TrackRecordTab: React.FC<TrackRecordTabProps> = ({ trackRecord }) =
   )
 
   // Generate an illustrative cumulative equity curve from settled records
-  const settledPoints = records
-    .filter((r) => r.fwd_return_1d !== null)
-    .slice(0, 30)
-    .reverse()
+  const settledPoints = useMemo(() => {
+    return records
+      .filter((r) => r.fwd_return_1d !== null)
+      .slice(0, 30)
+      .reverse()
+  }, [records])
 
-  let cumulative = 1.0
-  const equityPoints = settledPoints.map((r) => {
-    cumulative *= 1 + (r.fwd_return_1d || 0)
-    return cumulative
-  })
+  const { equityPoints, cumulativeTotal } = useMemo(() => {
+    let cumulative = 1.0
+    const points = settledPoints.map((r) => {
+      cumulative *= 1 + (r.fwd_return_1d || 0)
+      return cumulative
+    })
+    return { equityPoints: points, cumulativeTotal: cumulative }
+  }, [settledPoints])
 
   return (
     <div className="space-y-8 font-sans">
@@ -99,7 +104,7 @@ export const TrackRecordTab: React.FC<TrackRecordTabProps> = ({ trackRecord }) =
                   Curva de Capital Reciente
                 </span>
                 <span className="font-mono text-[#30D158] font-bold">
-                  +{((cumulative - 1) * 100).toFixed(2)}%
+                  +{((cumulativeTotal - 1) * 100).toFixed(2)}%
                 </span>
               </div>
             )}
