@@ -42,6 +42,57 @@ class TestWebAPI(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertIn("QuantVibe", res.text)
 
+    def test_mt5_bridge_endpoints(self):
+        # 1. Download EA
+        res_ea = self.client.get("/api/mt5/download-ea")
+        self.assertEqual(res_ea.status_code, 200)
+        self.assertIn("QuantVibe_Bridge", res_ea.headers.get("content-disposition", ""))
+
+        # 2. Heartbeat registration
+        hb_payload = {
+            "account": "998877",
+            "broker": "IC Markets Demo",
+            "server": "ICMarketsSC",
+            "currency": "USD",
+            "balance": 10000.0,
+            "equity": 10000.0,
+            "leverage": 500,
+            "algo_trading": True
+        }
+        res_hb = self.client.post("/api/mt5/heartbeat", json=hb_payload)
+        self.assertEqual(res_hb.status_code, 200)
+
+        # 3. Status
+        res_status = self.client.get("/api/mt5/status?account=998877")
+        self.assertEqual(res_status.status_code, 200)
+        self.assertTrue(res_status.json()["connected"])
+
+        # 4. Ack
+        ack_payload = {
+            "order_id": "ORD-1",
+            "account": "998877",
+            "symbol": "TSLA.US",
+            "status": "FILLED",
+            "ticket": 123456,
+            "fill_price": 60.50,
+            "balance": 10000.0,
+            "notes": "Test fill"
+        }
+        res_ack = self.client.post("/api/mt5/ack", json=ack_payload)
+        self.assertEqual(res_ack.status_code, 200)
+
+    def test_recalculate_orders_plan(self):
+        res = self.client.post(
+            "/api/orders/recalculate",
+            json={"capital": 5000.0, "symbol_suffix": ".US", "symbol_prefix": ""}
+        )
+        if res.status_code == 200:
+            data = res.json()
+            self.assertEqual(data["total_notional_target"], 5000.0)
+            for ord_item in data["orders"]:
+                if ord_item["status"] == "PLANNED":
+                    self.assertTrue(ord_item["broker_symbol"].endswith(".US"))
+
 
 if __name__ == "__main__":
     unittest.main()

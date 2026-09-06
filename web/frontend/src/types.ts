@@ -72,6 +72,7 @@ export interface EvaluationData {
 
 export interface OrderItem {
   instrument: string
+  broker_symbol?: string
   action: string
   rank: number
   signal_score: number

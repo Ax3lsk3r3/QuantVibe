@@ -32,14 +32,22 @@ def _price_at(raw_dir: Path, instrument: str, as_of: str) -> float | None:
     return price
 
 
-def build_plan(cfg_path: str | None, signals_path: Path, is_live: bool = False) -> dict:
+def build_plan(
+    cfg_path: str | None,
+    signals_path: Path,
+    is_live: bool = False,
+    capital_override: float | None = None,
+    symbol_suffix: str = "",
+    symbol_prefix: str = "",
+    fractional: bool = True,
+) -> dict:
     from qlib_side.common import load_config
 
     cfg = load_config(cfg_path)
     payload = load_signals(signals_path)
     as_of = payload["as_of"]
     raw_dir = Path(cfg["data"]["raw_dir"])
-    notional = float(cfg["execution"]["total_notional"])
+    notional = float(capital_override) if capital_override and capital_override > 0 else float(cfg["execution"]["total_notional"])
     action = str(cfg["execution"].get("action", "BUY")).upper()
     n = len(payload["signals"])
     per_name = notional / n if n else 0.0
@@ -47,9 +55,11 @@ def build_plan(cfg_path: str | None, signals_path: Path, is_live: bool = False) 
     orders = []
     for sig in sorted(payload["signals"], key=lambda s: s["rank"]):
         inst = sig["instrument"]
+        broker_sym = f"{symbol_prefix}{inst}{symbol_suffix}"
         price = _price_at(raw_dir, inst, as_of)
         entry = {
             "instrument": inst,
+            "broker_symbol": broker_sym,
             "action": action,
             "rank": sig["rank"],
             "signal_score": sig["score"],
@@ -60,11 +70,21 @@ def build_plan(cfg_path: str | None, signals_path: Path, is_live: bool = False) 
             entry.update({"status": "SKIPPED", "reason": "sin_datos_de_precio"})
             orders.append(entry)
             continue
-        qty = int(per_name // price)
-        if qty < 1:
-            entry.update({"status": "SKIPPED", "reason": "notional_insuficiente", "est_price": price})
+
+        raw_qty = per_name / price
+        if raw_qty < 0.001:
+            entry.update({"status": "SKIPPED", "reason": "capital_insuficiente", "est_price": price})
             orders.append(entry)
             continue
+
+        # If fractional or raw_qty < 1.0, use 2 decimal places (CFD lots / fractional shares)
+        if fractional or raw_qty < 1.0:
+            qty = round(raw_qty, 2)
+            if qty <= 0:
+                qty = 0.01  # Minimum lot for MT5 / micro-share
+        else:
+            qty = int(round(raw_qty))
+
         entry.update(
             {
                 "status": "PLANNED",
@@ -114,9 +134,10 @@ def submit(plan_path: Path, order_cmd_template: str) -> int:
     print(f"\n[EXEC] Despachando {total} órdenes al conector de ejecución...", flush=True)
 
     for idx, order in enumerate(planned_orders, start=1):
+        target_sym = order.get("broker_symbol") or order["instrument"]
         argv = [
             tok.format(
-                symbol=order["instrument"], qty=order["qty"], est_price=order["est_price"]
+                symbol=target_sym, qty=order["qty"], est_price=order["est_price"]
             )
             for tok in shlex.split(order_cmd_template, posix=False)
         ]
@@ -144,6 +165,10 @@ def main() -> None:
     parser.add_argument("--config", default=None)
     parser.add_argument("--signals", default=str(DEFAULT_SIGNALS))
     parser.add_argument("--out", default=str(ARTIFACTS / "orders_plan.json"))
+    parser.add_argument("--capital", type=float, default=None, help="Capital total objetivo de la cuenta (ej. 5000, 50000)")
+    parser.add_argument("--symbol-suffix", default="", help="Sufijo del broker (ej. .US, .pro, _m)")
+    parser.add_argument("--symbol-prefix", default="", help="Prefijo del broker (ej. #)")
+    parser.add_argument("--fractional", action="store_true", default=True, help="Permitir lotes / fracciones fraccionarias")
     parser.add_argument(
         "--submit",
         action="store_true",
@@ -163,7 +188,15 @@ def main() -> None:
     is_live = args.submit and os.environ.get("VIBE_ALLOW_ORDERS", "").strip() == "1"
 
     try:
-        plan = build_plan(args.config, signals_path, is_live=is_live)
+        plan = build_plan(
+            args.config,
+            signals_path,
+            is_live=is_live,
+            capital_override=args.capital,
+            symbol_suffix=args.symbol_suffix,
+            symbol_prefix=args.symbol_prefix,
+            fractional=args.fractional,
+        )
     except FileNotFoundError as exc:
         print(f"[ERROR] {exc}\nEjecuta scripts/run_pipeline.py primero.", file=sys.stderr, flush=True)
         raise SystemExit(1)

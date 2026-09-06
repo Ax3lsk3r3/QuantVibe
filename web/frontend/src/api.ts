@@ -59,14 +59,70 @@ export async function runPipeline(mode: 'demo' | 'real', steps?: string[]): Prom
   return res.json()
 }
 
-export async function executeOrders(allowLive: boolean, orderCmdTemplate?: string): Promise<any> {
+export async function executeOrders(
+  allowLive: boolean,
+  orderCmdTemplate?: string,
+  brokerId?: string,
+  credentials?: Record<string, string>,
+  accountCapital?: number,
+  symbolSuffix?: string,
+  symbolPrefix?: string
+): Promise<any> {
   const res = await apiFetch('/orders/execute', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ allow_live: allowLive, order_cmd_template: orderCmdTemplate }),
+    body: JSON.stringify({
+      allow_live: allowLive,
+      order_cmd_template: orderCmdTemplate,
+      broker_id: brokerId || 'mt5',
+      credentials,
+      account_capital: accountCapital,
+      symbol_suffix: symbolSuffix || '',
+      symbol_prefix: symbolPrefix || '',
+    }),
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`)
   return res.json()
+}
+
+export async function recalculateOrdersPlan(
+  capital: number,
+  symbolSuffix: string = '',
+  symbolPrefix: string = '',
+  brokerId: string = 'mt5'
+): Promise<OrdersPlan> {
+  const res = await apiFetch('/orders/recalculate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      capital,
+      symbol_suffix: symbolSuffix,
+      symbol_prefix: symbolPrefix,
+      broker_id: brokerId,
+    }),
+  })
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`)
+  return res.json()
+}
+
+export async function fetchMt5Status(account?: string): Promise<{
+  connected: boolean
+  session: any
+  active_count: number
+  recent_history: any[]
+}> {
+  const query = account ? `?account=${encodeURIComponent(account)}` : ''
+  const res = await apiFetch(`/mt5/status${query}`)
+  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`)
+  return res.json()
+}
+
+export function getDownloadEaUrl(): string {
+  return `${resolvedApiBase}/mt5/download-ea`
+}
+
+export function getDownloadBatUrl(): string {
+  return `${resolvedApiBase}/mt5/download-bat`
 }
 
 export async function fetchBrokerCatalog(): Promise<BrokerInfo[]> {

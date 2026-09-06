@@ -15,6 +15,8 @@ import {
   Globe,
   HelpCircle,
   Sparkles,
+  Download,
+  Sliders,
 } from 'lucide-react'
 import type {
   OrdersPlan,
@@ -27,6 +29,10 @@ import {
   fetchBrokerCatalog,
   testBrokerConnection,
   fetchFeatureAttribution,
+  recalculateOrdersPlan,
+  fetchMt5Status,
+  getDownloadEaUrl,
+  getDownloadBatUrl,
 } from '../api'
 import { Btn, Eyebrow, MetricRail, StatusDot, CopyChip, cn, Segmented } from './ui'
 
@@ -376,12 +382,84 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
     }
   }
 
+  // Capital & Sizing Controller
+  const [accountCapital, setAccountCapital] = useState<number>(orders?.total_notional_target || 10000)
+  const [symbolSyntaxPreset, setSymbolSyntaxPreset] = useState<string>('none')
+  const [symbolSuffix, setSymbolSuffix] = useState<string>('')
+  const [symbolPrefix, setSymbolPrefix] = useState<string>('')
+  const [isRecalculating, setIsRecalculating] = useState<boolean>(false)
+
+  // MT5 Live Connection Status
+  const [mt5Status, setMt5Status] = useState<{
+    connected: boolean
+    session: any
+    active_count: number
+  } | null>(null)
+
+  useEffect(() => {
+    if (orders?.total_notional_target && orders.total_notional_target > 0) {
+      setAccountCapital(orders.total_notional_target)
+    }
+  }, [orders?.total_notional_target])
+
+  // Poll MT5 heartbeat status
+  useEffect(() => {
+    if (selectedBrokerId !== 'mt5') return
+    const checkStatus = () => {
+      fetchMt5Status(credentials.account)
+        .then((data) => setMt5Status(data))
+        .catch(() => {})
+    }
+    checkStatus()
+    const timer = setInterval(checkStatus, 3000)
+    return () => clearInterval(timer)
+  }, [selectedBrokerId, credentials.account])
+
+  const handleSymbolPresetChange = (preset: string) => {
+    setSymbolSyntaxPreset(preset)
+    let suf = ''
+    let pre = ''
+    if (preset === 'dot_us') suf = '.US'
+    else if (preset === 'hash') pre = '#'
+    else if (preset === 'cfd') suf = '_CFD'
+    else if (preset === 'pro') suf = '.pro'
+    else if (preset === 'm') suf = '_m'
+    setSymbolSuffix(suf)
+    setSymbolPrefix(pre)
+    handleRecalculate(accountCapital, suf, pre)
+  }
+
+  const handleRecalculate = async (cap?: number, suf?: string, pre?: string) => {
+    setIsRecalculating(true)
+    try {
+      await recalculateOrdersPlan(
+        cap ?? accountCapital,
+        suf ?? symbolSuffix,
+        pre ?? symbolPrefix,
+        selectedBrokerId
+      )
+      onRefresh()
+    } catch (err) {
+      console.error('Error recalculando dimensionamiento:', err)
+    } finally {
+      setIsRecalculating(false)
+    }
+  }
+
   const handleExecute = async () => {
     setShowConfirmModal(false)
     setIsSubmitting(true)
     setSubmitOutput(null)
     try {
-      const res = await executeOrders(allowLive, orderCmdTemplate)
+      const res = await executeOrders(
+        allowLive,
+        orderCmdTemplate,
+        selectedBrokerId,
+        credentials,
+        accountCapital,
+        symbolSuffix,
+        symbolPrefix
+      )
       const ok = res.return_code === 0
       const combinedOutput = [res.stdout, res.stderr].filter(Boolean).join('\n')
       setSubmitOutput({
@@ -632,27 +710,80 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
               )}
             </AnimatePresence>
 
-            {/* 1-Click Terminal Switch for MT5 */}
+            {/* MT5 Direct Connection Hub & Live Sync */}
             {selectedBroker.id === 'mt5' && (
-              <div className="flex items-center justify-between p-4 rounded-2xl border border-white/[0.08] bg-black/40">
-                <div className="flex items-center gap-2.5">
-                  <span className="h-2 w-2 rounded-full bg-[#30D158]" />
-                  <span className="text-xs text-[#D1D1D6] font-medium">
-                    Detectar terminal MT5 abierta en este PC automáticamente
-                  </span>
+              <div
+                className="rounded-2xl border p-4 sm:p-5 transition-all duration-300 space-y-3.5 backdrop-blur-xl"
+                style={{
+                  borderColor: mt5Status?.connected ? 'rgba(48, 209, 88, 0.4)' : 'rgba(255, 255, 255, 0.1)',
+                  backgroundColor: mt5Status?.connected ? 'rgba(48, 209, 88, 0.05)' : 'rgba(0, 0, 0, 0.5)',
+                }}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-start sm:items-center gap-3">
+                    <StatusDot tone={mt5Status?.connected ? 'pos' : 'warn'} ping={mt5Status?.connected} />
+                    <div>
+                      <div className="text-xs font-bold text-white flex flex-wrap items-center gap-2">
+                        <span>
+                          {mt5Status?.connected
+                            ? 'Terminal MetaTrader 5 Conectado en Tiempo Real'
+                            : 'MetaTrader 5: En Espera de Conexión del Terminal'}
+                        </span>
+                        <span
+                          className={cn(
+                            'font-mono text-[9px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider',
+                            mt5Status?.connected
+                              ? 'bg-[#30D158]/20 text-[#30D158] border border-[#30D158]/30'
+                              : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                          )}
+                        >
+                          {mt5Status?.connected ? 'LIVE IPC SYNC' : 'AWAITING LOCAL TERMINAL'}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#86868B] mt-0.5 leading-relaxed">
+                        {mt5Status?.connected
+                          ? `Broker: ${mt5Status.session.broker || 'MetaTrader 5'} (${mt5Status.session.server || 'Server'}) · Cuenta: ${mt5Status.session.account} · Balance: $${Number(mt5Status.session.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} ${mt5Status.session.currency || 'USD'} · Apalancamiento: 1:${mt5Status.session.leverage || 100}`
+                          : 'Para que las órdenes se ejecuten en tu MT5, descarga el Expert Advisor oficial o inicia el puente 1-clic en tu PC:'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 1-Click download actions */}
+                  <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                    <a
+                      href={getDownloadEaUrl()}
+                      download="QuantVibe_Bridge.mq5"
+                      className="apple-press inline-flex items-center gap-1.5 rounded-full border border-white/[0.15] bg-white/[0.08] hover:bg-white/[0.15] px-3 py-1.5 font-mono text-[10px] font-bold text-white transition-all shadow-sm"
+                    >
+                      <Download className="h-3.5 w-3.5 text-blue-400" />
+                      <span>Descargar EA (.mq5)</span>
+                    </a>
+                    <a
+                      href={getDownloadBatUrl()}
+                      download="start_mt5_bridge.bat"
+                      className="apple-press inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 px-3 py-1.5 font-mono text-[10px] font-bold text-blue-300 transition-all shadow-sm"
+                    >
+                      <Zap className="h-3.5 w-3.5 text-blue-400" />
+                      <span>Puente 1-Clic (.bat)</span>
+                    </a>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setUseOpenTerminal(!useOpenTerminal)}
-                  className={cn(
-                    'apple-press px-4 py-1.5 rounded-full font-mono text-[10px] uppercase tracking-wider font-bold transition-colors',
-                    useOpenTerminal
-                      ? 'bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]'
-                      : 'border border-white/10 bg-white/5 text-[#86868B]'
-                  )}
-                >
-                  {useOpenTerminal ? '1-Clic Activo' : 'Ingreso Manual'}
-                </button>
+
+                {/* Sub-bar showing connection method toggle */}
+                <div className="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs">
+                  <span className="text-[#86868B] text-[11px]">
+                    {useOpenTerminal
+                      ? 'Detección automática activa vía WebRequest / Socket Local.'
+                      : 'Modo manual: ingresa Login, Contraseña y Servidor abajo.'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setUseOpenTerminal(!useOpenTerminal)}
+                    className="text-[10px] font-mono text-[#A1A1A6] hover:text-white underline transition-colors"
+                  >
+                    {useOpenTerminal ? 'Cambiar a credenciales manuales' : 'Cambiar a detección automática'}
+                  </button>
+                </div>
               </div>
             )}
 
@@ -1006,6 +1137,121 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
         ]}
       />
 
+      {/* ═══════════════ 4B. CAPITAL SIZING & BROKER RULES CONTROLLER ═══════════════ */}
+      <div className="glass-panel specular-hairline rounded-3xl p-6 sm:p-8 space-y-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.07] pb-5">
+          <div>
+            <div className="flex items-center gap-2">
+              <Sliders className="h-4 w-4 text-[#30D158]" />
+              <h3 className="text-base font-bold text-white tracking-tight">
+                Dimensionamiento de Capital & Nomenclatura del Broker
+              </h3>
+            </div>
+            <p className="text-xs text-[#86868B] mt-1">
+              Adapta el portafolio al balance exacto de tu cuenta (Prop Firm o Personal) y ajusta los prefijos/sufijos que exige tu broker.
+            </p>
+          </div>
+
+          <Btn
+            variant="secondary"
+            size="sm"
+            loading={isRecalculating}
+            onClick={() => handleRecalculate()}
+            className="self-start md:self-auto font-mono text-xs"
+          >
+            <RefreshCw className={cn("h-3.5 w-3.5", isRecalculating && "animate-spin")} />
+            <span>Recalcular Lotes</span>
+          </Btn>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+          {/* Capital Selector (7 cols) */}
+          <div className="lg:col-span-7 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#86868B]">
+                Capital Objetivo de la Cuenta (USD)
+              </label>
+              <span className="font-mono text-xs font-bold text-white">
+                ${accountCapital.toLocaleString('en-US', { minimumFractionDigits: 2 })} USD
+              </span>
+            </div>
+
+            {/* Quick chips */}
+            <div className="flex flex-wrap items-center gap-2">
+              {[1000, 5000, 10000, 25000, 50000, 100000].map((val) => {
+                const isSel = accountCapital === val
+                return (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => {
+                      setAccountCapital(val)
+                      handleRecalculate(val)
+                    }}
+                    className={cn(
+                      'apple-press px-3 py-1.5 rounded-full font-mono text-xs transition-all',
+                      isSel
+                        ? 'bg-white text-black font-bold shadow-md'
+                        : 'border border-white/[0.08] bg-black/40 text-[#86868B] hover:text-white hover:border-white/20'
+                    )}
+                  >
+                    ${val >= 1000 ? `${val / 1000}k` : val}
+                    {val === 100000 && <span className="ml-1 text-[9px] text-amber-400 font-bold">FTMO</span>}
+                  </button>
+                )
+              })}
+
+              {/* Custom input */}
+              <div className="relative inline-flex items-center">
+                <span className="absolute left-3 text-xs text-[#86868B]">$</span>
+                <input
+                  type="number"
+                  value={accountCapital || ''}
+                  onChange={(e) => setAccountCapital(Number(e.target.value) || 0)}
+                  onBlur={() => handleRecalculate(accountCapital)}
+                  placeholder="Otro monto"
+                  className="w-28 rounded-full border border-white/[0.1] bg-black/50 pl-6 pr-3 py-1.5 font-mono text-xs text-white placeholder-[#555] focus:border-white/40 focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Broker Symbol Syntax (5 cols) */}
+          <div className="lg:col-span-5 space-y-2.5">
+            <label className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#86868B] block">
+              Sintaxis de Activos del Broker (Sufijos / Prefijos)
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { id: 'none', label: 'Estándar', sub: 'AAPL' },
+                { id: 'dot_us', label: '.US', sub: 'AAPL.US' },
+                { id: 'hash', label: '#', sub: '#AAPL' },
+                { id: 'cfd', label: '_CFD', sub: 'AAPL_CFD' },
+                { id: 'pro', label: '.pro', sub: 'AAPL.pro' },
+              ].map((p) => {
+                const isSel = symbolSyntaxPreset === p.id
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => handleSymbolPresetChange(p.id)}
+                    className={cn(
+                      'apple-press px-2.5 py-1.5 rounded-xl font-mono text-xs flex items-center gap-1.5 transition-all',
+                      isSel
+                        ? 'border border-[#30D158]/50 bg-[#30D158]/10 text-[#30D158] font-bold'
+                        : 'border border-white/[0.08] bg-black/40 text-[#86868B] hover:text-white'
+                    )}
+                  >
+                    <span>{p.label}</span>
+                    <span className="text-[9px] opacity-60">({p.sub})</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ═══════════════ 5. STAGED ORDERS — DENSE TERMINAL TABLE (EMSX Desk) ═══════════════ */}
       <div className="glass-panel specular-hairline overflow-hidden rounded-3xl">
         <div className="flex items-center justify-between border-b border-white/[0.07] px-6 py-5">
@@ -1035,38 +1281,54 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
               <thead>
                 <tr className="border-b border-white/[0.07] text-[10px] uppercase tracking-[0.16em] text-[#636366]">
                   <th className="px-6 py-3.5 font-medium">Acción</th>
-                  <th className="px-6 py-3.5 font-medium">Instrumento</th>
+                  <th className="px-6 py-3.5 font-medium">Instrumento (Broker)</th>
                   <th className="px-6 py-3.5 font-medium">Rank Qlib</th>
-                  <th className="px-6 py-3.5 text-right font-medium">Cantidad</th>
+                  <th className="px-6 py-3.5 text-right font-medium">Lotes / Cantidad</th>
                   <th className="px-6 py-3.5 text-right font-medium">Precio est.</th>
                   <th className="px-6 py-3.5 text-right font-medium">Notional</th>
                 </tr>
               </thead>
               <tbody>
-                {orderList.map((ord, idx) => (
-                  <motion.tr
-                    key={ord.instrument}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.04, duration: 0.25 }}
-                    className="border-b border-white/[0.05] transition-colors last:border-b-0 hover:bg-white/[0.02]"
-                  >
-                    <td className="px-6 py-4">
-                      <span className="badge-terminal-green rounded px-2.5 py-1 text-[10px] font-bold">
-                        {ord.action}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-bold text-white">{ord.instrument}</td>
-                    <td className="px-6 py-4 text-[#636366]">#{ord.rank}</td>
-                    <td className="tnum px-6 py-4 text-right text-[#D2D2D7]">×{ord.qty}</td>
-                    <td className="tnum px-6 py-4 text-right text-[#86868B]">
-                      ${ord.est_price.toFixed(2)}
-                    </td>
-                    <td className="tnum px-6 py-4 text-right font-bold text-white">
-                      ${ord.est_notional.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                    </td>
-                  </motion.tr>
-                ))}
+                {orderList.map((ord, idx) => {
+                  const displaySymbol = ord.broker_symbol || (
+                    symbolSuffix || symbolPrefix
+                      ? `${symbolPrefix}${ord.instrument}${symbolSuffix}`
+                      : ord.instrument
+                  )
+                  return (
+                    <motion.tr
+                      key={ord.instrument}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.04, duration: 0.25 }}
+                      className="border-b border-white/[0.05] transition-colors last:border-b-0 hover:bg-white/[0.02]"
+                    >
+                      <td className="px-6 py-4">
+                        <span className="badge-terminal-green rounded px-2.5 py-1 text-[10px] font-bold">
+                          {ord.action}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm font-bold text-white">
+                        <span>{displaySymbol}</span>
+                        {displaySymbol !== ord.instrument && (
+                          <span className="ml-2 text-[10px] text-[#86868B] font-mono font-normal">
+                            (base: {ord.instrument})
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-[#636366]">#{ord.rank}</td>
+                      <td className="tnum px-6 py-4 text-right text-[#D2D2D7]">
+                        {ord.qty % 1 === 0 ? `×${ord.qty}` : `×${ord.qty.toFixed(2)}`}
+                      </td>
+                      <td className="tnum px-6 py-4 text-right text-[#86868B]">
+                        ${ord.est_price.toFixed(2)}
+                      </td>
+                      <td className="tnum px-6 py-4 text-right font-bold text-white">
+                        ${ord.est_notional.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </td>
+                    </motion.tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
@@ -1076,7 +1338,14 @@ export const ExecutionTab: React.FC<ExecutionTabProps> = ({ orders, onRefresh })
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-white/[0.07] px-6 py-5 bg-black/40">
           <div className="flex items-center gap-2 text-xs font-mono text-[#86868B]">
             <Lock className="h-4 w-4 text-[#30D158]" />
-            <span>Destino: <strong className="text-white">{selectedBroker.name}</strong></span>
+            <span>
+              Destino: <strong className="text-white">{selectedBroker.name}</strong>
+              {selectedBroker.id === 'mt5' && mt5Status?.connected && (
+                <span className="ml-2 text-[#30D158] font-bold">
+                  (● Enlace Activo: {mt5Status.session.broker || 'MT5 Terminal'})
+                </span>
+              )}
+            </span>
           </div>
 
           <Btn
