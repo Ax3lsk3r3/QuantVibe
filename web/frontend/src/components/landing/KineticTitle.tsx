@@ -30,8 +30,8 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
   const child = {
     hidden: {
       opacity: 0,
-      y: 30,
-      filter: 'blur(8px)',
+      y: 28,
+      filter: 'blur(12px)',
     },
     visible: {
       opacity: 1,
@@ -39,40 +39,50 @@ export const KineticTitle: React.FC<KineticTitleProps> = ({
       filter: 'blur(0px)',
       transition: {
         type: 'spring' as const,
-        damping: 28,
-        stiffness: 300,
+        damping: 26,
+        stiffness: 280,
         bounce: 0,
       },
     },
   }
 
   return (
-    <motion.h1
-      variants={container}
-      initial="hidden"
-      animate="visible"
-      className={`font-sans font-extrabold tracking-[-0.04em] text-white ${className}`}
-    >
-      {words.map((word, index) => {
-        const isHighlight = highlightWord && word.toLowerCase().includes(highlightWord.toLowerCase())
-        const isItalic = italicWord && word.toLowerCase().includes(italicWord.toLowerCase())
+    <div className="relative inline-block w-full">
+      {/* Diffused atmospheric metallic aura behind headline */}
+      <div
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[160px] w-full max-w-4xl rounded-full bg-gradient-to-r from-transparent via-white/[0.08] to-transparent blur-[80px]"
+        aria-hidden
+      />
 
-        return (
-          <motion.span
-            key={index}
-            variants={child}
-            className={`mr-[0.22em] inline-block last:mr-0 ${
-              isItalic
-                ? 'italic text-[#86868B]'
-                : isHighlight
-                ? 'titanium-text-gradient'
-                : 'text-white'
-            }`}
-          >
-            {word}
-          </motion.span>
-        )
-      })}
-    </motion.h1>
+      <motion.h1
+        variants={container}
+        initial="hidden"
+        animate="visible"
+        className={`relative z-10 font-sans font-black tracking-[-0.045em] select-none ${className}`}
+      >
+        {words.map((word, index) => {
+          const isHighlight =
+            highlightWord && word.toLowerCase().includes(highlightWord.toLowerCase())
+          const isItalic =
+            italicWord && word.toLowerCase().includes(italicWord.toLowerCase())
+
+          return (
+            <motion.span
+              key={index}
+              variants={child}
+              className={`inline-block py-1 pr-[0.24em] last:pr-0 overflow-visible ${
+                isHighlight
+                  ? 'metallic-text-bright'
+                  : isItalic
+                  ? 'metallic-text-smoked'
+                  : 'metallic-text-lead'
+              }`}
+            >
+              {word}
+            </motion.span>
+          )
+        })}
+      </motion.h1>
+    </div>
   )
 }

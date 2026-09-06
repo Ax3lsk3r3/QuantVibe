@@ -152,7 +152,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             text="El rigor cuantitativo institucional, con manos autónomas"
             highlightWord="cuantitativo"
             italicWord="autónomas"
-            className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold leading-[1.0] tracking-[-0.04em]"
+            className="text-4xl sm:text-6xl md:text-7xl lg:text-[5.5rem] font-black leading-[1.02] tracking-[-0.045em]"
           />
         </div>
 

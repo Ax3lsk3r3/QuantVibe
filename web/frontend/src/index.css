@@ -147,6 +147,28 @@
     -webkit-text-fill-color: transparent;
   }
 
+  /* Bloomberg Professional & Liquid Titanium Metallic Gradients */
+  .metallic-text-lead {
+    background: linear-gradient(180deg, #FFFFFF 5%, #EBEBF2 40%, #B8B8C6 75%, #888894 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 20px rgba(255, 255, 255, 0.14));
+  }
+
+  .metallic-text-bright {
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 35%, #D4D4E2 65%, #A2A2B2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 32px rgba(255, 255, 255, 0.35));
+  }
+
+  .metallic-text-smoked {
+    background: linear-gradient(180deg, #D6D6DF 0%, #9D9DAA 50%, #666672 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 14px rgba(255, 255, 255, 0.08));
+  }
+
   /* Apple & ElevenLabs Luxury Buttons with Explicit States */
   .apple-btn-primary {
     background: #FFFFFF;
