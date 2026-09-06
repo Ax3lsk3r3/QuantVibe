@@ -523,7 +523,7 @@ def get_brokers_catalog() -> List[Dict[str, Any]]:
             "name": "MetaTrader 5 Bridge",
             "category": "Forex & Multi-Asset EAs",
             "icon": "mt5",
-            "description": "Terminal MT5 de baja latencia con Expert Advisor IPC bridge. Compatible con Darwinex, FTMO, IC Markets e Interactive Brokers.",
+            "description": "En MT5 no se usan API Keys. Se conecta mediante tu Número de Cuenta (Login), Contraseña y Servidor que te asigna tu broker (ej. ICMarkets, FTMO, Darwinex), o por detección automática 1-clic si tienes MT5 abierto en tu PC.",
             "assets": ["Forex", "Índices", "Commodities", "CFDs"],
             "license": "Brokers Multi-Jurisdicción (FCA, ASIC, CySEC)",
             "status": "ready",
@@ -531,9 +531,9 @@ def get_brokers_catalog() -> List[Dict[str, Any]]:
             "default_template": "python scripts/connectors/broker_mt5.py --symbol {symbol} --action BUY --volume {qty} --magic 202609",
             "supported_modes": ["paper", "live"],
             "fields": [
-                {"key": "terminal_path", "label": "Ruta Terminal MT5", "type": "text", "placeholder": "C:\\Program Files\\MetaTrader 5\\terminal64.exe"},
-                {"key": "account", "label": "Número de Cuenta MT5", "type": "text", "placeholder": "10849204"},
-                {"key": "server", "label": "Servidor del Broker", "type": "text", "placeholder": "ICMarketsSC-Demo"}
+                {"key": "account", "label": "Número de Cuenta (Login ID)", "type": "text", "placeholder": "Ej: 10849204 (Ver barra superior en MT5)"},
+                {"key": "password", "label": "Contraseña de Trading", "type": "password", "placeholder": "Tu contraseña de inicio de sesión en MT5"},
+                {"key": "server", "label": "Servidor del Broker", "type": "text", "placeholder": "Ej: ICMarketsSC-Demo, FTMO-Server, Darwinex-Live"}
             ]
         },
         {
