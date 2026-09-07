@@ -1,8 +1,14 @@
 import unittest
-from starlette.testclient import TestClient
-from web.api import app
+
+try:
+    from starlette.testclient import TestClient
+    from web.api import app
+    HAS_WEB_DEPS = True
+except ImportError:
+    HAS_WEB_DEPS = False
 
 
+@unittest.skipUnless(HAS_WEB_DEPS, "web dependencies (fastapi/starlette) not installed")
 class TestWebAPI(unittest.TestCase):
     def setUp(self):
         self.client = TestClient(app)

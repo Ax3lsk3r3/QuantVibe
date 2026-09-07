@@ -5,14 +5,8 @@ Supports Spot & USD-M Futures with HMAC-SHA256 signature authentication.
 Pure Python standard library (no external dependencies required).
 """
 import argparse
-import hashlib
-import hmac
 import json
-import os
 import sys
-import time
-import urllib.request
-import urllib.error
 import uuid
 from datetime import datetime, timezone
 

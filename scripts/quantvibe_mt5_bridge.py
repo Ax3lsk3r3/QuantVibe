@@ -6,12 +6,11 @@ Bridges QuantVibe Cloud Web Platform (https://quantvibeapp.com/) with native loc
 """
 import argparse
 import json
-import os
 import sys
 import time
 import urllib.request
 import urllib.error
-from datetime import datetime, timezone
+from datetime import datetime
 
 
 def parse_args():
@@ -115,7 +114,7 @@ def main():
     account_id = str(args.account or account_info.login)
     terminal_info = mt5.terminal_info()
 
-    print(f"[2/3] Conexión MT5 Establecida:")
+    print("[2/3] Conexión MT5 Establecida:")
     print(f"      • Cuenta Login : {account_info.login} ({account_info.currency})")
     print(f"      • Broker / Firm: {account_info.company}")
     print(f"      • Servidor MT5 : {account_info.server}")
@@ -255,7 +254,7 @@ def send_ack(server: str, order_id: str, account: str, symbol: str, status: str,
             headers={"Content-Type": "application/json", "User-Agent": "QuantVibe-Bridge-Python/2.0"},
             method="POST"
         )
-        with urllib.request.urlopen(req, timeout=4) as resp:
+        with urllib.request.urlopen(req, timeout=4):
             pass
     except Exception:
         pass

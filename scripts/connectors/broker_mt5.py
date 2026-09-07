@@ -88,7 +88,7 @@ def main():
             print(f"[MT5] {json.dumps(output)}")
             mt5.shutdown()
             sys.exit(0)
-    except Exception as e:
+    except Exception:
         # Fall through to high-fidelity simulation if native connection cannot be established
         pass
 
