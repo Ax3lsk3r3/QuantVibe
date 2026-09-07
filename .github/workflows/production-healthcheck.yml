@@ -11,103 +11,14 @@ jobs:
     name: Probe Production Telemetry
     runs-on: ubuntu-latest
     steps:
-      - name: Probe quantvibeapp.com endpoints
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run Production Sentinel
         run: |
-          python3 - << 'PYEOF'
-          import urllib.request
-          import json
-          import time
-          import os
-          import sys
-
-          BASE_URL = "https://quantvibeapp.com"
-          HEADERS = {
-              "User-Agent": "QuantVibe-Production-Sentinel/1.0 (GitHubActions; +https://quantvibeapp.com)"
-          }
-
-          endpoints = [
-              {"name": "Frontend Landing & App", "path": "/", "expect_json": False},
-              {"name": "System Status & Pipeline Info", "path": "/api/status", "expect_json": True},
-              {"name": "Verified Alpha Signals (SHA-256)", "path": "/api/signals", "expect_json": True},
-              {"name": "Execution Orders Plan", "path": "/api/orders", "expect_json": True},
-              {"name": "Track Record Ledger", "path": "/api/track-record", "expect_json": True},
-              {"name": "Bloomberg RSS News Stream", "path": "/api/news/bloomberg?region=colombia", "expect_json": True},
-          ]
-
-          results = []
-          has_failure = False
-
-          print(f"📡 Probing Production Telemetry at {BASE_URL}...\n")
-
-          for ep in endpoints:
-              url = BASE_URL + ep["path"]
-              req = urllib.request.Request(url, headers=HEADERS)
-              t0 = time.time()
-              status_code = None
-              error_msg = None
-              latency_ms = 0
-              details = ""
-
-              try:
-                  with urllib.request.urlopen(req, timeout=15) as res:
-                      latency_ms = (time.time() - t0) * 1000
-                      status_code = res.status
-                      body = res.read().decode("utf-8", errors="replace")
-
-                      if ep["expect_json"]:
-                          data = json.loads(body)
-                          if ep["path"] == "/api/status":
-                              healthy = data.get("deployment", {}).get("healthy", True)
-                              version = data.get("version", "unknown")
-                              details = f"Version: {version} | Healthy: {healthy}"
-                          elif ep["path"] == "/api/signals":
-                              verified = data.get("verified", False)
-                              signals_count = len(data.get("payload", {}).get("signals", []))
-                              details = f"Verified: {verified} | Signals: {signals_count}"
-                          elif ep["path"] == "/api/orders":
-                              dry_run = data.get("dry_run", True)
-                              orders_count = len(data.get("orders", []))
-                              details = f"Orders: {orders_count} (dry_run={dry_run})"
-                          elif ep["path"] == "/api/track-record":
-                              rec_count = len(data.get("records", []))
-                              details = f"Records: {rec_count}"
-                          elif "news" in ep["path"]:
-                              art_count = len(data.get("articles", []))
-                              details = f"Articles: {art_count}"
-                      else:
-                          details = "HTML Application Nominal"
-
-              except Exception as e:
-                  latency_ms = (time.time() - t0) * 1000
-                  error_msg = str(e)
-                  has_failure = True
-
-              badge = "🟢 PASS" if not error_msg and status_code == 200 else "🔴 FAIL"
-              results.append({
-                  "name": ep["name"],
-                  "path": ep["path"],
-                  "status": status_code or "ERR",
-                  "latency": f"{latency_ms:.1f}ms",
-                  "badge": badge,
-                  "details": error_msg or details
-              })
-              print(f"{badge} [{status_code or 'ERR'}] {ep['name']} ({latency_ms:.1f}ms) - {error_msg or details}")
-
-          # Write Step Summary
-          summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
-          if summary_file:
-              with open(summary_file, "a", encoding="utf-8") as f:
-                  f.write("## 🌐 Production Healthcheck & Telemetry Report\n\n")
-                  f.write(f"**Target Host:** `{BASE_URL}`  \n")
-                  f.write(f"**Timestamp:** `{time.strftime('%Y-%m-%d %H:%M:%S UTC', time.gmtime())}`  \n\n")
-                  f.write("| Service / Endpoint | Route | Status | Latency | Result | Details |\n")
-                  f.write("|---|---|:---:|:---:|:---:|---|\n")
-                  for r in results:
-                      f.write(f"| **{r['name']}** | `{r['path']}` | `{r['status']}` | {r['latency']} | {r['badge']} | {r['details']} |\n")
-                  f.write("\n")
-
-          if has_failure:
-              sys.exit("❌ One or more production endpoints failed the healthcheck.")
-          else:
-              print("\n✅ All production services are healthy and nominal.")
-          PYEOF
+          python scripts/sentinel.py
