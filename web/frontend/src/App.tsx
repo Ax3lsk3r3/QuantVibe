@@ -164,6 +164,15 @@ export const App: React.FC = () => {
                 {l.label}
               </button>
             ))}
+            <a
+              href="https://github.com/Ax3lsk3r3/QuantVibe"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 transition-colors hover:text-white"
+            >
+              <span>GitHub</span>
+              <span className="text-[9px] text-[#30D158]">↗</span>
+            </a>
           </nav>
 
           <div className="space-y-1 text-right font-mono text-[10px] leading-relaxed text-[#48484A]">
