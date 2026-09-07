@@ -1,0 +1,102 @@
+name: Quant Rebalance Pipeline (Paper)
+
+on:
+  schedule:
+    # Run Monday through Friday at 21:00 UTC (after US market close)
+    - cron: '0 21 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  rebalance:
+    name: Run Quantitative Pipeline & Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install pandas numpy coverage fastapi httpx
+
+      - name: Run End-to-End Pipeline
+        run: |
+          python scripts/run_pipeline.py --force-demo
+
+      - name: Generate Rebalance Telemetry Summary
+        run: |
+          python3 - << 'PYEOF'
+          import json
+          import os
+
+          summary_file = os.environ.get("GITHUB_STEP_SUMMARY")
+          if not summary_file:
+              exit(0)
+
+          eval_data = {}
+          signals_data = {}
+          orders_data = {}
+
+          if os.path.exists("artifacts/evaluation.json"):
+              with open("artifacts/evaluation.json", "r") as f:
+                  eval_data = json.load(f)
+
+          if os.path.exists("artifacts/signals.json"):
+              with open("artifacts/signals.json", "r") as f:
+                  signals_data = json.load(f)
+
+          if os.path.exists("artifacts/orders_plan.json"):
+              with open("artifacts/orders_plan.json", "r") as f:
+                  orders_data = json.load(f)
+
+          with open(summary_file, "a", encoding="utf-8") as f:
+              f.write("## 📈 Daily Quant Pipeline Execution Summary\n\n")
+              
+              # Evaluation metrics
+              metrics = eval_data.get("metrics", {})
+              verdict = eval_data.get("verdict", "N/A")
+              model_name = eval_data.get("model", "N/A")
+              f.write(f"**Model:** `{model_name}` | **Verdict Gate:** `{'🟢 ' + verdict if verdict == 'APROBADO' else '🟡 ' + verdict}`  \n\n")
+              
+              f.write("| Metric | Value | Description |\n")
+              f.write("|---|:---:|---|\n")
+              f.write(f"| **Mean IC** | `{metrics.get('ic_mean', 0):+.4f}` | Rank correlation with 1-day future return |\n")
+              f.write(f"| **ICIR** | `{metrics.get('icir', 0):+.4f}` | Information Coefficient Information Ratio |\n")
+              f.write(f"| **Hit-Rate Top-K** | `{(metrics.get('hit_rate_topk', 0)*100):.1f}%` | Percentage of top signals beating universe median |\n")
+              f.write(f"| **Top-K Return** | `{(metrics.get('topk_mean_return', 0)*100):+.3f}%` | Average return of selected top assets |\n\n")
+
+              # Top Signals
+              signals_list = signals_data.get("payload", {}).get("signals", [])
+              f.write("### 🎯 Alpha Top Ranked Assets\n\n")
+              f.write("| Rank | Ticker | Alpha Score | Target Notional |\n")
+              f.write("|:---:|:---:|:---:|:---:|\n")
+              for s in signals_list[:5]:
+                  f.write(f"| #{s.get('rank')} | **{s.get('symbol')}** | `{s.get('score', 0):+.4f}` | ${s.get('target_notional', 0):,.2f} |\n")
+              f.write("\n")
+
+              # Orders Plan
+              orders_list = orders_data.get("orders", [])
+              f.write("### 📋 Generated Paper Orders\n\n")
+              f.write(f"**Dry Run:** `{orders_data.get('dry_run')}` | **Total Planned:** `{len(orders_list)}`  \n\n")
+              f.write("| Action | Symbol | Qty | Est. Price | Est. Value |\n")
+              f.write("|:---:|:---:|:---:|:---:|:---:|\n")
+              for o in orders_list:
+                  f.write(f"| `{o.get('action')}` | **{o.get('symbol')}** | `{o.get('quantity')}` | ~${o.get('price_estimate', 0):.2f} | ~${(o.get('quantity', 0)*o.get('price_estimate', 0)):,.2f} |\n")
+              f.write("\n")
+          PYEOF
+
+      - name: Archive Pipeline Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: quant-pipeline-artifacts-${{ github.run_id }}
+          path: |
+            artifacts/signals.json
+            artifacts/orders_plan.json
+            artifacts/evaluation.json
+            artifacts/track_record.db
+          retention-days: 30

@@ -1,82 +1,82 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-06T18:37:38+00:00",
+  "generated_at": "2026-09-07T19:32:57+00:00",
   "dry_run": true,
   "currency": "USD",
   "total_notional_target": 5000.0,
   "source_model": "DemoMomentum",
   "data_source": "synthetic",
-  "signals_checksum": "5e68be9df4cd21d433de5e5e037904502803192017d0992863341172462a283b",
+  "signals_checksum": "4f58b14585ac548dffb1a294a709cc4d7d39db6c054608843ec03d06a64d480a",
   "orders": [
     {
       "instrument": "TSLA",
       "broker_symbol": "TSLA.US",
       "action": "BUY",
       "rank": 1,
-      "signal_score": 0.1281508803155218,
-      "signal_as_of": "2026-09-04",
-      "signals_checksum": "5e68be9df4cd21d433de5e5e037904502803192017d0992863341172462a283b",
+      "signal_score": 0.1343215305497553,
+      "signal_as_of": "2026-09-07",
+      "signals_checksum": "4f58b14585ac548dffb1a294a709cc4d7d39db6c054608843ec03d06a64d480a",
       "status": "PLANNED",
-      "qty": 16.54,
-      "est_price": 60.469,
-      "est_notional": 1000.16
+      "qty": 16.26,
+      "est_price": 61.4952,
+      "est_notional": 999.91
     },
     {
       "instrument": "AAPL",
       "broker_symbol": "AAPL.US",
       "action": "BUY",
       "rank": 2,
-      "signal_score": 0.1005455912773567,
-      "signal_as_of": "2026-09-04",
-      "signals_checksum": "5e68be9df4cd21d433de5e5e037904502803192017d0992863341172462a283b",
+      "signal_score": 0.0869758571260879,
+      "signal_as_of": "2026-09-07",
+      "signals_checksum": "4f58b14585ac548dffb1a294a709cc4d7d39db6c054608843ec03d06a64d480a",
       "status": "PLANNED",
       "qty": 3.87,
-      "est_price": 258.2975,
-      "est_notional": 999.61
+      "est_price": 258.3534,
+      "est_notional": 999.83
     },
     {
       "instrument": "META",
       "broker_symbol": "META.US",
       "action": "BUY",
       "rank": 3,
-      "signal_score": 0.0835580320576823,
-      "signal_as_of": "2026-09-04",
-      "signals_checksum": "5e68be9df4cd21d433de5e5e037904502803192017d0992863341172462a283b",
+      "signal_score": 0.0714523242096261,
+      "signal_as_of": "2026-09-07",
+      "signals_checksum": "4f58b14585ac548dffb1a294a709cc4d7d39db6c054608843ec03d06a64d480a",
       "status": "PLANNED",
-      "qty": 18.39,
-      "est_price": 54.3711,
-      "est_notional": 999.88
+      "qty": 18.47,
+      "est_price": 54.1302,
+      "est_notional": 999.78
     },
     {
       "instrument": "JPM",
       "broker_symbol": "JPM.US",
       "action": "BUY",
       "rank": 4,
-      "signal_score": 0.0541345341964536,
-      "signal_as_of": "2026-09-04",
-      "signals_checksum": "5e68be9df4cd21d433de5e5e037904502803192017d0992863341172462a283b",
+      "signal_score": 0.0603048006804334,
+      "signal_as_of": "2026-09-07",
+      "signals_checksum": "4f58b14585ac548dffb1a294a709cc4d7d39db6c054608843ec03d06a64d480a",
       "status": "PLANNED",
-      "qty": 26.7,
-      "est_price": 37.4534,
-      "est_notional": 1000.01
+      "qty": 26.3,
+      "est_price": 38.022,
+      "est_notional": 999.98
     },
     {
-      "instrument": "NVDA",
-      "broker_symbol": "NVDA.US",
+      "instrument": "AMZN",
+      "broker_symbol": "AMZN.US",
       "action": "BUY",
       "rank": 5,
-      "signal_score": 0.0474513837938415,
-      "signal_as_of": "2026-09-04",
-      "signals_checksum": "5e68be9df4cd21d433de5e5e037904502803192017d0992863341172462a283b",
+      "signal_score": 0.0291679258036521,
+      "signal_as_of": "2026-09-07",
+      "signals_checksum": "4f58b14585ac548dffb1a294a709cc4d7d39db6c054608843ec03d06a64d480a",
       "status": "PLANNED",
-      "qty": 18.05,
-      "est_price": 55.393,
-      "est_notional": 999.84
+      "qty": 8.18,
+      "est_price": 122.2634,
+      "est_notional": 1000.11
     }
   ],
   "totals": {
     "planned_orders": 5,
     "skipped_orders": 0,
-    "estimated_exposure": 4999.5
+    "estimated_exposure": 4999.61
   }
 }

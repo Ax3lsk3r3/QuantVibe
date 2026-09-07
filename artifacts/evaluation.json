@@ -1,10 +1,10 @@
 {
-  "n_days": 1459,
-  "mean_ic": 0.06809562381872182,
-  "icir": 0.2034666930979537,
-  "hit_rate_topk": 0.570938999314599,
-  "avg_topk_fwd_return": 0.0011845710616860765,
-  "avg_universe_fwd_return": 0.00031342473412874095,
+  "n_days": 1460,
+  "mean_ic": 0.0682274802822748,
+  "icir": 0.20390745383280232,
+  "hit_rate_topk": 0.5712328767123288,
+  "avg_topk_fwd_return": 0.001186619396816375,
+  "avg_universe_fwd_return": 0.00031291203792260824,
   "passed": true,
   "failures": [],
   "thresholds": {
@@ -13,5 +13,5 @@
     "min_icir": 0.0
   },
   "fwd_horizon": 1,
-  "evaluated_at": "2026-09-06T00:30:41+00:00"
+  "evaluated_at": "2026-09-07T19:31:42+00:00"
 }

@@ -1,6 +1,8 @@
 # QuantVibe
 
 [![CI](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml/badge.svg)](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml)
+[![CD](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/deploy.yml/badge.svg)](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/deploy.yml)
+[![CodeQL](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/codeql.yml/badge.svg)](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/codeql.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Ax3lsk3r3/QuantVibe/badges/coverage-badge.json)](https://github.com/Ax3lsk3r3/QuantVibe/actions/workflows/ci.yml)
 [![Code Style: ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 ![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue?logo=python&logoColor=white)
