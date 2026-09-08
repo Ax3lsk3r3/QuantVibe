@@ -82,11 +82,11 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" << 'EOF'
             set -e
-            echo "🚀 Starting continuous deployment on production host..."
+            echo "Starting continuous deployment on production host..."
             cd ~/QuantVibe
             git fetch origin main
             git reset --hard origin/main
-            echo "📌 Deployed commit: $(git log --oneline -1)"
+            echo "Deployed commit: $(git log --oneline -1)"
           EOF
 
       - name: Upload freshly built frontend (atomic swap)
@@ -104,7 +104,7 @@ jobs:
             mv static static.old
             mv static.new static
             rm -rf static.old
-            echo "🎨 Frontend synced from CI build:"
+            echo "Frontend synced from CI build:"
             ls -la static static/assets
           '
 
@@ -122,7 +122,7 @@ jobs:
             pkill -f "python scripts/start_web.py" || true
             nohup python scripts/start_web.py --port 80 > web.log 2>&1 &
             sleep 3
-            curl -f http://localhost/api/status || (echo "❌ Healthcheck failed" && exit 1)
+            curl -f http://localhost/api/status || (echo "Healthcheck failed" && exit 1)
             iptables -t nat -A PREROUTING -p tcp --dport 8000 -j REDIRECT --to-port 80 2>/dev/null || true
-            echo "✅ Deployment completed successfully! Live on https://quantvibeapp.com"
+            echo "Deployment completed successfully! Live on https://quantvibeapp.com"
           EOF

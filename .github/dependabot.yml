@@ -9,7 +9,7 @@ updates:
       time: "04:00"
     open-pull-requests-limit: 5
 
-  # Frontend dependencies
+  # Frontend dependencies (tracks web/frontend/pnpm-lock.yaml)
   - package-ecosystem: "npm"
     directory: "/web/frontend"
     schedule:
