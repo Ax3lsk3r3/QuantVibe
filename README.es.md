@@ -12,6 +12,8 @@
 Idioma: [English](README.md) | **Español**  
 Terminal en Producción: [https://quantvibeapp.com](https://quantvibeapp.com)
 
+![QuantVibe Terminal Cuantitativo en Vivo](assets/quantvibe_demo.gif)
+
 **Usa [Qlib](https://github.com/microsoft/qlib) como cerebro cuant y [Vibe-Trading](https://github.com/HKUDS/Vibe-Trading) como manos.**
 
 `QuantVibe` es un proyecto de integración que conecta dos herramientas existentes sin hacer fork de ninguna:
@@ -45,6 +47,9 @@ Los dos mundos **nunca se importan entre sí**: se comunican por un archivo firm
 - **Track record en SQLite**: Cada señal publicada se registra y se liquida con precios reales cuando existen; `stats` muestra hit-rate y exceso vs universo.
 - **Servidor FastMCP** (`bridge/mcp_server.py`): Tres herramientas de solo lectura: `get_latest_signals`, `list_universe`, `signal_health` (control de frescura).
 - **Guardarraíles de ejecución**: `execute_signals.py` solo escribe un *plan de órdenes* por defecto. Enviar órdenes reales exige `--submit` Y la variable `VIBE_ALLOW_ORDERS=1`.
+- **Puente Nativo MetaTrader 5 (MQL5 EA)**: Integración IPC de copia cero con `QuantVibe_Bridge.mq5` para Forex, CFDs y firmas de fondeo (FTMO, IC Markets, Darwinex) con ejecución sub-milisegundo.
+- **Terminal Bloomberg & Stream Macroeconómico**: Noticias financieras en tiempo real transmitidas vía proxy RSS con screeners para múltiples clases de activos (Tecnología, Hardware IA, Cripto 24/7, Finanzas, Materias Primas).
+- **Mesa de Órdenes 1-Clic**: Mesa interactiva con deslizador dinámico de capital, recálculo automático de lotes y explicabilidad de factores con IA (SHAP).
 - **Trazabilidad de procedencia**: Si cada símbolo vino de yfinance o del generador sintético viaja en `manifest.json` -> `signals.json`.
 
 ## Estructura
@@ -64,8 +69,11 @@ web/api.py                           API REST FastAPI, stream SSE y montaje SPA 
 web/server.py                        ejecutor del servidor web en producción
 web/static/                          paquete compilado de producción del frontend
 web/frontend/                        React 19 + TypeScript + Tailwind + Framer Motion
+scripts/connectors/QuantVibe_Bridge.mq5  Expert Advisor nativo MQL5 para MetaTrader 5
+scripts/connectors/broker_mt5.py         conector IPC y despachador de órdenes para MT5
+scripts/connectors/broker_alpaca.py      conector para acciones de EE.UU. en Alpaca Markets
 scripts/start_web.py                 lanzador web en un solo comando (puerto único: 8000 o 80)
-scripts/run_pipeline.py              orquestador end-to-end a través de venvs aislados
+scripts/run_pipeline.py              end-to-end orchestrator across isolated venvs
 scripts/setup.ps1                    crea venvs\qlib y venvs\vibe e instala dependencias
 Dockerfile                           imagen Python 3.11 con pyqlib; corre los tests en el build
 ```
@@ -103,6 +111,8 @@ python scripts/start_web.py
 3. **Mesa de Órdenes & Guardarraíles:** Visualizador del plan de órdenes (`orders_plan.json`), cálculo de exposición y switch de seguridad para alternar entre Paper Trading y envío real (`VIBE_ALLOW_ORDERS=1`).
 4. **Track Record & Auditoría:** Rendimiento histórico asentado en SQLite (`artifacts/track_record.db`), hit-rate real y exceso frente al universo.
 5. **Arquitectura & MCP Inspector:** Estado de los servidores FastMCP y grafos de conocimiento indexados.
+6. **Puente Nativo MetaTrader 5:** Despachador de órdenes en 1-clic, prueba de latencia con brokers, recálculo automático de lotes e instalador del EA.
+7. **Terminal Bloomberg & Stream en Vivo:** Noticias financieras en tiempo real, análisis de sentimiento, cinta global de cotizaciones TradingView y screeners multiactivo.
 
 ### Desarrollo del Frontend
 

@@ -12,6 +12,8 @@
 Language: **English** | [Español](README.es.md)  
 Live Production Terminal: [https://quantvibeapp.com](https://quantvibeapp.com)
 
+![QuantVibe Institutional Quantitative Platform](assets/quantvibe_demo.gif)
+
 **Uses [Qlib](https://github.com/microsoft/qlib) as the quantitative brain and [Vibe-Trading](https://github.com/HKUDS/Vibe-Trading) as the execution hands.**
 
 `QuantVibe` is an integration project connecting two independent quantitative finance tools without forking either:
@@ -45,6 +47,9 @@ The two systems **never import each other**: they communicate exclusively across
 - **SQLite track record**: Every published signal is logged to `artifacts/track_record.db` and settled against realized prices. `stats` command reports real hit-rate and excess return.
 - **FastMCP server** (`bridge/mcp_server.py`): Exposes three read-only tools: `get_latest_signals`, `list_universe`, and `signal_health` (freshness check).
 - **Guarded execution**: By default, `execute_signals.py` only outputs a dry-run order plan (`orders_plan.json`). Real broker order submission requires `--submit` and the explicit environment variable `VIBE_ALLOW_ORDERS=1`.
+- **MetaTrader 5 Native EA Bridge**: Zero-copy IPC connection with `QuantVibe_Bridge.mq5` for Forex, CFDs, and Prop Firms (FTMO, IC Markets, Darwinex) with sub-millisecond execution.
+- **Bloomberg Stream & Macro Intelligence**: Real-time RSS streaming financial news with multi-universe monitoring (Mega-Cap Tech, Semiconductors AI, Crypto 24/7, Global Banking, Commodities).
+- **One-Click Execution Desk**: Hardware-style order desk with interactive capital sizing slider, automated lot calculation, and explainable AI feature attribution.
 - **Data provenance**: Tracks whether each symbol originated from yfinance or the synthetic generator via `manifest.json` -> `signals.json`.
 
 ## Structure
@@ -64,6 +69,9 @@ web/api.py                           FastAPI REST API, SSE streaming, and static
 web/server.py                        production web runner
 web/static/                          compiled production frontend assets
 web/frontend/                        React 19 + TypeScript + Tailwind + Framer Motion
+scripts/connectors/QuantVibe_Bridge.mq5  MQL5 native Expert Advisor for MetaTrader 5
+scripts/connectors/broker_mt5.py         MT5 IPC connector and trade dispatcher
+scripts/connectors/broker_alpaca.py      Alpaca Markets US Equities connector
 scripts/start_web.py                 one-command web launcher (single port: 8000 or 80)
 scripts/run_pipeline.py              end-to-end orchestrator across isolated venvs
 scripts/setup.ps1                    sets up venvs\qlib and venvs\vibe and installs dependencies
@@ -103,6 +111,8 @@ python scripts/start_web.py
 3. **Execution Desk & Guardrails:** Visualizer for `orders_plan.json`, portfolio exposure breakdown, and a hardware-style safety switch toggling Paper Trading vs real order dispatch (`VIBE_ALLOW_ORDERS=1`).
 4. **Track Record & Audit:** Historical performance settled in SQLite (`artifacts/track_record.db`), hit-rate metrics, and excess return vs universe benchmark.
 5. **Architecture & MCP Inspector:** Status monitor for FastMCP stdio server and indexed knowledge graphs.
+6. **MetaTrader 5 Native Bridge:** One-click trade dispatcher, broker latency diagnostics, automatic lot recalculation, and EA download installer.
+7. **Bloomberg Terminal & Live Market Stream:** Live financial news streaming, sentiment analysis, TradingView global quotes tape, and multi-asset universe screeners.
 
 ### Frontend Development
 
