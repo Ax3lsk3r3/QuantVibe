@@ -64,7 +64,6 @@ web/api.py                           API REST FastAPI, stream SSE y montaje SPA 
 web/server.py                        ejecutor del servidor web en producción
 web/static/                          paquete compilado de producción del frontend
 web/frontend/                        React 19 + TypeScript + Tailwind + Framer Motion
-docs/DEPLOYMENT_GUIDE.md             manual de operaciones y despliegue en la nube
 scripts/start_web.py                 lanzador web en un solo comando (puerto único: 8000 o 80)
 scripts/run_pipeline.py              orquestador end-to-end a través de venvs aislados
 scripts/setup.ps1                    crea venvs\qlib y venvs\vibe e instala dependencias
@@ -160,20 +159,17 @@ docker run --rm -v ./data:/app/data -v ./artifacts:/app/artifacts ghcr.io/ax3lsk
 
 `./data` y `./artifacts` están montados como volúmenes: las señales, planes y la base del track record quedan en tu disco, no dentro del contenedor.
 
-## Despliegue en la Nube (Producción 24/7)
+## Ejecución en Producción (Servicio 24/7)
 
-Para desplegar QuantVibe en un servidor en la nube (Alibaba Cloud ECS, AWS EC2, DigitalOcean, etc.):
-
-Consulta el manual de operaciones paso a paso: [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md).
+QuantVibe puede ejecutarse como un servicio en segundo plano en cualquier equipo Linux, macOS o Windows:
 
 ```bash
-# En un servidor Ubuntu 22.04 / 24.04:
-sudo apt update && sudo apt install -y python3-pip python3-venv git
 git clone https://github.com/Ax3lsk3r3/QuantVibe.git
 cd QuantVibe
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements-web.txt
-nohup python scripts/start_web.py --port 80 > web.log 2>&1 &
+python scripts/run_pipeline.py --force-demo
+nohup python scripts/start_web.py --port 8000 > web.log 2>&1 &
 ```
 
 ## Conectar el agente de Vibe-Trading

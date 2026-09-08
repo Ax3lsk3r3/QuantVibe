@@ -22,8 +22,13 @@ artifacts/*.csv
 artifacts/track_record.db-wal
 artifacts/track_record.db-shm
 
-# Private Infrastructure & Server Documentation (Local PC Only)
+# Private Infrastructure, Deployment Guides & Audit Logs (Local PC Only)
 infrastructure/
+docs/DEPLOYMENT*.md
+docs/*deployment*
+docs/*Deployment*
+*audit*.md
+.security_audit*
 local/
 secrets/
 scratch/
