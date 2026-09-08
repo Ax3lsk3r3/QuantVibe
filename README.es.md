@@ -246,9 +246,20 @@ Falta cualquiera de las dos barreras -> exit code 2, cero órdenes. Empieza con 
 
 ## Comunidad
 
+- [Discusiones](https://github.com/Ax3lsk3r3/QuantVibe/discussions) — debates sobre arquitectura y estrategias cuantitativas
 - [Contribuir](CONTRIBUTING.md) — cómo reportar bugs y proponer cambios
 - [Reportar una vulnerabilidad](SECURITY.md)
 - [Issues](https://github.com/Ax3lsk3r3/QuantVibe/issues) — plantillas para bug e idea
+
+## Historial de Estrellas
+
+<a href="https://star-history.com/#Ax3lsk3r3/QuantVibe&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Ax3lsk3r3/QuantVibe&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Ax3lsk3r3/QuantVibe&type=Date" />
+   <img alt="QuantVibe Star History Chart" src="https://api.star-history.com/svg?repos=Ax3lsk3r3/QuantVibe&type=Date" />
+ </picture>
+</a>
 
 ## Aviso Legal y Descargo de Responsabilidad
 

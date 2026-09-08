@@ -246,9 +246,20 @@ If either the `--submit` flag or the environment variable is missing, execution 
 
 ## Community
 
+- [Discussions](https://github.com/Ax3lsk3r3/QuantVibe/discussions) — architecture and quantitative strategy discussions
 - [Contributing](CONTRIBUTING.md) — bug reports and pull requests
 - [Security](SECURITY.md) — vulnerability disclosure policy
 - [Issues](https://github.com/Ax3lsk3r3/QuantVibe/issues) — issue templates
+
+## Star History
+
+<a href="https://star-history.com/#Ax3lsk3r3/QuantVibe&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=Ax3lsk3r3/QuantVibe&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=Ax3lsk3r3/QuantVibe&type=Date" />
+   <img alt="QuantVibe Star History Chart" src="https://api.star-history.com/svg?repos=Ax3lsk3r3/QuantVibe&type=Date" />
+ </picture>
+</a>
 
 ## Legal Notice and Disclaimer
 
