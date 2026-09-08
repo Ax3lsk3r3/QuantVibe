@@ -77,13 +77,13 @@ jobs:
 
       - name: Sync backend code on server (git)
         env:
-          SSH_HOST: ${{ secrets.SERVER_HOST || '47.85.111.6' }}
-          SSH_USER: ${{ secrets.SERVER_USER || 'root' }}
+          SSH_HOST: ${{ secrets.SERVER_HOST }}
+          SSH_USER: ${{ secrets.SERVER_USER }}
         run: |
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" << 'EOF'
             set -e
-            echo "🚀 Starting continuous deployment on Alibaba Cloud ECS..."
-            cd /root/QuantVibe
+            echo "🚀 Starting continuous deployment on production host..."
+            cd ~/QuantVibe
             git fetch origin main
             git reset --hard origin/main
             echo "📌 Deployed commit: $(git log --oneline -1)"
@@ -91,12 +91,12 @@ jobs:
 
       - name: Upload freshly built frontend (atomic swap)
         env:
-          SSH_HOST: ${{ secrets.SERVER_HOST || '47.85.111.6' }}
-          SSH_USER: ${{ secrets.SERVER_USER || 'root' }}
+          SSH_HOST: ${{ secrets.SERVER_HOST }}
+          SSH_USER: ${{ secrets.SERVER_USER }}
         run: |
           tar -czf - -C web/static . | ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" '
             set -e
-            cd /root/QuantVibe/web
+            cd ~/QuantVibe/web
             rm -rf static.new static.old
             mkdir -p static.new
             tar -xzf - -C static.new
@@ -110,12 +110,12 @@ jobs:
 
       - name: Restart service & healthcheck
         env:
-          SSH_HOST: ${{ secrets.SERVER_HOST || '47.85.111.6' }}
-          SSH_USER: ${{ secrets.SERVER_USER || 'root' }}
+          SSH_HOST: ${{ secrets.SERVER_HOST }}
+          SSH_USER: ${{ secrets.SERVER_USER }}
         run: |
           ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" << 'EOF'
             set -e
-            cd /root/QuantVibe
+            cd ~/QuantVibe
             source venv/bin/activate
             pip install -r requirements-web.txt --quiet
             python scripts/run_pipeline.py --force-demo || true

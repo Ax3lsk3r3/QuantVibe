@@ -1,8 +1,63 @@
+# Python virtual environments & bytecode
+venv/
 venvs/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Testing & Linting Caches
+.pytest_cache/
+.coverage
+coverage.xml
+coverage/
+htmlcov/
+.ruff_cache/
+
+# Data & Dynamic Artifacts
 data/
 artifacts/*.csv
-__pycache__/
-*.pyc
-.pytest_cache/
+artifacts/track_record.db-wal
+artifacts/track_record.db-shm
+
+# Private Infrastructure & Server Documentation (Local PC Only)
+infrastructure/
+local/
+secrets/
+scratch/
+tmp/
+*.log
+web.log
+
+# Environment & Credentials (NEVER commit)
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.id_rsa
+*.pub
+credentials.json
+
+# Local Code Graphs & AI Memory Indexes
+.codebase-memory/
+.codegraph/
+.cache/
+
+# Node & Frontend Build
 node_modules/
+dist/
+.vite/
+npm-debug.log*
+pnpm-debug.log*
+
+# Operating System & IDEs
 .DS_Store
+Thumbs.db
+ehthumbs.db
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
