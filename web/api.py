@@ -821,7 +821,7 @@ def execute_orders(req: OrderSubmitRequest) -> Dict[str, Any]:
             raise HTTPException(status_code=400, detail="Operadores de shell no permitidos en la plantilla de orden.")
         if not re.match(r"^[a-zA-Z0-9_\-\.\/ \{\}:=\"']+$", template):
             raise HTTPException(status_code=400, detail="Caracteres no autorizados en la plantilla de orden.")
-        
+
         tokens = template.split()
         if not tokens:
             raise HTTPException(status_code=400, detail="Plantilla de orden vacía.")
