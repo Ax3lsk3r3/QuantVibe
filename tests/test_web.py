@@ -99,6 +99,66 @@ class TestWebAPI(unittest.TestCase):
                 if ord_item["status"] == "PLANNED":
                     self.assertTrue(ord_item["broker_symbol"].endswith(".US"))
 
+    def test_recalculate_orders_plan_injection_rejected(self):
+        # Invalid capital
+        res_neg = self.client.post(
+            "/api/orders/recalculate",
+            json={"capital": -100.0, "symbol_suffix": "", "symbol_prefix": ""}
+        )
+        self.assertEqual(res_neg.status_code, 400)
+
+        # Disallowed characters in symbol suffix (command injection attempt)
+        res_inj = self.client.post(
+            "/api/orders/recalculate",
+            json={"capital": 5000.0, "symbol_suffix": "; rm -rf /", "symbol_prefix": ""}
+        )
+        self.assertEqual(res_inj.status_code, 400)
+
+    def test_ssrf_webhook_rejected(self):
+        # Localhost attempt
+        res_local = self.client.post(
+            "/api/brokers/test",
+            json={"broker_id": "webhook", "credentials": {"webhook_url": "http://127.0.0.1:8000/api/status"}}
+        )
+        self.assertEqual(res_local.status_code, 400)
+        self.assertIn("anti-SSRF", res_local.json().get("detail", ""))
+
+        # Alibaba Cloud ECS metadata service attempt
+        res_alicloud = self.client.post(
+            "/api/brokers/test",
+            json={"broker_id": "webhook", "credentials": {"webhook_url": "http://100.100.100.200/latest/meta-data/"}}
+        )
+        self.assertEqual(res_alicloud.status_code, 400)
+
+        # AWS/GCP metadata service attempt
+        res_meta = self.client.post(
+            "/api/brokers/test",
+            json={"broker_id": "webhook", "credentials": {"webhook_url": "http://169.254.169.254/latest/meta-data/"}}
+        )
+        self.assertEqual(res_meta.status_code, 400)
+
+        # Private RFC1918 VPC subnet attempt
+        res_priv = self.client.post(
+            "/api/brokers/test",
+            json={"broker_id": "webhook", "credentials": {"webhook_url": "http://172.24.233.233:80/"}}
+        )
+        self.assertEqual(res_priv.status_code, 400)
+
+    def test_pipeline_run_validation(self):
+        # Disallowed mode
+        res_mode = self.client.post(
+            "/api/pipeline/run",
+            json={"mode": "evil_mode"}
+        )
+        self.assertEqual(res_mode.status_code, 400)
+
+        # Disallowed steps
+        res_step = self.client.post(
+            "/api/pipeline/run",
+            json={"mode": "demo", "steps": ["prepare", "malicious_step"]}
+        )
+        self.assertEqual(res_step.status_code, 400)
+
 
 if __name__ == "__main__":
     unittest.main()

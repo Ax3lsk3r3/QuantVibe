@@ -1,13 +1,17 @@
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import json
 import os
 import queue
+import re
+import socket
 import sqlite3
 import subprocess
 import sys
 import threading
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
@@ -25,6 +29,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from bridge.signal_store import checksum_of, load_signals
+from vibe_side.execute_signals import build_plan
 
 app = FastAPI(
     title="QuantVibe Terminal API",
@@ -86,6 +91,75 @@ class BrokerTestRequest(BaseModel):
     broker_id: str
     environment: str = "paper"  # "paper" or "live"
     credentials: Optional[Dict[str, str]] = None
+
+
+def is_safe_webhook_url(url_str: str) -> tuple[bool, str]:
+    """
+    Validates destination URL against SSRF, loopback, private RFC1918 subnets,
+    and cloud provider metadata ranges (100.100.100.200, 169.254.169.254, 100.64.0.0/10).
+    """
+    if not url_str or not isinstance(url_str, str):
+        return False, "URL vacía o no válida"
+
+    try:
+        parsed = urllib.parse.urlparse(url_str.strip())
+    except Exception:
+        return False, "URL con formato malformado"
+
+    if parsed.scheme not in ("http", "https"):
+        return False, "Esquema no permitido (únicamente se acepta http o https)"
+
+    hostname = parsed.hostname
+    if not hostname:
+        return False, "Hostname no especificado"
+
+    if not re.match(r"^[a-zA-Z0-9.-]+$", hostname):
+        return False, "Caracteres no permitidos en hostname"
+
+    lower_host = hostname.lower()
+    if lower_host in ("localhost", "127.0.0.1", "::1", "0.0.0.0"):
+        return False, "Acceso a localhost denegado por política de seguridad"
+
+    target_port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    try:
+        addr_info = socket.getaddrinfo(hostname, target_port)
+    except socket.gaierror:
+        return False, f"No se pudo resolver el dominio: {hostname}"
+    except Exception as exc:
+        return False, f"Fallo al resolver DNS: {exc}"
+
+    blocked_networks = [
+        ipaddress.ip_network("0.0.0.0/8"),
+        ipaddress.ip_network("10.0.0.0/8"),
+        ipaddress.ip_network("100.64.0.0/10"),   # Carrier-Grade NAT & Alibaba Cloud ECS metadata 100.100.100.200
+        ipaddress.ip_network("127.0.0.0/8"),    # IPv4 Loopback
+        ipaddress.ip_network("169.254.0.0/16"), # Link-Local & AWS/GCP metadata 169.254.169.254
+        ipaddress.ip_network("172.16.0.0/12"),  # Private Class B (including Alibaba VPC 172.24.233.233)
+        ipaddress.ip_network("192.168.0.0/16"), # Private Class C
+        ipaddress.ip_network("224.0.0.0/4"),    # Multicast
+        ipaddress.ip_network("240.0.0.0/4"),    # Reserved
+        ipaddress.ip_network("255.255.255.255/32"),
+        ipaddress.ip_network("::1/128"),        # IPv6 Loopback
+        ipaddress.ip_network("fc00::/7"),       # IPv6 Unique Local Address
+        ipaddress.ip_network("fe80::/10"),      # IPv6 Link-Local
+    ]
+
+    for item in addr_info:
+        sockaddr = item[4]
+        ip_str = sockaddr[0]
+        try:
+            ip_obj = ipaddress.ip_address(ip_str)
+        except ValueError:
+            return False, f"Dirección IP no válida: {ip_str}"
+
+        if ip_obj.is_loopback or ip_obj.is_private or ip_obj.is_link_local or ip_obj.is_multicast or ip_obj.is_reserved:
+            return False, f"Destino en red interna/privada denegado: {ip_str}"
+
+        for net in blocked_networks:
+            if ip_obj.version == net.version and ip_obj in net:
+                return False, f"Destino en rango protegido o metadatos de nube denegado ({net}): {ip_str}"
+
+    return True, "OK"
 
 
 # Live in-memory registry for MT5 Expert Advisors and Local Desktop Bridges
@@ -419,13 +493,32 @@ def _run_pipeline_worker(mode: str, steps: Optional[List[str]], config_path: Opt
 
 @app.post("/api/pipeline/run")
 def trigger_pipeline(req: PipelineRunRequest) -> Dict[str, Any]:
-    """Triggers end-to-end pipeline execution in background thread."""
+    """Triggers end-to-end pipeline execution in background thread with strict input validation."""
     if pipeline_state["is_running"]:
         raise HTTPException(status_code=409, detail="El pipeline ya está en ejecución.")
 
+    if req.mode not in ("demo", "real"):
+        raise HTTPException(status_code=400, detail="Modo de ejecución no válido (se requiere 'demo' o 'real').")
+
+    allowed_steps = {"prepare", "settle", "train", "export", "execute"}
+    steps_list = None
+    if req.steps:
+        for s in req.steps:
+            if s not in allowed_steps:
+                raise HTTPException(status_code=400, detail=f"Paso de pipeline no permitido: {s}")
+        steps_list = list(req.steps)
+
+    valid_config = None
+    if req.config_path:
+        cfg = (PROJECT_ROOT / req.config_path).resolve()
+        cfg_dir = (PROJECT_ROOT / "config").resolve()
+        if not str(cfg).startswith(str(cfg_dir)) or not cfg.is_file() or cfg.suffix not in (".yaml", ".yml", ".json"):
+            raise HTTPException(status_code=400, detail="Ruta de configuración no permitida o inexistente.")
+        valid_config = str(cfg)
+
     t = threading.Thread(
         target=_run_pipeline_worker,
-        args=(req.mode, req.steps, req.config_path),
+        args=(req.mode, steps_list, valid_config),
         daemon=True
     )
     t.start()
@@ -433,7 +526,7 @@ def trigger_pipeline(req: PipelineRunRequest) -> Dict[str, Any]:
     return {
         "status": "started",
         "mode": req.mode,
-        "steps": req.steps or ["prepare", "settle", "train", "export", "execute"]
+        "steps": steps_list or ["prepare", "settle", "train", "export", "execute"]
     }
 
 
@@ -494,28 +587,38 @@ async def stream_pipeline_logs():
 
 @app.post("/api/orders/recalculate")
 def recalculate_orders_plan(req: RecalculatePlanRequest) -> Dict[str, Any]:
-    """Recalculates orders_plan.json dynamically for custom account capital and broker symbol syntax."""
+    """Recalculates orders_plan.json dynamically for custom account capital and broker symbol syntax in-process."""
     signals_file = ARTIFACTS_DIR / "signals.json"
     if not signals_file.is_file():
         raise HTTPException(status_code=404, detail="signals.json no encontrado. Corre el pipeline primero.")
 
-    cmd = [
-        sys.executable,
-        "-m",
-        "vibe_side.execute_signals",
-        "--signals", str(signals_file),
-        "--capital", str(req.capital),
-        "--symbol-suffix", req.symbol_suffix or "",
-        "--symbol-prefix", req.symbol_prefix or "",
-        "--fractional"
-    ]
-    res = subprocess.run(cmd, cwd=str(PROJECT_ROOT), capture_output=True, text=True)
-    if res.returncode != 0:
-        raise HTTPException(status_code=500, detail=f"Fallo al recalcular plan: {res.stderr}")
+    if req.capital <= 0 or req.capital > 100_000_000:
+        raise HTTPException(status_code=400, detail="El capital debe ser un valor positivo válido (máximo 100M).")
+
+    suffix = (req.symbol_suffix or "").strip()
+    prefix = (req.symbol_prefix or "").strip()
+    if not re.match(r"^[a-zA-Z0-9._#-]{0,10}$", suffix):
+        raise HTTPException(status_code=400, detail="Formato de sufijo de símbolo inválido.")
+    if not re.match(r"^[a-zA-Z0-9._#-]{0,10}$", prefix):
+        raise HTTPException(status_code=400, detail="Formato de prefijo de símbolo inválido.")
+
+    try:
+        updated_plan = build_plan(
+            cfg_path=None,
+            signals_path=signals_file,
+            is_live=False,
+            capital_override=req.capital,
+            symbol_suffix=suffix,
+            symbol_prefix=prefix,
+            fractional=True,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Fallo al recalcular plan: {exc}")
 
     orders_path = ARTIFACTS_DIR / "orders_plan.json"
-    with open(orders_path, "r", encoding="utf-8") as fh:
-        updated_plan = json.load(fh)
+    with open(orders_path, "w", encoding="utf-8") as fh:
+        json.dump(updated_plan, fh, indent=2)
+
     return updated_plan
 
 
@@ -685,20 +788,50 @@ def execute_orders(req: OrderSubmitRequest) -> Dict[str, Any]:
         if creds.get("signature_token"):
             env["ORDER_WEBHOOK_SECRET"] = creds["signature_token"]
 
+    # Sanitize symbol prefix/suffix and capital
+    suffix = (req.symbol_suffix or "").strip()
+    prefix = (req.symbol_prefix or "").strip()
+    if not re.match(r"^[a-zA-Z0-9._#-]{0,10}$", suffix):
+        raise HTTPException(status_code=400, detail="Formato de sufijo de símbolo no válido.")
+    if not re.match(r"^[a-zA-Z0-9._#-]{0,10}$", prefix):
+        raise HTTPException(status_code=400, detail="Formato de prefijo de símbolo no válido.")
+
+    capital_val = None
+    if req.account_capital is not None and req.account_capital > 0:
+        if req.account_capital > 100_000_000:
+            raise HTTPException(status_code=400, detail="Capital de cuenta excede límite permitido (100M).")
+        capital_val = str(req.account_capital)
+
     cmd = [sys.executable, "-m", "vibe_side.execute_signals", "--signals", str(ARTIFACTS_DIR / "signals.json")]
 
-    if req.account_capital and req.account_capital > 0:
-        cmd.extend(["--capital", str(req.account_capital)])
-    if req.symbol_suffix:
-        cmd.extend(["--symbol-suffix", req.symbol_suffix])
-    if req.symbol_prefix:
-        cmd.extend(["--symbol-prefix", req.symbol_prefix])
+    if capital_val:
+        cmd.extend(["--capital", capital_val])
+    if suffix:
+        cmd.extend(["--symbol-suffix", suffix])
+    if prefix:
+        cmd.extend(["--symbol-prefix", prefix])
 
     if req.allow_live:
         if not req.order_cmd_template:
             raise HTTPException(status_code=400, detail="El envío real exige order_cmd_template.")
+        template = req.order_cmd_template.strip()
+        if len(template) > 300:
+            raise HTTPException(status_code=400, detail="Plantilla de orden demasiado extensa (máx 300 caracteres).")
+        if re.search(r"[;&|`$()<>\r\n]", template):
+            raise HTTPException(status_code=400, detail="Operadores de shell no permitidos en la plantilla de orden.")
+        if not re.match(r"^[a-zA-Z0-9_\-\.\/ \{\}:=\"']+$", template):
+            raise HTTPException(status_code=400, detail="Caracteres no autorizados en la plantilla de orden.")
+        
+        tokens = template.split()
+        if not tokens:
+            raise HTTPException(status_code=400, detail="Plantilla de orden vacía.")
+        first_bin = Path(tokens[0]).name.lower()
+        forbidden_bins = {"sh", "bash", "zsh", "dash", "cmd", "cmd.exe", "powershell", "powershell.exe", "pwsh", "nc", "netcat", "wget", "curl", "rm", "cat", "chmod", "dd", "mkfifo"}
+        if first_bin in forbidden_bins:
+            raise HTTPException(status_code=400, detail=f"Binario '{first_bin}' restringido por directiva de seguridad.")
+
         env["VIBE_ALLOW_ORDERS"] = "1"
-        cmd.extend(["--submit", "--order-cmd-template", req.order_cmd_template])
+        cmd.extend(["--submit", "--order-cmd-template", template])
 
     result = subprocess.run(cmd, cwd=str(PROJECT_ROOT), env=env, capture_output=True, text=True)
 
@@ -986,10 +1119,18 @@ def test_broker_connection(req: BrokerTestRequest) -> Dict[str, Any]:
 
     elif broker_id == "webhook":
         target_url = creds.get("webhook_url")
-        if target_url and target_url.startswith("http"):
+        if target_url:
+            safe, reason = is_safe_webhook_url(target_url)
+            if not safe:
+                raise HTTPException(status_code=400, detail=f"Destino de webhook denegado por política de seguridad (anti-SSRF): {reason}")
+
             try:
-                test_req = urllib.request.Request(target_url, headers={"User-Agent": "QuantVibe-Webhook-Ping/1.0"})
+                test_req = urllib.request.Request(
+                    target_url,
+                    headers={"User-Agent": "QuantVibe-Webhook-Ping/1.0", "Accept": "*/*"}
+                )
                 with urllib.request.urlopen(test_req, timeout=4) as resp:
+                    _ = resp.read(1024)
                     latency_ms = round((time.perf_counter() - start_time) * 1000, 1)
                     return {
                         "ok": True,
@@ -1265,7 +1406,11 @@ if STATIC_DIR.is_dir():
         # Don't hijack /api
         if full_path.startswith("api/"):
             raise HTTPException(status_code=404, detail="Endpoint no encontrado")
-        target_file = STATIC_DIR / full_path
+        target_file = (STATIC_DIR / full_path).resolve()
+        static_resolved = STATIC_DIR.resolve()
+        if not str(target_file).startswith(str(static_resolved)):
+            raise HTTPException(status_code=403, detail="Acceso denegado")
+
         if target_file.is_file() and full_path != "index.html" and not full_path.endswith(".html"):
             # Unhashed files (favicon, icons): force revalidation so edits propagate
             return FileResponse(str(target_file), headers={"Cache-Control": "no-cache"})
