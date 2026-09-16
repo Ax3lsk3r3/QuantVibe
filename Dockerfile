@@ -24,4 +24,4 @@ COPY web/ web/
 RUN python -m compileall -q bridge qlib_side vibe_side scripts tests \
     && python -m unittest discover -s tests
 
-CMD ["python", "scripts/run_pipeline.py", "--force-demo"]
+CMD ["python", "-m", "bridge.mcp_server"]
