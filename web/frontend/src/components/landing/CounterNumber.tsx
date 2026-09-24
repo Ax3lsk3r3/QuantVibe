@@ -19,11 +19,11 @@ export const CounterNumber: React.FC<CounterNumberProps> = ({
 }) => {
   const [displayValue, setDisplayValue] = useState(0)
   const startTimeRef = useRef<number | null>(null)
-  const startValRef = useRef<number>(0)
+  const latestValRef = useRef<number>(0)
 
   useEffect(() => {
     let animationFrameId: number
-    startValRef.current = displayValue
+    const startVal = latestValRef.current
     startTimeRef.current = null
 
     const step = (timestamp: number) => {
@@ -33,13 +33,15 @@ export const CounterNumber: React.FC<CounterNumberProps> = ({
 
       // Easing out cubic: 1 - pow(1 - progress, 3)
       const easeOut = 1 - Math.pow(1 - progress, 3)
-      const current = startValRef.current + (value - startValRef.current) * easeOut
+      const current = startVal + (value - startVal) * easeOut
 
+      latestValRef.current = current
       setDisplayValue(current)
 
       if (progress < 1) {
         animationFrameId = requestAnimationFrame(step)
       } else {
+        latestValRef.current = value
         setDisplayValue(value)
       }
     }

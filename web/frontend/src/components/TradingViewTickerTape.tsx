@@ -43,9 +43,10 @@ export const TradingViewTickerTape: React.FC<TradingViewTickerTapeProps> = ({ cl
 
     containerRef.current.appendChild(script)
 
+    const container = containerRef.current
     return () => {
-      if (containerRef.current) {
-        containerRef.current.innerHTML = ''
+      if (container) {
+        container.innerHTML = ''
       }
     }
   }, [])

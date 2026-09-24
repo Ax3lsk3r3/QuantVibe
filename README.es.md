@@ -66,7 +66,6 @@ qlib_side/evaluate.py                IC/ICIR/hit-rate + gate de publicación
 qlib_side/export_signals.py          predictions.csv -> evaluación -> signals.json verificado
 vibe_side/execute_signals.py         señales -> plan equal-weight; submit con doble guardia
 web/api.py                           API REST FastAPI, stream SSE y montaje SPA estático
-web/server.py                        ejecutor del servidor web en producción
 web/static/                          paquete compilado de producción del frontend
 web/frontend/                        React 19 + TypeScript + Tailwind + Framer Motion
 scripts/connectors/QuantVibe_Bridge.mq5  Expert Advisor nativo MQL5 para MetaTrader 5

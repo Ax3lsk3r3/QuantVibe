@@ -41,9 +41,14 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Brand — modern geometric sans wordmark */}
           <button
             onClick={() => setActiveTab('landing')}
-            className="apple-press group flex shrink-0 items-baseline gap-2 select-none"
+            className="apple-press group flex shrink-0 items-center gap-2.5 select-none"
             title="Volver al Showcase Institucional"
           >
+            <img
+              src="/favicon.svg"
+              alt="QuantVibe Logo"
+              className="h-7 w-7 rounded-lg object-contain shadow-sm transition-transform duration-200 group-hover:scale-105"
+            />
             <span className="font-sans text-xl font-extrabold tracking-tight text-white">
               Quant<span className="text-[#86868B] transition-colors group-hover:text-white">Vibe</span>
             </span>
