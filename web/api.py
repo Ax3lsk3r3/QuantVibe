@@ -1413,7 +1413,14 @@ if STATIC_DIR.is_dir():
 
         if target_file.is_file() and full_path != "index.html" and not full_path.endswith(".html"):
             # Unhashed files (favicon, icons): force revalidation so edits propagate
-            return FileResponse(str(target_file), headers={"Cache-Control": "no-cache"})
+            return FileResponse(
+                str(target_file),
+                headers={
+                    "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
+                    "Pragma": "no-cache",
+                    "Expires": "0",
+                },
+            )
 
         # Always serve index.html with no-cache headers to prevent browser stale cache
         headers = {
