@@ -1,100 +1,82 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="20 20 465 425" width="100%" height="100%">
   <defs>
-    <!-- Squircle Deep Space Gradient -->
-    <radialGradient id="badgeBg" cx="50%" cy="30%" r="75%">
-      <stop offset="0%" stop-color="#1E1436" />
-      <stop offset="60%" stop-color="#0A0D18" />
-      <stop offset="100%" stop-color="#05060A" />
-    </radialGradient>
-
-    <!-- Purple Nebula Glow behind letters -->
-    <radialGradient id="nebulaGlow" cx="65%" cy="35%" r="45%">
-      <stop offset="0%" stop-color="#9333EA" stop-opacity="0.3" />
-      <stop offset="100%" stop-color="#9333EA" stop-opacity="0" />
-    </radialGradient>
-
-    <!-- Q Platinum Gradient -->
-    <linearGradient id="qSilverB" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FFFFFF" />
-      <stop offset="65%" stop-color="#F1F5F9" />
-      <stop offset="100%" stop-color="#CBD5E1" />
-    </linearGradient>
+    <style>
+      .q-letter {
+        fill: #0F172A;
+        transition: fill 0.2s ease;
+      }
+      @media (prefers-color-scheme: dark) {
+        .q-letter {
+          fill: #FFFFFF;
+        }
+      }
+    </style>
 
     <!-- V Electric Violet Gradient -->
-    <linearGradient id="vPurpleB" x1="10%" y1="0%" x2="90%" y2="100%">
+    <linearGradient id="vPurple" x1="10%" y1="0%" x2="90%" y2="100%">
       <stop offset="0%" stop-color="#C084FC" />
       <stop offset="35%" stop-color="#9333EA" />
-      <stop offset="100%" stop-color="#6B21A8" />
+      <stop offset="100%" stop-color="#7E22CE" />
     </linearGradient>
 
-    <filter id="neonGlowB" x="-40%" y="-40%" width="180%" height="180%">
-      <feDropShadow dx="0" dy="0" stdDeviation="3.5" flood-color="#00E676" flood-opacity="0.85"/>
+    <filter id="neonGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#00E676" flood-opacity="0.8"/>
     </filter>
 
-    <filter id="letterShadowB" x="-15%" y="-15%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.75"/>
+    <filter id="letterShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.4"/>
     </filter>
   </defs>
 
-  <!-- SQUIRCLE BADGE BACKGROUND (Apple 22.5% radius standard) -->
-  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#badgeBg)" stroke="rgba(255, 255, 255, 0.12)" stroke-width="2"/>
+  <!-- LETTERS LAYER (NO BACKGROUND TILE) -->
+  <g filter="url(#letterShadow)">
+    <!-- LETTER Q -->
+    <path class="q-letter" stroke="#FFFFFF" stroke-width="7" stroke-linejoin="round" fill-rule="evenodd" d="
+      M 158,135
+      C 218.75,135 268,184.25 268,245
+      C 268,269.8 259.8,292.8 245.8,311.2
+      L 278,343.4
+      C 284,349.4 279.7,359.8 271.2,359.8
+      L 237,359.8
+      C 231.7,359.8 226.6,357.7 222.8,353.9
+      L 204.6,335.7
+      C 190.4,342.3 174.6,346 158,346
+      C 97.25,346 48,296.75 48,245
+      C 48,183.25 97.25,135 158,135 Z
+      M 158,183
+      C 123.76,183 96,210.76 96,245
+      C 96,279.24 123.76,307 158,307
+      C 171.6,307 184.2,302.6 194.4,295.2
+      L 179.2,280
+      C 175.7,276.5 178.2,270.5 183.2,270.5
+      L 208,270.5
+      C 214.5,270.5 218,277.8 214.2,283.1
+      C 217.9,271.8 220,259.6 220,245
+      C 220,210.76 192.24,183 158,183 Z
+    "/>
+
+    <!-- LETTER V -->
+    <path fill="url(#vPurple)" stroke="#FFFFFF" stroke-width="4" stroke-opacity="0.3" stroke-linejoin="round" d="
+      M 275,135
+      L 345,345
+      C 348,354 356.5,359.5 366,359.5
+      C 375.5,359.5 384,354 387,345
+      L 457,135
+      C 459.8,126.5 453.5,118 444.5,118
+      L 403,118
+      C 397,118 391.8,122 389.8,128
+      L 366,220
+      L 342.2,128
+      C 340.2,122 335,118 329,118
+      L 287.5,118
+      C 278.5,118 272.2,126.5 275,135 Z
+    "/>
+  </g>
+
+  <!-- CANDLESTICK ALPHA STREAM -->
   
-  <!-- Subtle Internal Highlight / Specular Reflection -->
-  <path d="M 124,18 L 388,18 C 452,18 480,46 480,110 L 480,180 C 350,140 162,140 32,180 L 32,110 C 32,46 60,18 124,18 Z" fill="white" opacity="0.03"/>
-
-  <!-- Purple Ambient Glow -->
-  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#nebulaGlow)" />
-
-  <!-- SCALED INNER LOGO (Transform to fit comfortably with generous safe margin) -->
-  <g transform="translate(25.6, 25.6) scale(0.9)">
-    <!-- LETTERS -->
-    <g filter="url(#letterShadowB)">
-      <!-- Q -->
-      <path fill="url(#qSilverB)" fill-rule="evenodd" d="
-        M 158,135
-        C 218.75,135 268,184.25 268,245
-        C 268,269.8 259.8,292.8 245.8,311.2
-        L 278,343.4
-        C 284,349.4 279.7,359.8 271.2,359.8
-        L 237,359.8
-        C 231.7,359.8 226.6,357.7 222.8,353.9
-        L 204.6,335.7
-        C 190.4,342.3 174.6,346 158,346
-        C 97.25,346 48,296.75 48,245
-        C 48,183.25 97.25,135 158,135 Z
-        M 158,183
-        C 123.76,183 96,210.76 96,245
-        C 96,279.24 123.76,307 158,307
-        C 171.6,307 184.2,302.6 194.4,295.2
-        L 179.2,280
-        C 175.7,276.5 178.2,270.5 183.2,270.5
-        L 208,270.5
-        C 214.5,270.5 218,277.8 214.2,283.1
-        C 217.9,271.8 220,259.6 220,245
-        C 220,210.76 192.24,183 158,183 Z
-      "/>
-
-      <!-- V -->
-      <path fill="url(#vPurpleB)" d="
-        M 275,135
-        L 345,345
-        C 348,354 356.5,359.5 366,359.5
-        C 375.5,359.5 384,354 387,345
-        L 457,135
-        C 459.8,126.5 453.5,118 444.5,118
-        L 403,118
-        C 397,118 391.8,122 389.8,128
-        L 366,220
-        L 342.2,128
-        C 340.2,122 335,118 329,118
-        L 287.5,118
-        C 278.5,118 272.2,126.5 275,135 Z
-      "/>
-    </g>
-
-    <!-- CANDLESTICKS -->
-    <g id="candlestickStreamBadge">
-      
+  <g id="candlestickStream">
+    
       <!-- Candle x=32 -->
       <line x1="32" y1="400" x2="32" y2="442" stroke="#000000" stroke-width="4.5" stroke-linecap="round" opacity="0.55"/>
       <line x1="32" y1="400" x2="32" y2="442" stroke="#FF3366" stroke-width="2.5" stroke-linecap="round"/>
@@ -268,6 +250,5 @@
       <line x1="480" y1="30" x2="480" y2="80" stroke="#00E676" stroke-width="2.5" stroke-linecap="round"/>
       <rect x="474.5" y="37" width="11" height="34" rx="2" fill="#000000" opacity="0.55"/>
       <rect x="475.5" y="38" width="9" height="32" rx="1.5" fill="#00E676" filter="url(#neonGlow)"/>
-    </g>
   </g>
 </svg>
